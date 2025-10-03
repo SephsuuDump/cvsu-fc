@@ -1,0 +1,30 @@
+button
+
+.header-wrapper {
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+
+.header-wrapper.show {
+  transform: translateY(0);
+}
+
+.header-wrapper.hide {
+  transform: translateY(-100%);
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center-x {
+    display: flex;
+    justify-content: center;
+}
+
+.flex-center-y {
+    display: flex;
+    align-items: center;
+}

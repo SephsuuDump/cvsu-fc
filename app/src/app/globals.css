@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-darkgreen: #016630;
+  --color-gray: #6a7282;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  /* background: var(--background); */
+  font-family: "Merriweather Sans", sans-serif;
+  /* font-family: 'Poppins', Arial, sans-serif; */
+}
+
+.head {
+    font-family: "Inter", sans-serif;
+}
+
+.body {
+  font-family: "Merriweather", serif;
+}
+
+@layer utilities {
+  .stack-sm {
+    @apply flex flex-col gap-1;
+  }
+  .stack-md {
+    @apply flex flex-col gap-2;
+  }
+  .stack-lg {
+    @apply flex flex-col gap-4;
+  }
+
+  .row-sm {
+    @apply flex gap-1;
+  }
+  .row-md {
+    @apply flex gap-2;
+  }
+  .row-lg {
+    @apply flex gap-4;
+  }
+}

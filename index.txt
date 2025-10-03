@@ -1,0 +1,154 @@
+Got it ✅ — you’re tasked to implement the **frontend of CvSU Faculty Connect** in **Next.js** based on the functional requirements.
+I’ll give you a **detailed route plan** (pages + subpages), their **features**, and how they map to the requirements.
+
+---
+
+# 🌐 Next.js Route Plan for **CvSU Faculty Connect**
+
+### 1. `/` → **Landing Page / Login**
+
+**Features:**
+
+* Welcome banner and school branding (CvSU Faculty Connect).
+* Per campus role (admin, coordinator, member, job offer).
+* Login form (Email/Password or Single Sign-On if available).
+* Links: *Forgot Password*.
+* Redirect based on role: Faculty → `/dashboard`, Admin → `/admin`.
+
+---
+
+### 2. `/dashboard` → **Faculty Dashboard**
+
+**Main Requirement:** Faculty Dashboard
+**Features:**
+
+- Admin (all campuses)
+* Announcements 
+  - w/ label (urgent/priority)
+  - can modify visbility
+* Analytics
+  - Monthly allocation 
+* Calendar
+  - Schedule of events 
+
+- Coordinator (assigned campus)
+* Announcements 
+  - w/ label (urgent/priority)
+  - can modify visbility
+* Analytics
+  - Monthly allocation 
+* Calendar
+  - Schedule of events 
+
+- Member and JO (view only)
+* Announcements 
+  - w/ label (urgent/priority)
+  - can modify visbility
+* Analytics
+  - Monthly allocation 
+* Calendar
+  - Schedule of events 
+
+---
+
+### 3. `/profile` → **Profile Management**
+
+**Main Requirement:** Profile Management
+**Features:**
+
+- All end user except Admin
+* Full Name, Contact No., E-mail, Member Since, Highest Educ Attainment, Position
+
+### 4. `/calendar` → **Events Calendar**
+
+**Main Requirement:** Calendar
+**Features:**
+
+- Calendar
+* Can view events  
+
+* Monthly/Weekly view of events.
+* Event details on click (title, description, date, organizer).
+* Filter: Faculty events, University events, Deadlines.
+* Faculty can subscribe to specific events.
+* Sync button (option to export to Google Calendar or iCal).
+
+---
+
+### 5. `/cash-assistance` → **Cash Assistance Monitoring**
+
+**Main Requirement:** Cash Assistance Monitoring
+**Features:**
+
+* Anonymous dashboard:
+
+  * Displays **total assistance funds disbursed** (aggregate only).
+  * Graph of disbursements over time (no names).
+* Download summary button (PDF/CSV).
+* Admin-only view: Add/Edit records (hidden from faculty).
+
+---
+
+### 6. `/contributions` → **Faculty Cash Contributions**
+
+- Contributions
+
+### 7. `/communication` → **Messaging & Announcements**
+
+**Main Requirement:** Communication
+**Features:**
+
+* Person to person only
+* Within same campus
+
+### 8. `/admin` (Optional, if you have admin role)
+
+**For administrators only**
+
+* Manage faculty profiles (add/update/remove).
+* Manage contributions and assistance records.
+* Post announcements and events.
+* Generate reports.
+
+---
+
+# 🛠️ Frontend Implementation Notes (Next.js + TailwindCSS)
+
+* **Layout System:**
+
+  * `components/Layout.tsx` → Navbar, Sidebar, Footer.
+  * Dashboard & Admin pages share a protected layout.
+* **Auth Guard:**
+
+  * Middleware for role-based access (`faculty`, `admin`).
+* **UI Libraries:**
+
+  * TailwindCSS (for layout/styling).
+  * shadcn/ui or Material UI (for components like tables, modals, forms).
+* **State Management:**
+
+  * React Query or SWR for API calls.
+* **Data Visualization:**
+
+  * Recharts/Chart.js for contribution & assistance graphs.
+* **Calendar:**
+
+  * FullCalendar React for events.
+
+---
+
+# 📑 Summary Mapping of Requirements to Routes
+
+| Requirement                | Next.js Route      | Key Feature(s)                                                 |
+| -------------------------- | ------------------ | -------------------------------------------------------------- |
+| Faculty Dashboard          | `/dashboard`       | Profile summary, announcements, calendar preview, quick links. |
+| Profile Management         | `/profile`         | View/edit personal + academic details.                         |
+| Calendar                   | `/calendar`        | Full event calendar with filters & export.                     |
+| Cash Assistance Monitoring | `/cash-assistance` | Anonymous disbursement tracking + graph.                       |
+| Communication              | `/communication`   | Messaging inbox + announcement board.                          |
+| Record-Keeping             | `/contributions`   | Faculty contributions table, summary, reports.                 |
+| Admin Functions (optional) | `/admin`           | Manage data, announcements, reports.                           |
+
+---
+
+👉 Do you want me to **make a Next.js folder/file structure** (with example `pages/` or `app/` routes and components) so you can scaffold this project faster?
