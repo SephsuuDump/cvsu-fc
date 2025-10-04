@@ -1,3 +1,5 @@
+import { Announcement } from "@/types/announcement";
+
 export const announcementsMock: Announcement[] = [
     {
         id: 1, label: "Urgent",

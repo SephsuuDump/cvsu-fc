@@ -11,7 +11,7 @@ interface LoaderProps {
 }
 
 export function FormLoader({ onProcess, label, loadingLabel }: LoaderProps) {
-    if (onProcess) return <><LoaderCircle className="w-4 h-4 text-light animate-spin" />{ loadingLabel }</>
+    if (onProcess) return <><LoaderCircle className="w-4 h-4 text-white animate-spin" />{ loadingLabel }</>
     else return <>{ label }</>
 }
 

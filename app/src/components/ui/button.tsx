@@ -76,9 +76,9 @@ function AddButton({
         // onClick={ handleSubmit }
         disabled={ onProcess }
         size="sm"
-        className="!bg-darkgreen hover:opacity-90"
+        className="text-white !bg-darkgreen hover:opacity-90"
     >
-        {!onProcess && <Plus className="w-4 h-4 text-light" />}
+        {!onProcess && <Plus className="w-4 h-4 text-white" />}
         <FormLoader onProcess={ onProcess } label={ label ?? "Yes, I'm sure." } loadingLabel={ loadingLabel || "Loading" } />
     </Button>
   );

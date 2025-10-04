@@ -1,0 +1,98 @@
+"use client"
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+
+export function Calendar({ className }: {
+    className?: string;
+}) {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+    // Get days in month
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    // First day index (0=Sunday)
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const handlePrev = () => {
+        if (currentMonth === 0) {
+        setCurrentMonth(11);
+        setCurrentYear(currentYear - 1);
+        } else {
+        setCurrentMonth(currentMonth - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentMonth === 11) {
+        setCurrentMonth(0);
+        setCurrentYear(currentYear + 1);
+        } else {
+        setCurrentMonth(currentMonth + 1);
+        }
+    };
+
+    // Create empty slots for offset before month starts
+    const emptyDays = Array.from({ length: firstDay });
+
+    // Generate all days
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    return (
+        <section className={`${className} bg-slate-50`}>
+            {/* Header */}
+            <div className="flex justify-between items-center p-4">
+                <button onClick={handlePrev} className="p-2 hover:bg-gray-100 rounded">
+                <ChevronLeft />
+                </button>
+                <h2 className="font-semibold text-lg">
+                {monthNames[currentMonth]} {currentYear}
+                </h2>
+                <button onClick={handleNext} className="p-2 hover:bg-gray-100 rounded">
+                <ChevronRight />
+                </button>
+            </div>
+
+            <div className="grid grid-cols-7 text-center font-medium text-gray-600">
+                {weekDays.map((day) => (
+                <div key={day} className="py-1">{day}</div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-7 text-center">
+                    {emptyDays.map((_, i) => (
+                        <div key={`empty-${i}`} />
+                    ))}
+                    {days.map((day, index) => {
+                        const isToday =
+                            day === today.getDate() &&
+                            currentMonth === today.getMonth() &&
+                            currentYear === today.getFullYear();
+
+                        const dayOfWeek = (firstDay + day - 1) % 7;
+                        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                        return (
+                            <button
+                                key={day}
+                                className={`text-start p-2 m-1 aspect-square bg-slate-100 shadow-sm border-slate-200 rounded-lg hover:bg-green-100
+                                    ${isToday ? "!bg-sky-100 font-bold" : ""}
+                                    ${isWeekend ? "text-darkred" : "text-gray-600"}
+                                `}
+                            >
+                                <div className="text-lg font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
+                                <div className="text-xs font-bold tracking-wider">0 EVENTS</div>
+                            </button>
+                        );
+                    })}
+            </div>
+        </section>
+    )
+}

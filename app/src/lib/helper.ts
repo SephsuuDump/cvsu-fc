@@ -63,3 +63,46 @@ export function formatCustomDate(dateString: string): string {
         year: "numeric",
     })} at ${formatTime(date)}`;
 }
+
+export function formatEventRange(eventStart: string, eventEnd: string): string {
+    const start = new Date(eventStart);
+    const end = new Date(eventEnd);
+
+    const sameDay =
+        start.getFullYear() === end.getFullYear() &&
+        start.getMonth() === end.getMonth() &&
+        start.getDate() === end.getDate();
+
+    const sameMonth =
+        start.getFullYear() === end.getFullYear() &&
+        start.getMonth() === end.getMonth();
+
+    const formatTime = (date: Date) =>
+        `${date.getHours().toString().padStart(2, "0")}:${date
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
+
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const startMonth = monthNames[start.getMonth()];
+    const endMonth = monthNames[end.getMonth()];
+
+    const startDay = start.getDate();
+    const endDay = end.getDate();
+    const year = start.getFullYear(); // assumes same year (can be extended)
+
+    if (sameDay) {
+        // 🟩 Same day
+        return `${startMonth} ${startDay}, ${year} ${formatTime(start)} - ${formatTime(end)}`;
+    } else if (sameMonth) {
+        // 🟨 Same month
+        return `${startMonth} ${startDay} ${formatTime(start)} - ${endMonth} ${endDay} ${formatTime(end)}, ${year}`;
+    } else {
+        // 🟥 Different months
+        return `${startMonth} ${startDay} ${formatTime(start)} - ${endMonth} ${endDay} ${formatTime(end)}, ${year}`;
+    }
+}

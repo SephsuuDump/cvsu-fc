@@ -12,7 +12,7 @@
 // announcement_id fk -> announcements
 // image_url text
 
-type Announcement = {
+export type Announcement = {
     id: number;
     label: string;
     content: string;
@@ -20,9 +20,20 @@ type Announcement = {
     createdAt: string;
 
     user: {
-        id?: number;
+        id: number;
         lastName: string;
         firstName: string;
         middleName?: string; 
     }
+
+    userId?: number;
+    announcementImages?: []
+
 }
+
+export const announcementInit: Partial<Announcement> = {
+    userId: 0,
+    content: '',
+    announcementImages: [],
+    createdAt: '',
+};
