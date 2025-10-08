@@ -2,6 +2,8 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { octoberEvents } from "../../../../public/mock/events";
+import { useEventCounts } from "@/hooks/use-event-count";
 
 export function Calendar({ className }: {
     className?: string;
@@ -10,10 +12,8 @@ export function Calendar({ className }: {
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
-    // Get days in month
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // First day index (0=Sunday)
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
     const monthNames = [
@@ -46,9 +46,11 @@ export function Calendar({ className }: {
 
     // Generate all days
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+    const eventCounts = useEventCounts(octoberEvents, currentMonth, currentYear);
+
     return (
         <section className={`${className} bg-slate-50`}>
-            {/* Header */}
             <div className="flex justify-between items-center p-4">
                 <button onClick={handlePrev} className="p-2 hover:bg-gray-100 rounded">
                 <ChevronLeft />
@@ -79,16 +81,19 @@ export function Calendar({ className }: {
 
                         const dayOfWeek = (firstDay + day - 1) % 7;
                         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                        const eventCount = eventCounts[day] || 0;
+
                         return (
                             <button
                                 key={day}
                                 className={`text-start p-2 m-1 aspect-square bg-slate-100 shadow-sm border-slate-200 rounded-lg hover:bg-green-100
-                                    ${isToday ? "!bg-sky-100 font-bold" : ""}
+                                    ${isToday ? "!bg-green-100 font-bold" : ""}
                                     ${isWeekend ? "text-darkred" : "text-gray-600"}
+                                    ${eventCount > 0 && "!text-green-600"}
                                 `}
                             >
                                 <div className="text-lg font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
-                                <div className="text-xs font-bold tracking-wider">0 EVENTS</div>
+                                <div className="text-xs font-bold tracking-wider">{eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}</div>
                             </button>
                         );
                     })}

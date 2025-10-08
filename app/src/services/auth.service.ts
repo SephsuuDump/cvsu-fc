@@ -5,7 +5,13 @@ import { User } from "@/types/user";
 const url = `${BASE_URL}/auth`
 
 export class AuthService {
-    static async authenticateUser(credentials: object) {
+    static async login(credentials: Partial<User>) {
+        // takes a partial User and returns a token whuch carries the claim of user
+        // sample body
+        // {
+        //     'email': '',
+        //     'password': ''
+        // }
         return await requestData(
             `${url}/login`,
             'POST',
@@ -13,6 +19,27 @@ export class AuthService {
             credentials
         )
     } 
+
+    static async register(user: Partial<User>) {
+        // creation of user and returns the user created
+        // sample body
+        // {   
+        //     'email': '',
+        //     'password': '',
+        //     'firstName': '',
+        //     'middleName': '',
+        //     'lastName': '',
+        //     'campusId': 0,
+        //     'contact', '',
+        //     'highestEducationalAttainment': '',
+        // }
+        return await requestData(
+            `${url}/register`,
+            'POST',
+            undefined,
+            user
+        ) 
+    }
 
     static async getCookie() {
         return await requestData(
@@ -34,26 +61,6 @@ export class AuthService {
         return await requestData(
             `/api/delete-token`,
             'POST'
-        )
-    }
-
-    static async registerUser(user: User) {
-        delete user.branch
-
-        return await requestData(
-            `${url}/register`,
-            'POST',
-            undefined,
-            user
-        )
-    }
-
-    async updateCredentials(credentials: object) {
-        return await requestData(
-            `${url}/update-credentials`,
-            'POST',
-            undefined,
-            credentials
         )
     }
 }

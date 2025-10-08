@@ -58,4 +58,18 @@ body {
   .row-lg {
     @apply flex gap-4;
   }
+
+  .thead {
+    @apply font-semibold py-4 text-sm
+  }
+  .th {
+    @apply pl-2
+  }
+  .tdata {
+    @apply border-1 border-slate-200 text-sm py-3
+  }
+  .td {
+    @apply pl-2 truncate
+  }
+
 }

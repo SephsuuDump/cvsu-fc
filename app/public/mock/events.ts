@@ -1,5 +1,6 @@
 export const eventsMock: FCEvent[] = [
     {
+        id: 1,
         title: "Faculty Orientation",
         description: "Introduction for new faculty members about university policies and teaching guidelines.",
         organizer: "Office of Academic Affairs",
@@ -9,6 +10,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-01-10T12:00:00Z",
     },
     {
+        id: 2,
         title: "Research Symposium 2025",
         description: "A presentation of research findings from different colleges across the university.",
         organizer: "Research and Development Office",
@@ -18,6 +20,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-02-15T15:00:00Z",
     },
     {
+        id: 3,
         title: "Curriculum Review Meeting",
         description: "Department heads and program coordinators discuss proposed curriculum updates.",
         organizer: "Curriculum Committee",
@@ -27,6 +30,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-03-05T15:00:00Z",
     },
     {
+        id: 4,
         title: "Midterm Examination Week",
         description: "Scheduled midterm examinations for all academic programs.",
         organizer: "Registrar’s Office",
@@ -36,6 +40,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-03-22T17:00:00Z",
     },
     {
+        id: 5,
         title: "University Foundation Day",
         description: "Annual celebration of the university’s founding with various cultural and sports activities.",
         organizer: "University Events Committee",
@@ -45,6 +50,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-04-10T17:00:00Z",
     },
     {
+        id: 6,
         title: "Faculty Development Seminar",
         description: "Professional development seminar focusing on innovative teaching methods.",
         organizer: "Human Resource Department",
@@ -54,6 +60,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-05-20T16:00:00Z",
     },
     {
+        id: 7,
         title: "Enrollment Period - First Semester",
         description: "Open enrollment period for the upcoming academic term.",
         organizer: "Registrar’s Office",
@@ -63,6 +70,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-06-15T17:00:00Z",
     },
     {
+        id: 8,
         title: "Student Research Defense",
         description: "Undergraduate students defend their research before a panel of evaluators.",
         organizer: "College of Science",
@@ -72,6 +80,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-07-12T12:00:00Z",
     },
     {
+        id: 9,
         title: "Career Fair 2025",
         description: "An opportunity for students to connect with companies and explore job openings.",
         organizer: "Career Placement Office",
@@ -81,6 +90,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-08-22T16:00:00Z",
     },
     {
+        id: 10,
         title: "Community Outreach Program",
         description: "Volunteer activity aimed at supporting local communities through service projects.",
         organizer: "Extension Services Office",
@@ -90,6 +100,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-09-14T15:00:00Z",
     },
     {
+        id: 11,
         title: "Final Examination Week",
         description: "Finals week for all courses before the semester ends.",
         organizer: "Registrar’s Office",
@@ -99,6 +110,7 @@ export const eventsMock: FCEvent[] = [
         eventEnd: "2025-10-31T17:00:00Z",
     },
     {
+        id: 12,
         title: "Christmas Celebration",
         description: "Year-end university-wide Christmas party and gift-giving program.",
         organizer: "University Events Committee",
@@ -106,5 +118,68 @@ export const eventsMock: FCEvent[] = [
         createdAt: "2025-12-15T16:00:00Z",
         eventStart: "2025-12-15T16:00:00Z",
         eventEnd: "2025-12-15T22:00:00Z",
+    },
+];
+
+export const octoberEvents: FCEvent[] = [
+    {
+        id: 13,
+        title: "Teachers’ Appreciation Day",
+        description: "A school-wide celebration to honor all teachers and staff members.",
+        organizer: "School Admin",
+        visibility: "Public",
+        eventStart: "2025-10-05T08:00:00Z",
+        eventEnd: "2025-10-05T12:00:00Z",
+        createdAt: "2025-09-25T09:00:00Z",
+    },
+    {
+        id: 14,
+        title: "Student Leadership Summit",
+        description: "A seminar focused on leadership development and team-building.",
+        organizer: "Student Council",
+        visibility: "Private",
+        eventStart: "2025-10-10T09:30:00Z",
+        eventEnd: "2025-10-10T15:00:00Z",
+        createdAt: "2025-09-28T14:00:00Z",
+    },
+    {
+        id: 15,
+        title: "Community Outreach Program",
+        description: "An outreach activity to support local communities through volunteer work.",
+        organizer: "Civic Department",
+        visibility: "Public",
+        eventStart: "2025-10-15T07:00:00Z",
+        eventEnd: "2025-10-15T11:00:00Z",
+        createdAt: "2025-09-30T08:00:00Z",
+    },
+    {
+        id: 16,
+        title: "Campus Clean-Up Drive",
+        description: "Environmental awareness campaign and clean-up event inside the campus.",
+        organizer: "Environmental Club",
+        visibility: "Public",
+        eventStart: "2025-10-20T06:30:00Z",
+        eventEnd: "2025-10-20T10:30:00Z",
+        createdAt: "2025-10-01T09:00:00Z",
+    },
+    {
+        id: 17,
+        title: "Intramurals 2025 Opening Ceremony",
+        description: "Kick-off of the annual sports festival with parade and lighting of torch.",
+        organizer: "Sports Committee",
+        visibility: "Public",
+        eventStart: "2025-10-25T08:00:00Z",
+        eventEnd: "2025-10-25T17:00:00Z",
+        createdAt: "2025-10-03T10:00:00Z",
+    },
+    {
+        id: 18,
+        title: "Intramurals 2025 Main Event",
+        description: "Continuation of the university sports festival with various athletic competitions.",
+        organizer: "Sports Committee",
+        visibility: "Public",
+        eventStart: "2025-10-25T08:00:00Z",
+        eventEnd: "2025-10-29T17:00:00Z",
+        createdAt: "2025-10-03T10:00:00Z",
     },
 ];

@@ -1,9 +1,13 @@
 type Claim = {
-    campusId: number;
-    campusName: string;
     id: number;
+    firstName: string;
+    lastName: string;
+    campus: {
+        id: number;
+        name: string;
+    };
+    role: string;
     iat: number;
     exp: number;
-    role: string;
 }
 

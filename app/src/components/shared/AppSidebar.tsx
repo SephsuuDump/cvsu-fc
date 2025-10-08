@@ -2,83 +2,59 @@
 
 import { useAuth } from "@/hooks/use-auth"
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarTrigger } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarTrigger, useSidebar } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { coordinatorRoute } from "@/lib/page-route";
 
 export function AppSidebar() {
     const { claims, loading } = useAuth();
+    const { open } = useSidebar();
     const pathName = usePathname();
     if (pathName === '/auth') return null;
-    let route: any[] = [];
+    let route: any[] = coordinatorRoute;
     
     return (
         <Sidebar
             collapsible="icon"
         >
             <SidebarTrigger 
-                className="rounded-full shadow-6xl bg-white absolute z-50 right-[-20px] top-[47%] -translate-x-1/2 -translate-y-1/2"
-                // onClick={() => setIsCollapsed(!isCollapsed)}
+                className="rounded-full shadow-6xl bg-white absolute z-50 right-[-28px] top-[47%] -translate-x-1/2 -translate-y-1/2"
             />
             <SidebarContent 
-                className="rounded-md"
+                className={`rounded-md bg-cover border-r-green-100 border-0`}
                 style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
             >
-                <Link href="/auth/login">
+                <Link 
+                    className="text-center aspect-auto"
+                    href="/auth/login"
+                >
                     <Image
-                        src="/images/papiverse_logo.png"
+                        src="/images/cvsu_logo.png"
                         alt="Papiverse Logo"
-                        width={150}
-                        height={150}
+                        width={open ? 50 : 30}
+                        height={open ? 50 : 30}
                         className="mx-auto mt-4"
                     />
+                    <div className={`font-bold text-lg ${!open && "text-sm"}`}>CvSU</div>
+                    <div className={`text-xs font-semibold text-darkgreen -mt-1 ${!open && "text-[8px]"}`}>FACULTY CONNECT</div>
                 </Link>
-                <SidebarMenu>
+                <SidebarMenu className={`mt-4 ${!open && "flex-center"}`}>
                     {route?.map((item, i) => (
-                        item.children.length !== 0 ?
-                        <Collapsible className="group/collapsible" key={ i }>
+                        <Link 
+                            href={ item.href } 
+                            className={`group/collapsible w-full hover:bg-slate-50 rounded-md ${!open && 'flex-center'}`} 
+                            key={ i }
+                        >
                             <SidebarMenuItem>
-                                <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton className="flex gap-2 pl-4">
-                                        <item.icon className="w-4 h-4" />
-                                        { item.title }
-                                        <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                    </SidebarMenuButton>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <SidebarMenuSub>
-                                        {item.children.map((sub: any, index: number) => (
-                                            <SidebarMenuButton className="py-0" key={ index }>
-                                                <Link 
-                                                    href={ sub.href } 
-                                                    className="flex-center-y w-full h-full my-auto"
-                                                >
-                                                    { sub.title }
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        ))}
-                                    </SidebarMenuSub>
-                                </CollapsibleContent>
+                                <SidebarMenuButton className="flex gap-2 pl-4">
+                                    <item.icon className="w-4 h-4" />
+                                    { item.title }
+                                </SidebarMenuButton>
                             </SidebarMenuItem>
-                        </Collapsible>
-                        :
-                        <Collapsible key={ i }>
-                            <SidebarMenuItem>
-                                <CollapsibleTrigger asChild>
-                                        <SidebarMenuButton className="flex gap-2 !py-0 pl-4">
-                                            <Link 
-                                                href={ item.href! }
-                                                className="flex-center-y gap-2 w-full h-full"
-                                            >
-                                                <item.icon className="w-4 h-4" />
-                                                { item.title }
-                                            </Link>
-                                        </SidebarMenuButton>
-                                </CollapsibleTrigger>
-                            </SidebarMenuItem>
-                        </Collapsible>
+                        </Link>
                     ))}
                 </SidebarMenu>
             </SidebarContent>

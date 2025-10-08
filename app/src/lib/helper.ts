@@ -64,6 +64,70 @@ export function formatCustomDate(dateString: string): string {
     })} at ${formatTime(date)}`;
 }
 
+export const fromatMessageDateTime = (messageDateTime: string): string => {
+    const now = new Date();
+    let date: Date;
+
+    // Try to parse messageDateTime if it contains "Today" or exact time only
+    // Otherwise, parse it as a Date object if possible
+    if (messageDateTime.startsWith("Today")) {
+        // Format: "Today 2:30 PM" => show time only
+        const parts = messageDateTime.split(" ");
+        return parts.slice(1, 3).join(" ");
+    } else if (/^\d{1,2}:\d{2} (AM|PM)$/.test(messageDateTime)) {
+        // Already a time string, return as is
+        return messageDateTime;
+    } else if (/^[A-Za-z]{3} \d{1,2}$/.test(messageDateTime)) {
+        // Date string "Jul 10" - already date format, return as is
+        return messageDateTime;
+    } else if (/^[A-Za-z]{3}$/.test(messageDateTime)) {
+        // Just day name, return as is
+        return messageDateTime;
+    } else {
+        // Try parsing date strings like "Jul 10", "Mon 3:20 PM", or "Yesterday"
+        if (messageDateTime.startsWith("Yesterday")) {
+        date = new Date();
+        date.setDate(date.getDate() - 1);
+        return date.toLocaleDateString("en-US", { weekday: "short" }); // e.g. "Tue"
+        } else if (/^[A-Za-z]{3} \d{1,2} \d{1,2}:\d{2} (AM|PM)$/.test(messageDateTime)) {
+        // "Jul 10 5:00 PM"
+        const [monthDay] = messageDateTime.split(" ");
+        return monthDay; // Just date only "Jul 10"
+        } else if (/^[A-Za-z]{3} \d{1,2}$/.test(messageDateTime)) {
+        return messageDateTime; // already date only
+        } else if (/^[A-Za-z]{3} \d{1,2} \d{4}$/.test(messageDateTime)) {
+        // "Jul 10 2023" - just return "Jul 10"
+        return messageDateTime.split(" ").slice(0, 2).join(" ");
+        } else if (/^[A-Za-z]{3}$/.test(messageDateTime)) {
+        return messageDateTime; // day name
+        }
+    }
+
+    // If original messageDateTime is a valid date string:
+    date = new Date(messageDateTime);
+    if (isNaN(date.getTime())) {
+        // If date is invalid, just return original string
+        return messageDateTime;
+    }
+
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // difference in days
+
+    if (diffDays === 0) {
+        // Today - show time like "2:30 PM"
+        return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    } else if (diffDays === 1) {
+        // Yesterday - show day name, e.g. "Tue"
+        return date.toLocaleDateString("en-US", { weekday: "short" });
+    } else if (diffDays > 7) {
+        // More than 1 week old - show date "Jul 10"
+        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } else {
+        // Between 2 and 7 days old - show day name e.g. "Mon"
+        return date.toLocaleDateString("en-US", { weekday: "short" });
+    }
+};
+
 export function formatEventRange(eventStart: string, eventEnd: string): string {
     const start = new Date(eventStart);
     const end = new Date(eventEnd);

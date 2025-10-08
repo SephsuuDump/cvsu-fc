@@ -1,4 +1,5 @@
 type FCEvent = {
+    id: number;
     title: string;
     description: string;
     organizer: string;
