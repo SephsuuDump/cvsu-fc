@@ -34,6 +34,7 @@ export function useFetchData<T>(
                 const message = err?.message || "Failed to fetch data";
                 setError(message);
                 toast.error(message);
+                console.log('Error:', err);
             } finally {
                 if (isMounted) setLoading(false);
             }

@@ -31,5 +31,15 @@ export type User = {
     updatedAt: string;
     isDeleted: string;
 
+    college: {
+        id: number,
+        name: string;
+    };
+
+    department: {
+        id: number,
+        name: string;
+    }
+
     confirmPassword?: string;
 }

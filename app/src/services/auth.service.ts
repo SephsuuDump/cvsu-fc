@@ -6,16 +6,10 @@ const url = `${BASE_URL}/auth`
 
 export class AuthService {
     static async login(credentials: Partial<User>) {
-        // takes a partial User and returns a token whuch carries the claim of user
-        // sample body
-        // {
-        //     'email': '',
-        //     'password': ''
-        // }
         return await requestData(
             `${url}/login`,
             'POST',
-            undefined,
+            { "Accept": "application/json" },
             credentials
         )
     } 

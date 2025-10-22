@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { hasEmptyField, updateField } from "@/lib/helper";
+import { AuthService } from "@/services/auth.service";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,12 +15,25 @@ const loginCredentialInit = {
 }
 
 export function AuthPage() {
+    const [onProcess, setProcess] = useState(false);
     const [credentials, setCredentials] = useState(loginCredentialInit);
 
     async function handleSubmit() {
         try {
+            setProcess(true);
+            const token = await AuthService.login(credentials);
+            console.log(token);
+            
+            if (token.token) {
+                localStorage.setItem('token', token);
+                const res = await AuthService.setCookie(token);
+                toast.success(res.message);
+                window.location.href = '/'
+            }
         } catch (error) { toast.error(`${error}`) }
+        finally { setProcess(false) }
     }
+
     return (
         <section className="flex-center flex-col h-screen">
             <img
@@ -65,8 +79,12 @@ export function AuthPage() {
                     </div>  
                     <Button 
                         type="submit"
-                        disabled={hasEmptyField(credentials)}
+                        disabled={hasEmptyField(credentials) || onProcess}
                         className="!bg-darkgreen font-bold text-white"
+                        onSubmit={ e => {
+                            e.preventDefault();
+                            handleSubmit();
+                        }}
                     >
                         LOGIN
                     </Button>

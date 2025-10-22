@@ -1,7 +1,10 @@
-export const campusesMock = [
+import { Campus } from "@/types/campus";
+
+export const campusesMock: Campus[] = [
     {
         id: 1,
         name: "CvSU Main Campus (Indang)",
+        location: "Indang, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -9,6 +12,7 @@ export const campusesMock = [
     {
         id: 2,
         name: "CvSU Bacoor City Campus",
+        location: "Bacoor City, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -16,6 +20,7 @@ export const campusesMock = [
     {
         id: 3,
         name: "CvSU Carmona Campus",
+        location: "Carmona, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -23,6 +28,7 @@ export const campusesMock = [
     {
         id: 4,
         name: "CvSU Cavite City Campus",
+        location: "Cavite City, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -30,6 +36,7 @@ export const campusesMock = [
     {
         id: 5,
         name: "CvSU General Trias City Campus",
+        location: "General Trias City, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -37,6 +44,7 @@ export const campusesMock = [
     {
         id: 6,
         name: "CvSU Imus City Campus",
+        location: "Imus City, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -44,6 +52,7 @@ export const campusesMock = [
     {
         id: 7,
         name: "CvSU Naic Campus",
+        location: "Naic, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -51,6 +60,7 @@ export const campusesMock = [
     {
         id: 8,
         name: "CvSU Rosario Campus",
+        location: "Rosario, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -58,6 +68,7 @@ export const campusesMock = [
     {
         id: 9,
         name: "CvSU Silang Campus",
+        location: "Silang, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -65,6 +76,7 @@ export const campusesMock = [
     {
         id: 10,
         name: "CvSU Tanza Campus",
+        location: "Tanza, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -72,6 +84,7 @@ export const campusesMock = [
     {
         id: 11,
         name: "CvSU Trece Martires City Campus",
+        location: "Trece Martires City, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -79,6 +92,7 @@ export const campusesMock = [
     {
         id: 12,
         name: "CvSU Maragondon Campus",
+        location: "Maragondon, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -86,6 +100,7 @@ export const campusesMock = [
     {
         id: 13,
         name: "CvSU Ternate Campus",
+        location: "Ternate, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
@@ -93,8 +108,9 @@ export const campusesMock = [
     {
         id: 14,
         name: "CvSU Don Severino delas Alas Campus (Graduate School)",
+        location: "Indang, Cavite",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         isDeleted: false,
-    }
+    },
 ];

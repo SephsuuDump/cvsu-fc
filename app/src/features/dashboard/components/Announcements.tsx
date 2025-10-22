@@ -6,14 +6,22 @@ import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAnnouncement } from "./CreateAnnouncement";
 import { AppAvatar } from "@/components/shared/AppAvatar";
+import { useState } from "react";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { Announcement } from "@/types/announcement";
+import { AnnouncementService } from "@/services/announcement.service";
+import { CvSULoading } from "@/components/ui/loader";
 
 export function Announcements() {
+    const [reload, setReload] = useState(false);
+
+    const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload]) 
     const { open, setOpen } = useCrudState();
 
+    if (loading) return <CvSULoading />
     return (
         <ScrollArea className="h-screen">
             <AppHeader 

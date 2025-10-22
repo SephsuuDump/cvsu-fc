@@ -1,14 +1,17 @@
 "use client"
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
-import { octoberEvents } from "../../../../public/mock/events";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { eventsMock, octoberEvents } from "../../../../public/mock/events";
 import { useEventCounts } from "@/hooks/use-event-count";
+import { ViewEventsDay } from "./ViewEventsDay";
 
-export function Calendar({ className }: {
+export function Calendar({ className, setOpen }: {
     className?: string;
+    setOpen: Dispatch<SetStateAction<boolean>>
 }) {
     const today = new Date();
+    const [selectedDay, setSelectedDay] = useState<string | undefined>();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
@@ -34,17 +37,15 @@ export function Calendar({ className }: {
 
     const handleNext = () => {
         if (currentMonth === 11) {
-        setCurrentMonth(0);
-        setCurrentYear(currentYear + 1);
+            setCurrentMonth(0);
+            setCurrentYear(currentYear + 1);
         } else {
-        setCurrentMonth(currentMonth + 1);
+            setCurrentMonth(currentMonth + 1);
         }
     };
 
-    // Create empty slots for offset before month starts
     const emptyDays = Array.from({ length: firstDay });
 
-    // Generate all days
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
     const eventCounts = useEventCounts(octoberEvents, currentMonth, currentYear);
@@ -86,6 +87,7 @@ export function Calendar({ className }: {
                         return (
                             <button
                                 key={day}
+                                onClick={ () => setSelectedDay(`${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`) }
                                 className={`text-start p-2 m-1 aspect-square bg-slate-100 shadow-sm border-slate-200 rounded-lg hover:bg-green-100
                                     ${isToday ? "!bg-green-100 font-bold" : ""}
                                     ${isWeekend ? "text-darkred" : "text-gray-600"}
@@ -98,6 +100,22 @@ export function Calendar({ className }: {
                         );
                     })}
             </div>
+
+            {selectedDay !== undefined && (
+                <ViewEventsDay
+                    today={ selectedDay }
+                    setSelectedDay={ setSelectedDay }
+                    events={
+                        selectedDay
+                        ? octoberEvents.filter(i =>
+                            selectedDay <= i.eventEnd.split("T")[0] &&
+                            selectedDay >= i.eventStart.split("T")[0]
+                            )
+                        : []
+                    }
+                    setOpen={ setOpen }
+                />
+            )}
         </section>
     )
 }

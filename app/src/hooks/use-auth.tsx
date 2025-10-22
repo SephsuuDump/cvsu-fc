@@ -9,9 +9,13 @@ interface AuthContextType {
 }
 
 const claimsInit = {
-    campusId: 0,
-    campusName: '',
+    campus: {
+        id: 0,
+        name: '',
+    },
     id: 0,
+    firstName: '',
+    lastName: '',
     iat: 0,
     exp: 0,
     role: ''

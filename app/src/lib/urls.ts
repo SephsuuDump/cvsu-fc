@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://395z4m7f-8080.asse.devtunnels.ms/api/v1';
+export const BASE_URL = 'https://ungleaned-early-shizuko.ngrok-free.dev/api';

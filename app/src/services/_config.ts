@@ -1,3 +1,5 @@
+import { error } from "console";
+
 export async function requestData(
     url: string,
     method: string,
@@ -13,8 +15,9 @@ export async function requestData(
     // ✅ If body is FormData → don't set Content-Type
     if (!(body instanceof FormData)) {
         finalHeaders = {
-        "Content-Type": "application/json",
-        ...finalHeaders,
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            ...finalHeaders,
         };
     }
 
@@ -26,8 +29,12 @@ export async function requestData(
 
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Request failed");
+        throw new Error(err.error || err.message || "Request failed");
     }
 
-    return res.json();
+    const response = await res.json();
+
+    console.log('Response Body:', response);
+
+    return response;
 }

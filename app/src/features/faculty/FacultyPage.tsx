@@ -17,15 +17,15 @@ export function FacultyPage() {
     const [tab, setTab] = useState('Members');
     const { open, setOpen } = useCrudState();
     return (
-        <section className="stack-md">
+        <section className="stack-md reveal">
             <AppHeader label="Faculty Members" />
             <div className="flex">
-                <div className="bg-slate-50 w-fit rounded-t-lg shadow-sx">
+                <div className="bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200">
                     {tabs.map((item, i) => (
                         <button
                             key={i}
                             onClick={ () => setTab(item) }
-                            className={`w-30 text-[14px] p-3 rounded-t-lg ${item === tab && 'bg-green-200'}`}
+                            className={`w-30 text-[14px] p-2.5 rounded-t-lg ${item === tab && 'bg-green-200'}`}
                         >
                             { item }
                         </button>
@@ -44,7 +44,7 @@ export function FacultyPage() {
                         <SlidersHorizontal className="w-4 h-4" />
                     </button>
                     <Button
-                        className="rounded-full bg-slate-50 shadow-sm"
+                        className="rounded-full bg-slate-50 shadow-sm text-black"
                         size="sm"
                     >
                         <FileUp /> Export

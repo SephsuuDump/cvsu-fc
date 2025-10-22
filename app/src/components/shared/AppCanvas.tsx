@@ -10,5 +10,5 @@ export function AppCanvas({ children }: { children: React.ReactNode }) {
                 {children}
             </main>
         )
-    } else return <main className="w-full">{children}</main>
+    } else return <main>{children}</main>
 }

@@ -7,6 +7,7 @@
 export type Campus = {
     id: number;
     name: string;
+    location: string;
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;

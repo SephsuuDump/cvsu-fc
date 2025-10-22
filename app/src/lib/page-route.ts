@@ -1,4 +1,4 @@
-import { CalendarRange, Landmark, LayoutDashboard, MessageSquare, Send } from "lucide-react";
+import { CalendarRange, HandCoins, Landmark, LayoutDashboard, MessageSquareText, University } from "lucide-react";
 
 export const coordinatorRoute = [
     { 
@@ -12,13 +12,23 @@ export const coordinatorRoute = [
         href: '/events',
     },
     { 
+        title: 'Campuses', 
+        icon: University,
+        href: '/campuses',
+    },
+    { 
         title: 'Faculty', 
         icon: Landmark,
         href: '/faculty',
     },
     {
         title: 'Messages',
-        icon: MessageSquare,
+        icon: MessageSquareText,
         href: '/messages',
+    },
+    {
+        title: 'Contributions',
+        icon: HandCoins,
+        href: '/contributions'
     }
 ]

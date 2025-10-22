@@ -25,6 +25,29 @@ export function hasEmptyField(obj: Record<string, any>): boolean {
     });
 }
 
+export function formatDateToWord(dateStr: string, includeTime: boolean = false): string {
+    if (!dateStr) return "";
+
+    const date = new Date(dateStr);
+
+    // Base options for the date
+    const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    };
+
+    // Add time formatting if requested
+    if (includeTime) {
+        options.hour = "numeric";
+        options.minute = "2-digit";
+        options.hour12 = true; // Use 12-hour format (AM/PM)
+    }
+
+    // Format to English readable date
+    return date.toLocaleDateString("en-US", options);
+}
+
 export function formatCustomDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -64,7 +87,7 @@ export function formatCustomDate(dateString: string): string {
     })} at ${formatTime(date)}`;
 }
 
-export const fromatMessageDateTime = (messageDateTime: string): string => {
+export const formatMessageDateTime = (messageDateTime: string): string => {
     const now = new Date();
     let date: Date;
 

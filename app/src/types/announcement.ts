@@ -12,28 +12,31 @@
 // announcement_id fk -> announcements
 // image_url text
 
-export type Announcement = {
-    id: number;
-    label: string;
-    content: string;
-    images: string[];
-    createdAt: string;
+// announcement_files table
+// announcement_id | referenced to announcement.id
+// file_path string
 
-    user: {
+export type Announcement = {
+    id: number; // pk
+    label: string; // enum GENERAL | URGENT not null 
+    content: string; // text not null
+    files: string[]; // list of file path
+    createdAt: string; // datetime
+    updatedAt: string; // datetime
+    isDeleted: string; // boolean
+    userId: number; // fk referenced to user.id
+
+    user?: {
         id: number;
         lastName: string;
         firstName: string;
         middleName?: string; 
     }
-
-    userId?: number;
-    announcementImages?: []
-
 }
 
 export const announcementInit: Partial<Announcement> = {
     userId: 0,
     content: '',
-    announcementImages: [],
+    files: [],
     createdAt: '',
 };

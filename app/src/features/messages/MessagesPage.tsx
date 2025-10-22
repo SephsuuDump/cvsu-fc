@@ -1,32 +1,30 @@
-import { Input } from "@/components/ui/input";
-import { messagesMock } from "../../../public/mock/messages";
 import { AppAvatar } from "@/components/shared/AppAvatar";
-import { formatCustomDate, fromatMessageDateTime } from "@/lib/helper";
+import { MessageSidebar } from "./components/MessagesSidebar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
 
 export function MessagesPage() {
     return (
-        <section className="stack-md">
-            <div className="stack-md bg-slate-50 shadow-sm border-r-1 border-r-slate-300 p-4 w-fit">
-                <div className="text-lg font-bold scale-x-110 origin-left">Chat</div>
-                <Input
-                    placeholder="Search for a member" 
-                />
-                <div className="row-lg">
-                    <div className="text-[10px]">COORDINATOR</div>
-                    <div className="text-[10px]">MEMBER</div>
+        <section className="flex h-[95vh] reveal">
+            <MessageSidebar className="w-80" />
+            <div className="relative w-full stack-md bg-slate-50 shadow-sm border-l-1 border-l-slate-300">
+                <div className="flex-center gap-2 shadow-sm py-3">
+                    <AppAvatar fallback="JB" />
+                    <div className="font-bold">Joseph Bataller</div>
                 </div>
-                {messagesMock.map((item, i) => (
-                    <div className="row-md p-3 bg-slate-100 shadow-sm rounded-sm">
-                        <AppAvatar
-                            fallback={ `${item.sender.firstName[0]}${item.sender.lastName[0]}` }
-                        />
-                        <div>
-                            <div className="text-sm font-bold">{ `${item.sender.firstName} ${item.sender.lastName}` }</div>
-                            <div className="text-xs text-gray -mt-0.5">{ item.content }</div>
-                        </div>
-                        <div className="text-[10px]">{ fromatMessageDateTime(item.createdAt) }</div>
-                    </div>
-                ))}
+                <div className="absolute flex-center bottom-0 w-full bg-white">
+                    <Input 
+                        className="border-0 rounded-none m-0"
+                        placeholder="Type your message here" 
+                    /> 
+                    <Button 
+                        className="!bg-darkgreen rounded-none"
+                        size="sm"
+                    >
+                        <Send /> Send
+                    </Button>
+                </div>
             </div>
         </section>
     )
