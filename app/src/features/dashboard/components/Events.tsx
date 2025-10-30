@@ -1,32 +1,30 @@
 "use client"
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { octoberEvents } from "../../../../public/mock/events";
 import { useEventCounts } from "@/hooks/use-event-count";
-import { ViewEventsDay } from "./ViewEventsDay";
-import { useFetchData } from "@/hooks/use-fetch-data";
-import { EventService } from "@/services/event.service";
-import { CvSULoading } from "@/components/ui/loader";
-import { useCrudState } from "@/hooks/use-crud-state";
-import { CreateEvent } from "./CreateEvent";
+import { ViewEventsDay } from "@/features/events/components/ViewEventsDay";
+import { AppHeader } from "@/components/shared/AppHeader";
 
-const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
-
-export function Calendar({ className }: {
+export function Events({ className }: {
     className?: string;
 }) {
     const today = new Date();
-    const { open, setOpen } = useCrudState();
+    const [open, setOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<string | undefined>();
-    const [eventDay, setEventDay] = useState<string | undefined>();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     const handlePrev = () => {
@@ -48,21 +46,15 @@ export function Calendar({ className }: {
     };
 
     const emptyDays = Array.from({ length: firstDay });
+
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-    const { data: events, loading } = useFetchData<FCEvent>(
-        EventService.getByCampus,
-        [currentMonth, currentYear], 
-        [0, monthNames[currentMonth].toLowerCase(), currentYear]
-    );
+    const eventCounts = useEventCounts(octoberEvents, currentMonth, currentYear);
 
-    const eventCounts = useEventCounts(events, currentMonth, currentYear);
-
-    if (loading) return <CvSULoading className={ className } />
     return (
         <section className={`${className}`}>
-            <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
-            <div className={`bg-slate-50 my-2 p-4`}>
+            <AppHeader label={ `Events on ${monthNames[currentMonth]}` } />
+            <div className={`bg-slate-50 my-2 rounded-md shadow-sm p-4`}>
                 <div className="flex justify-between items-center p-4">
                     <button onClick={handlePrev} className="p-2 hover:bg-gray-100 rounded">
                         <ChevronLeft />
@@ -98,18 +90,15 @@ export function Calendar({ className }: {
                             return (
                                 <button
                                     key={day}
-                                    onClick={ () => {
-                                        setSelectedDay(`${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`) ;
-                                        setEventDay(`${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
-                                    }}
+                                    onClick={ () => setSelectedDay(`${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`) }
                                     className={`text-start p-2 m-1 aspect-square bg-slate-100 shadow-sm border-slate-200 rounded-lg hover:bg-green-100
                                         ${isToday ? "!bg-green-100 font-bold" : ""}
                                         ${isWeekend ? "text-darkred" : "text-gray-600"}
                                         ${eventCount > 0 && "!text-green-600"}
                                     `}
                                 >
-                                    <div className="text-lg font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
-                                    <div className="text-xs font-bold tracking-wider">{eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}</div>
+                                    <div className="text-[15px] font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
+                                    <div className="text-[11px] font-bold tracking-wider">{eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}</div>
                                 </button>
                             );
                         })}
@@ -121,28 +110,16 @@ export function Calendar({ className }: {
                         setSelectedDay={ setSelectedDay }
                         events={
                             selectedDay
-                                ? events.filter(i => {
-                                    if (!i.event_start || !i.event_end) return false;
-
-                                    const start = new Date(i.event_start);
-                                    const end = new Date(i.event_end);
-                                    const selected = new Date(selectedDay);
-
-                                    return selected >= start && selected <= end;
-                                })
-                                : []
+                            ? octoberEvents.filter(i =>
+                                selectedDay <= i.event_end.split("T")[0] &&
+                                selectedDay >= i.event_start.split("T")[0]
+                                )
+                            : []
                         }
                         setOpen={ setOpen }
                     />
                 )}
             </div>
-
-            {open && (
-                <CreateEvent
-                    setOpen={ setOpen }
-                    selectedDay={ eventDay! }
-                />
-            )}
         </section>
     )
 }

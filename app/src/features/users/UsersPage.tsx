@@ -12,12 +12,20 @@ import { formatDateToWord } from "@/lib/helper";
 import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
 import { FileUp, Plus, SlidersHorizontal } from "lucide-react";
+import { CreateUser } from "./components/CreateUser";
+import { useState } from "react";
+import { CvSULoading } from "@/components/ui/loader";
+import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
+import { UpdateUser } from "./components/UpdateUser";
+import { DeleteUser } from "./components/DeleteUser";
 
 export function UsersPage() {
-    const { data: users, loading } = useFetchData<Partial<User>>(UserService.getAllUsers);
-    console.log(users);
+    const [reload, setReload] = useState(false);
+    const { data: users, loading } = useFetchData<Partial<User>>(UserService.getAllUsers, [reload]);
     
-    const { open, setOpen } = useCrudState();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
+
+    if (loading) return <CvSULoading />
     return (
         <section className="stack-md reveal">
             <AppHeader label="CvSU FC Users" />
@@ -48,34 +56,70 @@ export function UsersPage() {
                     </Button>
                 </div>
             </div>
+
             <div className="bg-slate-50 -mt-2">
-                <div className="thead grid grid-cols-4">
-                    <div className="th">Member Name</div>
-                    <div className="th">Email Address</div>
-                    <div className="th">College</div>
-                    <div className="th">Member Since</div>
+                <div className="flex-center-y">
+                    <div className="thead w-full grid grid-cols-4">
+                        <div className="th">Member Name</div>
+                        <div className="th">Email Address</div>
+                        <div className="th">College</div>
+                        <div className="th">Member Since</div>
+                    </div>
+                    <div className="th w-10"></div>
                 </div>
                 <Separator className="h-3 bg-slate-300" />
                 {users.map((item, i) => (
-                    <div className="tdata grid grid-cols-4" key={i}>
-                        <div className="td flex-center-y gap-2">
-                            <AppAvatar 
-                                className="inline-block"
-                                fallback={ `${item.firstName![0]}${item.lastname![0]}` } 
-                            /> 
-                            { item.lastname }, { item.firstName }
+                    <div className="tdata flex-center-y" key={i}>
+                        <div className="w-full grid grid-cols-4">
+                            <div className="td flex-center-y gap-2">
+                                <AppAvatar 
+                                    className="inline-block"
+                                    fallback={ `${item.first_name![0]}${item.last_name![0]}` } 
+                                /> 
+                                { item.last_name }, { item.first_name }
+                            </div>
+                            <Tooltip>
+                                <TooltipTrigger className="td text-start">
+                                    { item.email }
+                                </TooltipTrigger>
+                                <TooltipContent>{ item.email }</TooltipContent>
+                            </Tooltip>
+                            <div className="td">Contact Number</div>
+                            <div className="td">{ formatDateToWord(item.created_at!) }</div>
                         </div>
-                        <Tooltip>
-                            <TooltipTrigger className="td text-start">
-                                { item.email }
-                            </TooltipTrigger>
-                            <TooltipContent>{ item.email }</TooltipContent>
-                        </Tooltip>
-                        <div className="td">Contact Number</div>
-                        <div className="td">{ formatDateToWord(item.created_at!) }</div>
+                        <AppRUDSelection
+                            className="w-10 flex-center"
+                            item={ item }
+                            setView={ setView }
+                            setUpdate={ setUpdate }
+                            setDelete={ setDelete }
+                        />
                     </div>
                 ))}
             </div>
+
+            {open && (
+                <CreateUser 
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toUpdate && (
+                <UpdateUser
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload } 
+                />
+            )}
+
+            {toDelete && (
+                <DeleteUser
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload } 
+                />
+            )}
         </section>
     )
 }

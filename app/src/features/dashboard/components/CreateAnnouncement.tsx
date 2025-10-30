@@ -11,8 +11,6 @@ import { Plus, Upload, X } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-const labels = ['URGENT', 'GENERAL'];
-
 interface Preview {
     url: string;
     name: string;
@@ -80,32 +78,12 @@ export function CreateAnnouncement({ setOpen, setReload }: {
         setAnnouncement({
             content: "",
             files: [],
-            userId: 0,
-            createdAt: new Date().toISOString().slice(0, -1),
+            user_id: 0,
+            created_at: new Date().toISOString().slice(0, -1),
         });
         setSelectedFiles([]);
         setPreviews([]);
     };
-
-    async function handleSubmit() {
-        setProcess(true);
-        if (!announcement.content?.trim()) {
-            toast.info("Please enter announcement content");
-            setProcess(false);
-            return;
-        }
-
-        try {
-            const data = await AnnouncementService.createAnnouncement(claims.id, announcement, selectedFiles);
-            if (data) {
-                toast.success("Successfully created a post!");
-                resetForm();
-                setReload(prev => !prev);
-                setOpen(false);
-            }
-        } catch (error) { toast.error("Failed to create announcement") } 
-        finally { setProcess(false); }
-    }
 
     const formatFileSize = (bytes: number): string => {
         if (bytes === 0) return "0 Bytes";
@@ -119,17 +97,28 @@ export function CreateAnnouncement({ setOpen, setReload }: {
         fileInputRef.current?.click();
     };
 
-    useEffect(() => {
-        console.log(announcement);
-    }, [announcement]);
-
-    useEffect(() => {
-        console.log(selectedFiles);
-    }, [selectedFiles]);
+    async function handleSubmit() {
+        setProcess(true);
+        if (!announcement.content?.trim()) {
+            toast.info("Please enter announcement content");
+            setProcess(false);
+            return;
+        }
+        try {
+            const data = await AnnouncementService.createAnnouncement(claims.id, announcement, selectedFiles);
+            if (data) {
+                toast.success("Successfully created a post!");
+                resetForm();
+                setReload(prev => !prev);
+                setOpen(false);
+            }
+        } catch (error) { toast.error("Failed to create announcement") } 
+        finally { setProcess(false); }
+    }
 
     return (
         <Dialog open onOpenChange={ setOpen }>
-            <DialogContent>
+            <DialogContent className="overflow-y-auto h-9/10">
                 <ModalTitle label="Create an announcement" />
                 <div className="flex-center-y text-sm gap-2">
                     <div>Announcement Label:</div>

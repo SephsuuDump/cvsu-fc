@@ -7,7 +7,7 @@ export function useFetchData<T>(
     fetchFn: (...args: any[]) => Promise<T | { content: T[] }>,
     deps: any[] = [],
     args: any[] = [], 
-    page = 0,
+    page = 1,
     size = 1000,
 ) {
     const [items, setItems] = useState<T | T[] | null>(null);
@@ -20,7 +20,7 @@ export function useFetchData<T>(
         async function fetchData() {
             try {
                 setLoading(true);
-                const result = await fetchFn(...args, page, size);
+                const result = await fetchFn(page, size, ...args);
 
                 if (!isMounted) return;
 

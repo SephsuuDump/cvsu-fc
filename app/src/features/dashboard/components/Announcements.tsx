@@ -16,17 +16,22 @@ import { AnnouncementService } from "@/services/announcement.service";
 import { CvSULoading } from "@/components/ui/loader";
 import { FILE_URL } from "@/lib/urls";
 
-export function Announcements() {
+export function Announcements({ claims, className }: {
+    claims: Claim
+    className?: string
+}) {
     const [reload, setReload] = useState(false);
 
     const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload]) 
     const { open, setOpen } = useCrudState();
+    console.log(announcements);
+    
 
-    if (loading) return <CvSULoading />
+    if (loading) return <CvSULoading className={ className }  />
     return (
-        <ScrollArea className="h-screen">
+        <ScrollArea className={`h-screen ${className}`}>
             <AppHeader 
-                label="Welcome back, User!" 
+                label="Recent Announcements" 
                 className="mb-2"
             />
             <div className="flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
@@ -43,8 +48,8 @@ export function Announcements() {
                     <div className="flex flex-col gap-2 bg-slate-50 rounded-md shadow-sm border-slate-300 my-2 p-4" key={i}>
                         <div className="flex justify-between">
                             <div className="flex-center-y gap-2">
-                                <AppAvatar fallback={ `${item.user!.firstName[0]}${item.user!.lastName[0]}` } />
-                                <div className="font-semibold">{ item.user!.firstName } { item.user!.lastName }</div>
+                                <AppAvatar fallback={ `${item.user!.first_name[0]}${item.user!.last_name[0]}` } />
+                                <div className="font-semibold">{ item.user!.first_name } { item.user!.last_name }</div>
                             </div>
                             <AnnouncementBadge label={ item.label } />
                         </div>
@@ -95,7 +100,7 @@ export function Announcements() {
 
                         <Separator />
                         <div className="flex justify-between">
-                            <div className="text-xs text-gray-500">{ formatCustomDate(item.createdAt) }</div>
+                            <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
                             <Link
                                 href={``}
                                 className="text-xs text-darkgreen font-semibold opacity-80 hover:text-black hover:opacity-100"

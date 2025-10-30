@@ -15,22 +15,10 @@ export class AuthService {
     } 
 
     static async register(user: Partial<User>) {
-        // creation of user and returns the user created
-        // sample body
-        // {   
-        //     'email': '',
-        //     'password': '',
-        //     'firstName': '',
-        //     'middleName': '',
-        //     'lastName': '',
-        //     'campusId': 0,
-        //     'contact', '',
-        //     'highestEducationalAttainment': '',
-        // }
         return await requestData(
             `${url}/register`,
             'POST',
-            undefined,
+            { "Accept": "application/json" },
             user
         ) 
     }

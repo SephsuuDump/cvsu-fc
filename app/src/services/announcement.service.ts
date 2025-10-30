@@ -19,13 +19,8 @@ export class AnnouncementService {
             'GET'
         )
     }
+    
     static async createAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[]) {
-        console.log(userId);
-        console.log(files);
-        console.log(announcement);
-        
-        
-        
         const formData = new FormData();
         formData.append('user_id', userId.toString());
         files.forEach(file => {

@@ -9,8 +9,14 @@ export function updateField<T>(
     }));
 }
 
-export function hasEmptyField(obj: Record<string, any>): boolean {
-    return Object.values(obj).some((value) => {
+export function hasEmptyField<T extends Record<string, any>>(
+    obj: T,
+    exemptKeys: (keyof T)[] = []
+): boolean {
+    return Object.entries(obj).some(([key, value]) => {
+        // Skip exempted keys
+        if (exemptKeys.includes(key as keyof T)) return false;
+
         if (value === 0) return true;                 // number zero
         if (value === "") return true;                // empty string
         if (Array.isArray(value) && value.length === 0) return true; // empty array
@@ -193,3 +199,18 @@ export function formatEventRange(eventStart: string, eventEnd: string): string {
         return `${startMonth} ${startDay} ${formatTime(start)} - ${endMonth} ${endDay} ${formatTime(end)}, ${year}`;
     }
 }
+
+export function formatDateToLocal(dateStr: string) {
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+

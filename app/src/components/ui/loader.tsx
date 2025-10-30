@@ -52,16 +52,16 @@ export function SectionLoading({ className }: {
 export function ModalLoader() {
     return (
         <Dialog open>
-            <DialogContent>
+            <DialogContent className="flex-center h-100">
                 <DialogTitle></DialogTitle>
-                <div className="h-100 animate-bounce">
+                <div className="animate-fade-loop">
                     <Image
-                        src="/images/papiverse_logo.png"
-                        alt="Papiverse Logo"
-                        width={200}
-                        height={200}
+                        src="/images/cvsu_logo.png"
+                        alt="CvSU Logo"
+                        width={80}
+                        height={80}
                     />
-                    <div className="text-lg text-center">LOADING</div>
+                    <div className="text-center font-semibold">CvSU FC</div>
                 </div>
             </DialogContent>
         </Dialog>

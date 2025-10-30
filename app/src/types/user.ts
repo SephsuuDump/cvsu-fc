@@ -21,15 +21,17 @@ export type User = {
     id: number;
     email: string;
     password: string;
-    firstName: string;
+    first_name: string;
     middle_name: string;
-    lastname:string
-    campusId: number;
+    last_name:string;
+    role: string;
+    campus_id: number;
+    college_id: number;
     contact: string;
     highest_educational_attainment: string;
     created_at: string;
-    updatedAt: string;
-    isDeleted: string;
+    updated_at: string;
+    is_deleted: string;
 
     campus: {
         id: number;

@@ -25,21 +25,21 @@ export type Announcement = {
         file_name: string;
         file_path: string;
     }[]; // list of file path
-    createdAt: string; // datetime
-    updatedAt: string; // datetime
-    isDeleted: string; // boolean
-    userId: number; // fk referenced to user.id
+    created_at: string; // datetime
+    updated_at: string; // datetime
+    is_deleted: string; // boolean
+    user_id: number; // fk referenced to user.id
 
     user?: {
         id: number;
-        lastName: string;
-        firstName: string;
-        middleName?: string; 
+        last_name: string;
+        first_name: string;
+        middle_name?: string; 
     }
 }
 
 export const announcementInit: Partial<Announcement> = {
-    userId: 0,
+    user_id: 0,
     content: '',
     label: 'GENERAL'
 };

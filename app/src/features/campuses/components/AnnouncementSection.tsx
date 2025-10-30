@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { AnnouncementService } from "@/services/announcement.service";
 import { SectionLoading } from "@/components/ui/loader";
+import { Announcement } from "@/types/announcement";
 
 export function AnnouncementsSection() {
-    const { data: announcement, loading } = useFetchData(AnnouncementService.getAllAnnouncements, [], []); 
+    const { data: announcement, loading } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [], []); 
     
     if (loading) return <SectionLoading /> 
     return (
@@ -18,15 +19,15 @@ export function AnnouncementsSection() {
                     <div className="break-inside-avoid flex flex-col gap-2 bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all duration-200" key={i}>
                         <div className="flex justify-between">
                             <div className="flex-center-y gap-2">
-                                <AppAvatar fallback={ `${item.user.firstName[0]}${item.user.lastName[0]}` } />
-                                <div className="font-semibold">{ item.user.firstName } { item.user.lastName }</div>
+                                <AppAvatar fallback={ `${item.user?.first_name[0]}${item.user?.last_name[0]}` } />
+                                <div className="font-semibold">{ item.user?.first_name } { item.user?.last_name }</div>
                             </div>
                             <AnnouncementBadge label={ item.label } />
                         </div>
                         <div className="text-sm">{ item.content }</div>
                         <Separator />
                         <div className="flex justify-between">
-                            <div className="text-xs text-gray-500">{ formatCustomDate(item.createdAt) }</div>
+                            <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
                             <Link
                                 href={``}
                                 className="text-xs text-darkgreen font-semibold opacity-80 hover:text-black hover:opacity-100"

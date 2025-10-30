@@ -12,7 +12,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
     setSelectedDay: Dispatch<SetStateAction<string | undefined>>
     events: FCEvent[]
     setOpen: Dispatch<SetStateAction<boolean>>
-}) {
+}) {    
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setSelectedDay(undefined) }}>
             <DialogContent className="reveal">
@@ -26,7 +26,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                         }}
                         className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
                     >
-                        Publish an event to CvSU Main
+                        Publish event in { formatDateToWord(today) }
                     </Button>
                 </div>
                 {events && events.length > 0 ?
@@ -35,7 +35,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                             <div className="flex flex-col gap-2 bg-slate-100 rounded-md shadow-sm border-slate-300 my-2 p-4" key={i}>
                                 <div className="flex-center-y gap-1 mb-2">
                                     <CalendarDays className="w-4 h-4 text-darkgreen" />
-                                    <div className="text-sm text-gray-700 font-semibold">{ formatEventRange(item.eventStart, item.eventEnd) }</div>
+                                    <div className="text-sm text-gray-700 font-semibold">{ formatEventRange(item.event_start, item.event_end) }</div>
                                     <button
                                         className="ms-auto p-0.5 hover:rounded-full hover:bg-slate-200"
                                     >

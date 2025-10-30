@@ -2,7 +2,7 @@
 
 /**
  * Hook: returns the number of events per day for a given month & year.
- * Supports multi-day events and cross-month boundaries.
+ * Normalizes dates to avoid timezone shifting issues.
  */
 export function useEventCounts(
     events: FCEvent[],
@@ -14,21 +14,26 @@ export function useEventCounts(
     if (!events?.length) return eventCounts;
 
     for (const event of events) {
-        const start = new Date(event.eventStart);
-        const end = new Date(event.eventEnd);
+        if (!event.event_start || !event.event_end) continue;
 
-        const startDate = new Date(
-            Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())
-        );
-        const endDate = new Date(
-            Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())
-        );
+        const start = new Date(event.event_start);
+        const end = new Date(event.event_end);
 
-        for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
-            if (d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear) {
-                const day = d.getUTCDate();
-                eventCounts[day] = (eventCounts[day] || 0) + 1;
-            }
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+
+        const current = new Date(start);
+        while (current <= end) {
+        if (
+            current.getMonth() === currentMonth &&
+            current.getFullYear() === currentYear
+        ) {
+            const day = current.getDate();
+            eventCounts[day] = (eventCounts[day] || 0) + 1;
+        }
+
+        current.setDate(current.getDate() + 1);
+        current.setHours(0, 0, 0, 0);
         }
     }
 

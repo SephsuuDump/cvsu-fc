@@ -8,6 +8,8 @@ type AppInputProps = {
     noLabel?: boolean
     value?: string | number
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    type?: "text" | string
+    readonly?: false | true
 }
 
 export function AppInput({
@@ -17,6 +19,8 @@ export function AppInput({
     noLabel,
     value,
     onChange,
+    type,
+    readonly
 }: AppInputProps) {
     return (
         <div className={`${className} stack-sm`}>
@@ -25,6 +29,8 @@ export function AppInput({
             placeholder={placeholder}
             value={value ?? ""}
             onChange={ onChange }
+            type={ type }
+            readOnly={ readonly }
         />
         </div>
     )

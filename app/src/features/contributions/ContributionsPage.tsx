@@ -6,8 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { Check, FileUp, SlidersHorizontal, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { contributionsMock } from "../../../public/mock/contributions";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { CollegeService } from "@/services/college.service";
+import { CvSULoading } from "@/components/ui/loader";
+import { Contribution } from "@/types/contribution";
+import { ContributionService } from "@/services/contribution.service";
+import { Campus } from "@/types/campus";
+import { CampusService } from "@/services/campus.service";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
@@ -18,9 +25,19 @@ export function ContributionPage() {
         new Date().toLocaleString("default", { month: "long" })
     );
     const [selectedYear, setSelectedYear] = useState(String(currentYear));
+    const [selectedCampus, setSelectedCampus] = useState<Campus | undefined>(undefined);
+    const [selectedCollege, setSelectedCollege] = useState<College | undefined>(undefined);
 
+    const { data: campuses, loading: campusLoading } = useFetchData<Campus>(CampusService.getAllCampus); 
+    const { data: colleges, loading: collegesLoading } = useFetchData<College>(CollegeService.getAllColleges); 
+    const { data: contributions, loading: contributionsLoading } = useFetchData<Contribution>(
+        ContributionService.getByCampusCollege, 
+        [], 
+        [selectedCampus?.id ?? '', selectedCollege?.id ?? '']
+    )
     const { open, setOpen } = useCrudState();
 
+    if (collegesLoading || campusLoading || contributionsLoading) return <CvSULoading />
     return (
         <section className="stack-md reveal">
             <AppHeader label="Monthly Contributions" />
@@ -37,6 +54,19 @@ export function ContributionPage() {
                         <SelectContent>
                             {months.map((item, i) => (
                                 <SelectItem value={item} key={i}>{ item }</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select
+                        value={ String(selectedYear) }
+                        onValueChange={ (value) => setSelectedYear(value) }
+                    >
+                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
+                            <SelectValue placeholder='Select Month' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {pastFiveYears.map((item, i) => (
+                                <SelectItem value={String(item)} key={i}>{ item }</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>

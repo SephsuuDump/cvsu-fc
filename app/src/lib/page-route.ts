@@ -17,6 +17,11 @@ export const adminRoute = [
         href: '/campuses',
     },
     {
+        title: 'Announcements',
+        icon: Megaphone,
+        href: '/announcements'
+    },
+    {
         title: 'Messages',
         icon: MessageSquareText,
         href: '/messages',
@@ -37,7 +42,7 @@ export const coordinatorRoute = [
     { 
         title: 'Announcements', 
         icon: Megaphone,
-        href: '/events',
+        href: '/',
     },
     { 
         title: 'Events', 

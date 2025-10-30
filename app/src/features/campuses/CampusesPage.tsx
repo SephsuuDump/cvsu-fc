@@ -2,11 +2,10 @@
 
 import { AppHeader } from "@/components/shared/AppHeader";
 import { AppSelect } from "@/components/shared/AppSelect";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { campusesMock } from "../../../public/mock/campuses";
 import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { MembersSection } from "./components/MembersSection";
+import { FacultySection } from "./components/FacultySection";
 import { EventsSection } from "./components/EventsSection";
 import { AnnouncementsSection } from "./components/AnnouncementSection";
 import { CampusService } from "@/services/campus.service";
@@ -14,7 +13,7 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import { CvSULoading } from "@/components/ui/loader";
 import { Campus } from "@/types/campus";
 
-const tabs = ['Coordinators', 'Members', 'Job Offers', 'Events', 'Announcements']
+const tabs = ['Faculty', 'Events', 'Announcements']
 
 export function CampusesPage() {
     const { data: campuses, loading } = useFetchData<Campus>(CampusService.getAllCampus);
@@ -59,12 +58,12 @@ export function CampusesPage() {
             <Separator className="bg-slate-400" />
 
             {tab === tabs[0] && (
-                <MembersSection />
+                <FacultySection />
             )}
-            {tab === tabs[3] && (
+            {tab === tabs[1] && (
                 <EventsSection />
             )}
-            {tab === tabs[4] && (
+            {tab === tabs[2] && (
                 <AnnouncementsSection />
             )}
         </section>
