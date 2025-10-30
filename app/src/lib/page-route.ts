@@ -1,25 +1,48 @@
-import { CalendarRange, HandCoins, Landmark, LayoutDashboard, MessageSquareText, University } from "lucide-react";
+import { CalendarRange, HandCoins, Landmark, LayoutDashboard, Megaphone, MessageSquareText, University, UsersRound } from "lucide-react";
 
-export const coordinatorRoute = [
+export const adminRoute = [
     { 
-        title: 'Dashboard', 
+        title: 'Home', 
         icon: LayoutDashboard,
         href: '/',
     },
     { 
-        title: 'Events', 
-        icon: CalendarRange,
-        href: '/events',
+        title: 'Users', 
+        icon: UsersRound,
+        href: '/users',
     },
     { 
         title: 'Campuses', 
         icon: University,
         href: '/campuses',
     },
+    {
+        title: 'Messages',
+        icon: MessageSquareText,
+        href: '/messages',
+    },
+]
+
+export const coordinatorRoute = [
+    { 
+        title: 'Home', 
+        icon: LayoutDashboard,
+        href: '/',
+    },
     { 
         title: 'Faculty', 
         icon: Landmark,
         href: '/faculty',
+    },
+    { 
+        title: 'Announcements', 
+        icon: Megaphone,
+        href: '/events',
+    },
+    { 
+        title: 'Events', 
+        icon: CalendarRange,
+        href: '/events',
     },
     {
         title: 'Messages',
@@ -31,4 +54,32 @@ export const coordinatorRoute = [
         icon: HandCoins,
         href: '/contributions'
     }
+]
+
+export const memberRoute = [
+    { 
+        title: 'Home', 
+        icon: LayoutDashboard,
+        href: '/',
+    },
+    { 
+        title: 'Faculty', 
+        icon: Landmark,
+        href: '/faculty',
+    },
+    { 
+        title: 'Announcements', 
+        icon: Megaphone,
+        href: '/events',
+    },
+    { 
+        title: 'Events', 
+        icon: CalendarRange,
+        href: '/events',
+    },
+    {
+        title: 'Messages',
+        icon: MessageSquareText,
+        href: '/messages',
+    },
 ]

@@ -1,6 +1,7 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AddButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { updateField } from "@/lib/helper";
@@ -10,65 +11,62 @@ import { Plus, Upload, X } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+const labels = ['URGENT', 'GENERAL'];
+
 interface Preview {
     url: string;
     name: string;
     size: number;
+    type: string;
 }
 
-export function CreateAnnouncement({ setOpen }: {
+
+export function CreateAnnouncement({ setOpen, setReload }: {
     setOpen: Dispatch<SetStateAction<boolean>>;
+    setReload: Dispatch<SetStateAction<boolean>>;
 }) {
     const { claims, loading } = useAuth();
     const [announcement, setAnnouncement] = useState<Partial<Announcement>>(announcementInit);
-    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
     const [onProcess, setProcess] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
+    function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
         if (!e.target.files) return;
         const files = Array.from(e.target.files);
 
         const validFiles: File[] = files.filter(file => {
-            const isValidType = file.type.startsWith("image/");
-            const isValidSize = file.size <= 10 * 1024 * 1024; 
-
-            if (!isValidType) {
-                toast.error(`${file.name} is not a valid image file`);
-                return false;
-            }
+            const isValidSize = file.size <= 10 * 1024 * 1024; // still enforce size
 
             if (!isValidSize) {
                 toast.error(`${file.name} is too large (max 10MB)`);
                 return false;
             }
-            
+
             return true;
         });
 
         if (validFiles.length === 0) return;
 
-        // Add to existing images instead of replacing
-        setSelectedImages(prev => [...prev, ...validFiles]);
+        setSelectedFiles(prev => [...prev, ...validFiles]);
 
-        // Create preview URLs for new files
         const newPreviewUrls: Preview[] = validFiles.map(file => ({
             url: URL.createObjectURL(file),
             name: file.name,
             size: file.size,
+            type: file.type,
         }));
 
         setPreviews(prev => [...prev, ...newPreviewUrls]);
 
-        // Clear the input
         e.target.value = "";
     };
 
-    function removeImage(index: number) {
+    function removeFile(index: number) {
         URL.revokeObjectURL(previews[index].url);
-        setSelectedImages(prev => prev.filter((_, i) => i !== index));
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
         setPreviews(prev => prev.filter((_, i) => i !== index));
     };
 
@@ -81,11 +79,11 @@ export function CreateAnnouncement({ setOpen }: {
     function resetForm() {
         setAnnouncement({
             content: "",
-            announcementImages: [],
+            files: [],
             userId: 0,
             createdAt: new Date().toISOString().slice(0, -1),
         });
-        setSelectedImages([]);
+        setSelectedFiles([]);
         setPreviews([]);
     };
 
@@ -98,10 +96,12 @@ export function CreateAnnouncement({ setOpen }: {
         }
 
         try {
-            const data = await AnnouncementService.createAnnouncement(1, announcement, selectedImages);
+            const data = await AnnouncementService.createAnnouncement(claims.id, announcement, selectedFiles);
             if (data) {
                 toast.success("Successfully created a post!");
                 resetForm();
+                setReload(prev => !prev);
+                setOpen(false);
             }
         } catch (error) { toast.error("Failed to create announcement") } 
         finally { setProcess(false); }
@@ -121,13 +121,35 @@ export function CreateAnnouncement({ setOpen }: {
 
     useEffect(() => {
         console.log(announcement);
-    }, [announcement])
+    }, [announcement]);
+
+    useEffect(() => {
+        console.log(selectedFiles);
+    }, [selectedFiles]);
 
     return (
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent>
                 <ModalTitle label="Create an announcement" />
-                <div>
+                <div className="flex-center-y text-sm gap-2">
+                    <div>Announcement Label:</div>
+                    <Select
+                        value={ announcement.label }
+                        onValueChange={ (value) => setAnnouncement(prev => ({
+                            ...prev,
+                            label: value
+                        }))}
+                    >
+                        <SelectTrigger className="">
+                            <SelectValue placeholder="Select Label" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="GENERAL">GENERAL</SelectItem>
+                            <SelectItem value="URGENT">URGENT</SelectItem>
+                        </SelectContent>
+                    </Select> 
+                </div>
+                <div className="-mt-2">
                     <Textarea
                         name="content"
                         placeholder="Type your announcement here"
@@ -142,13 +164,13 @@ export function CreateAnnouncement({ setOpen }: {
                     <div>
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-medium text-gray-700">
-                                Selected Images ({previews.length})
+                                Selected Files ({previews.length})
                             </span>
                             <button
                                 type="button"
                                 onClick={() => {
                                 previews.forEach(preview => URL.revokeObjectURL(preview.url));
-                                setSelectedImages([]);
+                                setSelectedFiles([]);
                                 setPreviews([]);
                                 }}
                                 className="text-xs text-darkred hover:text-red-700"
@@ -159,22 +181,35 @@ export function CreateAnnouncement({ setOpen }: {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {previews.map((preview, idx) => (
                                 <div key={idx} className="relative group">
-                                <img
-                                    src={preview.url}
-                                    alt={`Preview ${idx + 1}`}
-                                    className="w-full h-24 object-cover rounded-md border border-gray-200"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(idx)}
-                                    className="absolute -top-2 -right-2 bg-darkred text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-darkred"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 rounded-b-md">
-                                    <div className="truncate">{preview.name}</div>
-                                    <div className="text-gray-300">{formatFileSize(preview.size)}</div>
-                                </div>
+                                    {preview.type.startsWith("image/") ? (
+                                        // 🖼️ Image preview
+                                        <img
+                                            src={preview.url}
+                                            alt={preview.name}
+                                            className="w-full h-24 object-cover rounded-md border border-gray-200"
+                                        />
+                                    ) : (
+                                        // 📄 Non-image preview
+                                        <div className="flex flex-col items-center justify-center w-full h-24 bg-gray-100 rounded-md border border-gray-200 text-gray-500 text-xs">
+                                            <Upload className="w-6 h-6 mb-1" />
+                                            <span className="truncate max-w-full px-2">{preview.name}</span>
+                                        </div>
+                                    )}
+
+                                    {/* ❌ Remove button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFile(idx)}
+                                        className="absolute -top-2 -right-2 bg-darkred text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-darkred"
+                                        >
+                                        <X className="h-3 w-3" />
+                                    </button>
+
+                                    {/* 📎 Info overlay */}
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 rounded-b-md">
+                                        <div className="truncate">{preview.name}</div>
+                                        <div className="text-gray-300">{formatFileSize(preview.size)}</div>
+                                    </div>
                                 </div>
                             ))}
                             <button
@@ -202,9 +237,9 @@ export function CreateAnnouncement({ setOpen }: {
                 <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="*/*"
                     ref={fileInputRef}
-                    onChange={handleImageChange}
+                    onChange={handleFileChange}
                     className="hidden"
                 />
                 <form   

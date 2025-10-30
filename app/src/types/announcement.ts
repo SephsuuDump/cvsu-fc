@@ -20,7 +20,11 @@ export type Announcement = {
     id: number; // pk
     label: string; // enum GENERAL | URGENT not null 
     content: string; // text not null
-    files: string[]; // list of file path
+    files: {
+        id: number;
+        file_name: string;
+        file_path: string;
+    }[]; // list of file path
     createdAt: string; // datetime
     updatedAt: string; // datetime
     isDeleted: string; // boolean
@@ -37,6 +41,5 @@ export type Announcement = {
 export const announcementInit: Partial<Announcement> = {
     userId: 0,
     content: '',
-    files: [],
-    createdAt: '',
+    label: 'GENERAL'
 };

@@ -22,24 +22,24 @@ export type User = {
     email: string;
     password: string;
     firstName: string;
-    middleName: string;
-    lastName:string
+    middle_name: string;
+    lastname:string
     campusId: number;
     contact: string;
-    highestEducationalAttainment: string;
-    createdAt: string;
+    highest_educational_attainment: string;
+    created_at: string;
     updatedAt: string;
     isDeleted: string;
+
+    campus: {
+        id: number;
+        name: string;
+    }
 
     college: {
         id: number,
         name: string;
     };
-
-    department: {
-        id: number,
-        name: string;
-    }
 
     confirmPassword?: string;
 }

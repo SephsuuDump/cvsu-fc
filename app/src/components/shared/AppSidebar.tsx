@@ -7,15 +7,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { coordinatorRoute } from "@/lib/page-route";
+import { adminRoute, coordinatorRoute, memberRoute } from "@/lib/page-route";
+import { AuthPage } from "@/features/auth/AuthPage";
 
 export function AppSidebar() {
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
     const pathName = usePathname();
     if (pathName === '/auth') return null;
-    let route: any[] = coordinatorRoute;
-    
+
+    let route;
+    if (!claims) return <AuthPage />;
+    if (claims.role === 'ADMIN') route = adminRoute
+    if (claims.role === 'COORDINATOR') route = coordinatorRoute
+    if (claims.role === 'MEMBER' || claims.role === 'JOBORDER') route = memberRoute
+
     return (
         <Sidebar
             collapsible="icon"

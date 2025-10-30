@@ -1,15 +1,20 @@
 import { formatCustomDate } from "@/lib/helper";
-import { announcementsMock } from "../../../../public/mock/announcements";
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import { Separator } from "@/components/ui/separator";
 import { AnnouncementBadge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { AnnouncementService } from "@/services/announcement.service";
+import { SectionLoading } from "@/components/ui/loader";
 
 export function AnnouncementsSection() {
+    const { data: announcement, loading } = useFetchData(AnnouncementService.getAllAnnouncements, [], []); 
+    
+    if (loading) return <SectionLoading /> 
     return (
         <section className="stack-md reveal">
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-                {announcementsMock.map((item, i) => (
+                {announcement.map((item, i) => (
                     <div className="break-inside-avoid flex flex-col gap-2 bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all duration-200" key={i}>
                         <div className="flex justify-between">
                             <div className="flex-center-y gap-2">

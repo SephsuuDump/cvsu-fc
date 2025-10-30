@@ -12,7 +12,6 @@ export async function requestData(
     console.log('Body:', body);
     let finalHeaders: HeadersInit = headers || {};
 
-    // ✅ If body is FormData → don't set Content-Type
     if (!(body instanceof FormData)) {
         finalHeaders = {
             "Accept": "application/json",
@@ -31,7 +30,8 @@ export async function requestData(
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || err.message || "Request failed");
     }
-
+    console.log('Response:', res);
+    
     const response = await res.json();
 
     console.log('Response Body:', response);

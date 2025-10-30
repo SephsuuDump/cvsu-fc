@@ -17,15 +17,18 @@ export function useEventCounts(
         const start = new Date(event.eventStart);
         const end = new Date(event.eventEnd);
 
-        // Normalize to midnight to avoid timezone issues
-        const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-        const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        const startDate = new Date(
+            Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())
+        );
+        const endDate = new Date(
+            Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())
+        );
 
-        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-            const day = d.getDate();
-            eventCounts[day] = (eventCounts[day] || 0) + 1;
-        }
+        for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
+            if (d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear) {
+                const day = d.getUTCDate();
+                eventCounts[day] = (eventCounts[day] || 0) + 1;
+            }
         }
     }
 

@@ -4,24 +4,37 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { AppSelect } from "@/components/shared/AppSelect";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { campusesMock } from "../../../public/mock/campuses";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { MembersSection } from "./components/MembersSection";
 import { EventsSection } from "./components/EventsSection";
 import { AnnouncementsSection } from "./components/AnnouncementSection";
+import { CampusService } from "@/services/campus.service";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { CvSULoading } from "@/components/ui/loader";
+import { Campus } from "@/types/campus";
 
 const tabs = ['Coordinators', 'Members', 'Job Offers', 'Events', 'Announcements']
 
 export function CampusesPage() {
+    const { data: campuses, loading } = useFetchData<Campus>(CampusService.getAllCampus);
     const [tab, setTab] = useState(tabs[0]);
-    const [selectedCampus, setSelectedCampus] = useState(campusesMock[0])
+    const [selectedCampus, setSelectedCampus] = useState<Campus | null>(null);
+
+    useEffect(() => {
+        if (campuses && campuses.length > 0 && !selectedCampus) {
+        setSelectedCampus(campuses[0]);
+        }
+    }, [campuses, selectedCampus]);
+    
+    if (loading || !selectedCampus) return <CvSULoading />
     return (
         <section className="stack-md reveal">
             <AppHeader label="CvSU Campuses" />
             <div className="flex-center-y justify-between">
-                <div className="text-lg font-bold">{ selectedCampus.name }</div>
+                <div className="text-lg font-bold">{ selectedCampus.name ?? '...' }</div>
                 <AppSelect
-                    items={campusesMock.map((item) => ({
+                    items={campuses.map((item) => ({
                         label: item.name,
                         value: String(item.id),
                     }))}

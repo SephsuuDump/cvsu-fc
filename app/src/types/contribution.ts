@@ -2,7 +2,8 @@ export type Contribution = {
     userId: number;
 
     contributions: {
-        date: string;
+        month: string;
+        year: number;
         contributed: boolean;
     }[];
     

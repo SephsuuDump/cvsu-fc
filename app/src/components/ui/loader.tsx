@@ -31,6 +31,24 @@ export function CvSULoading({ className }: { className?: string }) {
     );
 }
 
+export function SectionLoading({ className }: {
+    className?: string
+}) {
+    return (
+        <section className={ `relative flex-center w-full h-[50vh] ${className}` }>
+            <div className="animate-fade-loop">
+                <Image
+                    src="/images/cvsu_logo.png"
+                    alt="CvSU Logo"
+                    width={80}
+                    height={80}
+                />
+                <div className="text-center font-semibold">CvSU FC</div>
+            </div>
+        </section>
+    )
+}
+
 export function ModalLoader() {
     return (
         <Dialog open>

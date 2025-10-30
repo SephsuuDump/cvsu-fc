@@ -19,15 +19,27 @@ export class AnnouncementService {
             'GET'
         )
     }
-    static async createAnnouncement(userId: number, announcement: Partial<Announcement>, images: File[]) {
+    static async createAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[]) {
+        console.log(userId);
+        console.log(files);
+        console.log(announcement);
+        
+        
+        
         const formData = new FormData();
-        formData.append('userId', userId.toString());
-        images.forEach(file => {
-            formData.append('images', file); 
+        formData.append('user_id', userId.toString());
+        files.forEach(file => {
+            formData.append('files[]', file); 
         });
         formData.append('content', announcement.content!);
-        formData.append('createdAt', announcement.createdAt!);
-        return formData        
+        formData.append('label', announcement.label!)
+        
+        return await requestData(
+            `${url}/create`,
+            'POST',
+            { "Accept": "application/json" },
+            formData
+        )
     }
 
 }

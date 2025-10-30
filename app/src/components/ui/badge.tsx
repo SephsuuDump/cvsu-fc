@@ -48,7 +48,7 @@ export function AnnouncementBadge({ label }: {
   label: string;
 }) {
   return (
-    <Badge className={`scale-70 text-white origin-right ${label === 'Urgent' ? 'bg-amber-800' : 'bg-darkgreen'}`}>{ label.toUpperCase() }</Badge>
+    <Badge className={`scale-70 text-white origin-right ${label === 'URGENT' ? 'bg-amber-800' : 'bg-darkgreen'}`}>{ label.toUpperCase() }</Badge>
   )
 }
 
