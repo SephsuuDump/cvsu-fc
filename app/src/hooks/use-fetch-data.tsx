@@ -20,7 +20,7 @@ export function useFetchData<T>(
         async function fetchData() {
             try {
                 setLoading(true);
-                const result = await fetchFn(page, size, ...args);
+                const result = await fetchFn(...args, page, size);
 
                 if (!isMounted) return;
 

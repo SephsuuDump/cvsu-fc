@@ -1,6 +1,6 @@
 import { Contribution } from "@/types/contribution";
 
-export const contributionsMock: Contribution[] = [
+export const contributionsMock = [
   {
     userId: 1,
     user: {

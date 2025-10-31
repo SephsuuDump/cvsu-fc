@@ -18,6 +18,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } fr
 import { toast } from "sonner";
 
 interface Preview {
+    id?: number;
     url: string;
     name: string;
     size: number;
@@ -26,38 +27,61 @@ interface Preview {
 
 const visibilities = ['ALL', 'COORDINATOR', 'MEMBER', 'JOB OFFER'];
 
-export function CreateEvent({ setOpen, selectedDay }: {
-    setOpen: Dispatch<SetStateAction<boolean>>
-    selectedDay: string
+export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
+    toUpdate: FCEvent
+    setUpdate: Dispatch<SetStateAction<FCEvent | undefined>>
+    setReload: Dispatch<SetStateAction<boolean>>
 }) {
-    const date = new Date(selectedDay); 
-
+    console.log(toUpdate);
+    
     const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading: campusLoading } = useFetchData(CampusService.getAllCampus);
 
+    const [datePartStart, timePartStart] = toUpdate.event_start.split(" ");
+    const [datePartEnd, timePartEnd] = toUpdate.event_end.split(" ");
     const [onProcess, setProcess] = useState(false)
-    const [event, setEvent] = useState<Partial<FCEvent>>({
-        title: '',
-        description: '',
-        visibility: visibilities[0],
-        event_start: undefined,
-        event_end: undefined,
-        campus_id: 0
-    });
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [event, setEvent] = useState<FCEvent>(toUpdate);
+    const [existingFiles, setExistingFiles] = useState(toUpdate.files || []);
+    const [newFiles, setNewFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
 
-    const [startDate, setStartDate] = useState<Date | undefined>(date)
-    const [endDate, setEndDate] = useState<Date | undefined>(date)
+    const removedFileDataRef = useRef<FormData>(new FormData());
+
+
+    const [startDate, setStartDate] = useState<Date | undefined>()
+    const [endDate, setEndDate] = useState<Date | undefined>()
     const [startTime, setStartTime] = useState<string>("00:00:00")
     const [endTime, setEndTime] = useState<string>("12:00:00")
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        handleStartChange(startDate, startTime);
-        handleEndChange(endDate, endTime);
-    }, [selectedDay])
+        setStartDate(new Date(datePartStart));
+        setEndDate(new Date(datePartEnd));
+        setStartTime(timePartStart);
+        setEndTime(timePartEnd);
+    }, [datePartStart, datePartEnd, timePartStart, timePartEnd])
+
+    useEffect(() => {
+        const previews = [
+            ...existingFiles.map(file => ({
+                id: file.id,
+                url: `/storage/${file.file_path}`,
+                name: file.file_name,
+                size: 0,
+                type: "existing" as const
+            })),
+            ...newFiles.map(file => ({
+                url: URL.createObjectURL(file),
+                name: file.name,
+                size: file.size,
+                type: "new" as const,
+                file 
+            }))
+        ];
+
+        setPreviews(previews);
+    }, [existingFiles, newFiles]);
 
     const handleStartChange = (date?: Date, time?: string) => {
         if (!date && !time) return
@@ -85,38 +109,23 @@ export function CreateEvent({ setOpen, selectedDay }: {
         if (!e.target.files) return;
         const files = Array.from(e.target.files);
 
-        const validFiles: File[] = files.filter(file => {
-            const isValidSize = file.size <= 10 * 1024 * 1024; // still enforce size
-
-            if (!isValidSize) {
-                toast.error(`${file.name} is too large (max 10MB)`);
-                return false;
-            }
-
-            return true;
-        });
-
-        if (validFiles.length === 0) return;
-
-        setSelectedFiles(prev => [...prev, ...validFiles]);
-
-        const newPreviewUrls: Preview[] = validFiles.map(file => ({
-            url: URL.createObjectURL(file),
-            name: file.name,
-            size: file.size,
-            type: file.type,
-        }));
-
-        setPreviews(prev => [...prev, ...newPreviewUrls]);
-
+        setNewFiles(prev => [...prev, ...files]);
         e.target.value = "";
-    };
+    }
 
     function removeFile(index: number) {
-        URL.revokeObjectURL(previews[index].url);
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        const preview = previews[index];
+
+        if (preview.type === "existing") {
+            removedFileDataRef.current.append("remove_file_ids[]", String(preview.id));
+            setExistingFiles(prev => prev.filter(f => f.id !== preview.id));
+        } else {
+            setNewFiles(prev => prev.filter(f => f.name !== preview.name));
+        }
+
         setPreviews(prev => prev.filter((_, i) => i !== index));
-    };
+    }
+
 
     useEffect(() => {
         return () => {
@@ -139,25 +148,20 @@ export function CreateEvent({ setOpen, selectedDay }: {
     async function handleSubmit() {
         try {
             setProcess(true);
-            if (hasEmptyField(event, ["description", "campus_id"])) return toast.warning('Please fill up all the fields.');
+            if (hasEmptyField(event, ["is_deleted", "campus_id", "files"])) return toast.warning('Please fill up all the fields.');
 
-            const data = await EventService.createEvent(claims.id, event, selectedFiles);
+            const data = await EventService.updateEvent(claims, event, newFiles, removedFileDataRef.current);
             if (data) {
-                toast.success('Event created successfully.');
-                setOpen(prev => !prev);
+                toast.success('Event updated successfully.');
+                setUpdate(undefined);
             }
         } catch (error) { toast.error(`${error}`) }
         finally { setProcess(false) }
     }
 
-    useEffect(() => {
-        console.log(event);
-        
-    }, [event])
-
     if (authLoading || campusLoading) return <ModalLoader />
     return (
-        <Dialog open onOpenChange={ setOpen }>
+        <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
             <DialogContent className="overflow-y-auto h-9/10 reveal">
                 <ModalTitle label="Publish an Event" />
                 <AppInput
@@ -228,6 +232,7 @@ export function CreateEvent({ setOpen, selectedDay }: {
                             noLabel
                         />
                     </div>
+
                     <div className="stack-md">
                         <AppDateSelect
                             label="Event End Date"
@@ -254,9 +259,13 @@ export function CreateEvent({ setOpen, selectedDay }: {
                             <button
                                 type="button"
                                 onClick={() => {
-                                previews.forEach(preview => URL.revokeObjectURL(preview.url));
-                                setSelectedFiles([]);
-                                setPreviews([]);
+                                    existingFiles.forEach(f => {
+                                        removedFileDataRef.current.append("remove_file_ids[]", String(f.id));
+                                    });
+                                    previews.forEach(preview => URL.revokeObjectURL(preview.url));
+                                    setExistingFiles([]); 
+                                    setNewFiles([]);      
+                                    setPreviews([]);   
                                 }}
                                 className="text-xs text-darkred hover:text-red-700"
                             >

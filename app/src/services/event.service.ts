@@ -57,4 +57,34 @@ export class EventService {
         )
     }
 
+    static async updateEvent(claims: Claim, event: Partial<FCEvent>, files: File[], filesToRemove: FormData) {  
+        const formData = new FormData();
+        formData.append('title', event.title!);
+        formData.append('description', event.description!);
+        formData.append('user_id', String(claims.id));
+        formData.append('event_start', formatDateToLocal(event.event_start!));
+        formData.append('event_end', formatDateToLocal(event.event_end!));
+        formData.append('visibility', event.visibility!);
+        formData.append('campus_id', String(event.campus_id!));
+        files.forEach(file => {
+            formData.append('files[]', file); 
+        });
+
+        for (const [key, value] of filesToRemove.entries()) {
+            formData.append(key, value);
+        }
+
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+            
+        }
+        
+        return await requestData(
+            `${url}/create`,
+            'POST',
+            { "Accept": "application/json" },
+            formData
+        )
+    }
+
 }

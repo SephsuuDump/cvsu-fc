@@ -214,3 +214,10 @@ export function formatDateToLocal(dateStr: string) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+export function mergeFormData(target: FormData, source: FormData) {
+    for (const [key, value] of source.entries()) {
+        target.append(key, value);
+    }
+    return target;
+}
+

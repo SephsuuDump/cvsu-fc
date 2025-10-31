@@ -1,15 +1,19 @@
 export type Contribution = {
-    userId: number;
+    id: number;
+    user_id: number;
+    contributed: number;
+    year: string;
+    month: string;
 
     contributions: {
         month: string;
         year: number;
-        contributed: boolean;
+        contributed: number;
     }[];
     
-    user?: {
-        firstName: string;
-        lastName: string;
-        collegeName: string
-    },
+
+    first_name: string;
+    last_name: string;
+    college_name: string
+
 }

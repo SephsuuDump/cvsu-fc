@@ -37,4 +37,33 @@ export class AnnouncementService {
         )
     }
 
+    static async updateAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[], filesToRemove: FormData) {
+        const formData = new FormData();
+        formData.append('user_id', userId.toString());
+        files.forEach(file => {
+            formData.append('files[]', file); 
+        });
+        formData.append('content', announcement.content!);
+        formData.append('label', announcement.label!)
+
+        for (const [key, value] of filesToRemove.entries()) {
+            formData.append(key, value);
+        }
+        
+        return await requestData(
+            `${url}/update?id=${announcement.id}`,
+            'POST',
+            { "Accept": "application/json" },
+            formData
+        )
+    }
+
+    static async deleteAnnouncement(id: number) {
+        return await requestData(
+            `${url}/delete?id=${id}`,
+            'POST',
+            { "Accept": "application/json" }
+        )
+    }
+
 }

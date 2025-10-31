@@ -20,4 +20,9 @@ type FCEvent = {
         first_name: string;
         last_name: string;
     }
+
+    campus?: {
+        id: number;
+        name: string;
+    }
 }

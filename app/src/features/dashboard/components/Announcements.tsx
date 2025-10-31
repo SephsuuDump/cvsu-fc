@@ -15,6 +15,9 @@ import { Announcement } from "@/types/announcement";
 import { AnnouncementService } from "@/services/announcement.service";
 import { CvSULoading } from "@/components/ui/loader";
 import { FILE_URL } from "@/lib/urls";
+import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
+import { UpdateAnnouncement } from "./UpdateAnnouncement";
+import { DeleteAnnouncement } from "./DeleteAnnouncement";
 
 export function Announcements({ claims, className }: {
     claims: Claim
@@ -23,9 +26,7 @@ export function Announcements({ claims, className }: {
     const [reload, setReload] = useState(false);
 
     const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload]) 
-    const { open, setOpen } = useCrudState();
-    console.log(announcements);
-    
+    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Announcement>();
 
     if (loading) return <CvSULoading className={ className }  />
     return (
@@ -46,19 +47,30 @@ export function Announcements({ claims, className }: {
             <div>
                 {announcements.map((item, i) => (
                     <div className="flex flex-col gap-2 bg-slate-50 rounded-md shadow-sm border-slate-300 my-2 p-4" key={i}>
-                        <div className="flex justify-between">
+                        <div className="flex">
                             <div className="flex-center-y gap-2">
                                 <AppAvatar fallback={ `${item.user!.first_name[0]}${item.user!.last_name[0]}` } />
                                 <div className="font-semibold">{ item.user!.first_name } { item.user!.last_name }</div>
                             </div>
-                            <AnnouncementBadge label={ item.label } />
+                      
+                                
+                                <AnnouncementBadge 
+                                    label={ item.label }
+                                    className="ms-auto mr-4"
+                                />
+                                <AppRUDSelection 
+                                    item={ item }
+                                    className="hover:rounded-full hover:bg-slate-200"
+                                    setUpdate={ setUpdate }
+                                    setDelete={ setDelete }
+                                />
+                        
                         </div>
                         <div className="text-sm">{ item.content }</div>
 
                         {item.files && item.files.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {item.files.map((file, idx: number) => {
-                                // const fileUrl = `${FILE_URL}/${file}`;
                                 const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.file_path);
 
                                 return isImage ? (
@@ -115,6 +127,22 @@ export function Announcements({ claims, className }: {
             {open && (
                 <CreateAnnouncement
                     setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toUpdate && (
+                <UpdateAnnouncement
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteAnnouncement
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
                     setReload={ setReload }
                 />
             )}

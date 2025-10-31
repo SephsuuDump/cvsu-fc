@@ -1,4 +1,4 @@
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, LucideIcon } from "lucide-react";
 import { 
     DropdownMenu, 
     DropdownMenuContent, 
@@ -12,7 +12,8 @@ type AppRUDSelectionProps<T> = {
     setView?: (item: T) => void;
     setUpdate?: (item: T) => void;
     setDelete?: (item: T) => void;
-    className?: string
+    className?: string,
+    icon?: LucideIcon
 };
 
 export function AppRUDSelection<T>({
@@ -20,13 +21,15 @@ export function AppRUDSelection<T>({
     setView,
     setUpdate,
     setDelete,
-    className
+    className,
+    icon
 }: AppRUDSelectionProps<T>) {
+    const Icon = icon ?? EllipsisVertical;
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild className={ `${className}` }>
                 <button>
-                    <EllipsisVertical className="w-4 h-4" />
+                    <Icon className="w-4 h-4" />
                 </button>
             </DropdownMenuTrigger>
 

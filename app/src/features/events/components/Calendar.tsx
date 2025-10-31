@@ -53,7 +53,7 @@ export function Calendar({ className }: {
     const { data: events, loading } = useFetchData<FCEvent>(
         EventService.getByCampus,
         [currentMonth, currentYear], 
-        [0, monthNames[currentMonth].toLowerCase(), currentYear]
+        [0, monthNames[currentMonth].toLowerCase()]
     );
 
     const eventCounts = useEventCounts(events, currentMonth, currentYear);

@@ -5,11 +5,20 @@ import { BASE_URL } from "@/lib/urls";
 const url = `${BASE_URL}/contributions`;
 
 export class ContributionService {
-    static async getByCampusCollege(page: number, size: number, campusId: number, collegeId: number) {
+    static async getByCampusCollege(campusId: number, collegeId: number, year: string) {
         return await requestData(
-            `${url}/get-all?page=${page}&size=${size}&campus_id=${campusId}&college_id=${collegeId}`,
+            `${url}/sephsu?campus_id=${campusId}&college_id=${collegeId}&year=${year}`,
             'GET',
             { "Accept": "application/json" }
+        )
+    }
+
+    static async updateContribution(id: number, updatedContribution: boolean) {
+        return await requestData(
+            `${url}/update?id=${id}`,
+            'GET',
+            { "Accept": "application/json" },
+            { contribution: updatedContribution }
         )
     }
 }
