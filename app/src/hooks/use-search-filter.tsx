@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useMemo } from "react";
 
-// Helper: safely get nested values using dot notation
 function getValueByPath(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc?.[part], obj);
 }

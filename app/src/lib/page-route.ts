@@ -16,6 +16,11 @@ export const adminRoute = [
         icon: University,
         href: '/campuses',
     },
+    { 
+        title: 'Contributions', 
+        icon: HandCoins,
+        href: '/contributions',
+    },
     {
         title: 'Announcements',
         icon: Megaphone,

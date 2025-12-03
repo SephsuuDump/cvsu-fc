@@ -11,19 +11,37 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import { formatDateToWord } from "@/lib/helper";
 import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
-import { FileUp, Plus, SlidersHorizontal } from "lucide-react";
+import { FileUp, Plus, SlidersHorizontal, Users } from "lucide-react";
 import { CreateUser } from "./components/CreateUser";
 import { useState } from "react";
 import { CvSULoading } from "@/components/ui/loader";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateUser } from "./components/UpdateUser";
 import { DeleteUser } from "./components/DeleteUser";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, SelectLabel } from "@/components/ui/select";
+import { CampusService } from "@/services/campus.service";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Campus } from "@/types/campus";
+import { useSearchFilter } from "@/hooks/use-search-filter";
 
 export function UsersPage() {
     const [reload, setReload] = useState(false);
+    const [selectedCampus, setSelectedCampus] = useState(0);
     const { data: users, loading } = useFetchData<Partial<User>>(UserService.getAllUsers, [reload]);
+    const { data: campusesOptions, loading: campusesLoading } = useFetchData<Campus>(CampusService.getAllCampus, []);
+    const { setSearch, filteredItems } = useSearchFilter(users, [""])
+
+    const campuses = [
+        { id: 0, name: "All Campuses" },
+        ...campusesOptions
+    ];
+
+    const filteredUsers = filteredItems.filter(i => {
+        if (selectedCampus !== 0) return i.campus?.id === selectedCampus;
+        return true;
+    });
     
-    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
+    const { open, setOpen, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
 
     if (loading) return <CvSULoading />
     return (
@@ -43,11 +61,28 @@ export function UsersPage() {
                     >
                         <Plus className="w-4 h-4 text-slate-50" />
                     </button>
-                    <button
-                        className="rounded-full p-2 bg-slate-50 shadow-sm"
-                    >
-                        <SlidersHorizontal className="w-4 h-4" />
-                    </button>
+                    {campusesLoading ? (
+                        <Skeleton className="w-10" />
+                    ) : (
+                        <Select onValueChange={(value) => setSelectedCampus(Number(value))}>
+                            <SelectTrigger className="rounded-full w-40 truncate">
+                                <SelectValue placeholder="Select Campus" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>CvSU Campuses</SelectLabel>
+                                    {campuses.map((item) => (
+                                        <SelectItem 
+                                            key={ item.id }
+                                            value={ String(item.id) }
+                                        >
+                                            { item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.name }
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    )}
                     <Button
                         className="rounded-full bg-slate-50 shadow-sm text-black"
                         size="sm"
@@ -62,13 +97,19 @@ export function UsersPage() {
                     <div className="thead w-full grid grid-cols-4">
                         <div className="th">Member Name</div>
                         <div className="th">Email Address</div>
+                        <div className="th">Campus</div>
                         <div className="th">College</div>
-                        <div className="th">Member Since</div>
                     </div>
                     <div className="th w-10"></div>
                 </div>
                 <Separator className="h-3 bg-slate-300" />
-                {users.map((item, i) => (
+                {filteredUsers.length === 0 && (
+                    <div className="py-10 flex flex-col items-center justify-center text-slate-500">
+                        <Users className="h-10 w-10 mb-2 opacity-60" />
+                        <p className="text-sm">No users found.</p>
+                    </div>
+                )}
+                {filteredUsers.map((item, i) => (
                     <div className="tdata flex-center-y" key={i}>
                         <div className="w-full grid grid-cols-4">
                             <div className="td flex-center-y gap-2">
@@ -84,8 +125,13 @@ export function UsersPage() {
                                 </TooltipTrigger>
                                 <TooltipContent>{ item.email }</TooltipContent>
                             </Tooltip>
-                            <div className="td">Contact Number</div>
-                            <div className="td">{ formatDateToWord(item.created_at!) }</div>
+                            <div className="td">{ item.campus!.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.campus?.name }</div>
+                            <div className="td">
+                                <Tooltip>
+                                    <TooltipTrigger>{ item.college?.abbreviations }</TooltipTrigger>
+                                    <TooltipContent className="bg-darkgreen">{ item.college!.name }</TooltipContent>
+                                </Tooltip>
+                            </div>
                         </div>
                         <AppRUDSelection
                             className="w-10 flex-center"

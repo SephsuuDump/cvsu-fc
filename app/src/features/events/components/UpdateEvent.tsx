@@ -3,7 +3,7 @@ import { AppInput } from "@/components/shared/AppInput";
 import { AppTextarea } from "@/components/shared/AppTextare";
 import { AppTimeSelect } from "@/components/shared/AppTimeSelect";
 import { ModalTitle } from "@/components/shared/ModalTitle";
-import { AddButton } from "@/components/ui/button";
+import { AddButton, UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ModalLoader } from "@/components/ui/loader";
@@ -345,11 +345,11 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
                     className="flex-center-y justify-end gap-4"
                 >
                     <DialogClose>Cancel</DialogClose>
-                    <AddButton
+                    <UpdateButton
                         type="submit"
                         onProcess={ onProcess }
-                        label="Add Event"
-                        loadingLabel="Adding Event"
+                        label="Update Event"
+                        loadingLabel="Updating Event"
                     />
                 </form>
             </DialogContent>

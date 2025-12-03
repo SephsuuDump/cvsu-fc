@@ -6,6 +6,7 @@ export type Contribution = {
     month: string;
 
     contributions: {
+        id: number;
         month: string;
         year: number;
         contributed: number;

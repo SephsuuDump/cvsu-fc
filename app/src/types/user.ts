@@ -41,6 +41,7 @@ export type User = {
     college: {
         id: number,
         name: string;
+        abbreviations: string;
     };
 
     confirmPassword?: string;
