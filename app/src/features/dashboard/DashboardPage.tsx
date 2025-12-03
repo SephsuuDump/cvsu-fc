@@ -10,14 +10,14 @@ export function DashboardPage() {
     const { claims, loading } = useAuth();
     if (loading) return <CvSULoading />
     return (
-        <section className="grid grid-cols-5 gap-4 reveal">
+        <section className="grid grid-cols-2 gap-4 reveal">
             <Announcements 
                 claims={ claims }
-                className="w-full col-span-2"
+                className="w-full"
             />
                 
             <Calendar
-                className="w-full col-span-3"
+                className="w-full"
             />
         </section>
     )

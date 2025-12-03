@@ -1,12 +1,16 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AddButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { ModalLoader } from "@/components/ui/loader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { updateField } from "@/lib/helper";
 import { AnnouncementService } from "@/services/announcement.service";
+import { CampusService } from "@/services/campus.service";
 import { Announcement, announcementInit } from "@/types/announcement";
+import { Campus } from "@/types/campus";
 import { Plus, Upload, X } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,11 +27,13 @@ export function CreateAnnouncement({ setOpen, setReload }: {
     setOpen: Dispatch<SetStateAction<boolean>>;
     setReload: Dispatch<SetStateAction<boolean>>;
 }) {
-    const { claims, loading } = useAuth();
+    const { claims, loading: authLoading } = useAuth();
     const [announcement, setAnnouncement] = useState<Partial<Announcement>>(announcementInit);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
     const [onProcess, setProcess] = useState(false);
+
+    const { data: campuses, loading } = useFetchData<Campus>(CampusService.getAllCampus);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -116,6 +122,7 @@ export function CreateAnnouncement({ setOpen, setReload }: {
         finally { setProcess(false); }
     }
 
+    if (authLoading || loading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent className="overflow-y-auto h-9/10">
@@ -137,6 +144,23 @@ export function CreateAnnouncement({ setOpen, setReload }: {
                             <SelectItem value="URGENT">URGENT</SelectItem>
                         </SelectContent>
                     </Select> 
+                    <Select
+                        value={ announcement.campus_id ? String(announcement.campus_id) : "0" }
+                        onValueChange={ (value) => setAnnouncement(prev => ({
+                            ...prev,
+                            campus_id: Number(value)
+                        }))}
+                    >
+                        <SelectTrigger className="">
+                            <SelectValue placeholder="Select campus" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="0">All Campuses</SelectItem>
+                            {campuses.map((item, i) => (
+                                <SelectItem value={String(item.id)} key={i}>{ item.name.match(/-\s*(.*?)\s*Campus/i)?.[1] }</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="-mt-2">
                     <Textarea

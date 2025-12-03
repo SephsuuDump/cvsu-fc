@@ -4,14 +4,21 @@ import { AppAvatar } from "@/components/shared/AppAvatar";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { formatCustomDate } from "@/lib/helper";
-import { AtSign } from "lucide-react";
+import { AtSign, UserX } from "lucide-react";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { User } from "@/types/user";
 import { UserService } from "@/services/user.service";
-import { CvSULoading, SectionLoading } from "@/components/ui/loader";
+import { SectionLoading } from "@/components/ui/loader";
 
-export function FacultySection() {
-    const { data: faculties, loading } = useFetchData<User>(UserService.getAllUsers);
+export function FacultySection({ campusId }: {
+    campusId: number;
+}) {
+
+    const { data: faculties, loading } = useFetchData<User>(
+        UserService.getUsersByCampus, 
+        [campusId],
+        [campusId]
+    );
 
     if (loading) return <SectionLoading />
     return (
@@ -19,6 +26,12 @@ export function FacultySection() {
             <Input
                 placeholder="Search for a member"
             />
+            {faculties.length === 0 && (
+                <div className="col-span-3 py-10 flex flex-col items-center text-slate-500">
+                    <UserX className="w-12 h-12 mb-2 opacity-50" />
+                    <p className="text-sm">No faculty members found.</p>
+                </div>
+            )}
             <div className="grid grid-cols-3 gap-2">
                 {faculties.map((item, i) => (
                     <div className="bg-slate-50 p-4 shadow-sm stack-md" key={i}>

@@ -29,6 +29,7 @@ export type Announcement = {
     updated_at: string; // datetime
     is_deleted: string; // boolean
     user_id: number; // fk referenced to user.id
+    campus_id: number;
 
     user?: {
         id: number;
@@ -41,5 +42,6 @@ export type Announcement = {
 export const announcementInit: Partial<Announcement> = {
     user_id: 0,
     content: '',
-    label: 'GENERAL'
+    label: 'GENERAL',
+    campus_id: 0,
 };

@@ -13,20 +13,20 @@ export class EventService {
         )
     }
 
-    static async getByCampus(campusId: number, month: string) {
+    static async getEventsByCampus(campusId: number, month: string, year: string) {
         return await requestData(
-            `${url}/get-by-campus?campus_id=${campusId}&month=${month}`,
+            `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}`,
             'GET',
             { "Accept": "application/json" },
         )
     }
 
-    static async getEventsByCampus(id: number) {
-        return await requestData(
-            `${url}/get-all?id=${id}`,
-            'GET'
-        )
-    }
+    // static async getEventsByCampus(id: number) {
+    //     return await requestData(
+    //         `${url}/get-all?id=${id}`,
+    //         'GET'
+    //     )
+    // }
 
     static async createEvent(userId: number, event: Partial<FCEvent>, files: File[]) {
         console.log(userId);
@@ -84,6 +84,13 @@ export class EventService {
             'POST',
             { "Accept": "application/json" },
             formData
+        )
+    }
+
+    static async deleteEvent(id: number) {
+        return await requestData(
+            `${url}/delete?id=${id}`,
+            'POST',
         )
     }
 

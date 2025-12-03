@@ -52,7 +52,7 @@ export function SectionLoading({ className }: {
 export function ModalLoader() {
     return (
         <Dialog open>
-            <DialogContent className="flex-center h-100">
+            <DialogContent className="flex-center h-100 reveal">
                 <DialogTitle></DialogTitle>
                 <div className="animate-fade-loop">
                     <Image

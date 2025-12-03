@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Check, FileUp, SlidersHorizontal, X } from "lucide-react";
+import { Check, FileQuestion, FileUp, SlidersHorizontal, X } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { CollegeService } from "@/services/college.service";
 import { CvSULoading, SectionLoading } from "@/components/ui/loader";
@@ -161,7 +161,6 @@ export function ContributionPage() {
                     </Button>
                 </div>
             </div>
-
             {contributionsLoading ? (
                 <SectionLoading />
             ) : (
@@ -172,7 +171,12 @@ export function ContributionPage() {
                         <div className="th col-span-2">Contribution for {selectedYear}</div>
                     </div>
                     <Separator className="h-3 bg-slate-300" />
-
+                    {contributions.length === 0 && (
+                        <div className="py-16 flex flex-col items-center justify-center text-slate-500">
+                            <FileQuestion className="w-12 h-12 mb-3 opacity-50" />
+                            <p className="text-sm">No contributions found.</p>
+                        </div>
+                    )}
                     {contributions.map((item, i) => {
                         const monthData = item.contributions.find(
                             (c) => c.month.slice(0, 3).toUpperCase() === selectedMonth.slice(0,3).toUpperCase() && 

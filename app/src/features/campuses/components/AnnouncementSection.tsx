@@ -7,9 +7,17 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import { AnnouncementService } from "@/services/announcement.service";
 import { SectionLoading } from "@/components/ui/loader";
 import { Announcement } from "@/types/announcement";
+import { useState } from "react";
 
-export function AnnouncementsSection() {
-    const { data: announcement, loading } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [], []); 
+export function AnnouncementsSection({ campusId }: {
+    campusId: number
+}) {
+    const [reload, setReload] = useState(false);
+    const { data: announcement, loading } = useFetchData<Announcement>(
+        AnnouncementService.getAnnouncementsByCampus, 
+        [campusId, reload], 
+        [campusId]
+    ); 
     
     if (loading) return <SectionLoading /> 
     return (

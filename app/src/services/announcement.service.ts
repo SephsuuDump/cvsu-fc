@@ -13,9 +13,9 @@ export class AnnouncementService {
         )
     }
 
-    static async getAnnouncementsByBranch(id: number) {
+    static async getAnnouncementsByCampus(id: number) {
         return await requestData(
-            `${url}/get-all?id=${id}`,
+            `${url}/get-by-campus?campus_id=${id}`,
             'GET'
         )
     }
@@ -27,7 +27,8 @@ export class AnnouncementService {
             formData.append('files[]', file); 
         });
         formData.append('content', announcement.content!);
-        formData.append('label', announcement.label!)
+        formData.append('label', announcement.label!);
+        formData.append('campus_id', String(announcement.campus_id!))
         
         return await requestData(
             `${url}/create`,
