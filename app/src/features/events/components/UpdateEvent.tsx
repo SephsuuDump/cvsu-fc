@@ -40,7 +40,7 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
     const [datePartStart, timePartStart] = toUpdate.event_start.split(" ");
     const [datePartEnd, timePartEnd] = toUpdate.event_end.split(" ");
     const [onProcess, setProcess] = useState(false)
-    const [event, setEvent] = useState<FCEvent>(toUpdate);
+    const [event, setEvent] = useState<FCEvent>({...toUpdate, campus_id: toUpdate.campus!.id});
     const [existingFiles, setExistingFiles] = useState(toUpdate.files || []);
     const [newFiles, setNewFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);

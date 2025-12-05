@@ -73,11 +73,6 @@ export const memberRoute = [
         href: '/',
     },
     { 
-        title: 'Faculty', 
-        icon: Landmark,
-        href: '/faculty',
-    },
-    { 
         title: 'Announcements', 
         icon: Megaphone,
         href: '/events',

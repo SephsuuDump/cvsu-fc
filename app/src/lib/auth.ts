@@ -1,4 +1,4 @@
-import { Claim } from "@/types/claims";
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -46,5 +46,5 @@ export async function requirePermission(permission: string) {
     }
 
     export function hasRole(token: Claim, roles: string[]): boolean {
-    return roles.includes(token.roles[0]);
+    return roles.includes(token.role);
 }

@@ -25,7 +25,17 @@ export function Announcements({ claims, className }: {
 }) {
     const [reload, setReload] = useState(false);
 
-    const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload]) 
+    const getAnnouncements = (() => {
+        if (claims.role === "ADMIN") return AnnouncementService.getAllAnnouncements;
+        if (["COORDINATOR", "JOB ORDER", "MEMBER"].includes(claims.role)) return AnnouncementService.getAnnouncementsByCampus;
+        return AnnouncementService.getAllAnnouncements; // fallback
+    })();
+
+    const { data: announcements, loading, error } = useFetchData<Announcement>(
+        getAnnouncements, 
+        [reload, claims.campus.id],
+        [claims.campus.id]
+    );
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Announcement>();
 
     if (loading) return <CvSULoading className={ className }  />
@@ -35,15 +45,17 @@ export function Announcements({ claims, className }: {
                 label="Recent Announcements" 
                 className="mb-2"
             />
-            <div className="flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
-                <AppAvatar />
-                <Button 
-                    onClick={ () => setOpen(true) }
-                    className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
-                >
-                    Announce something to CvSU Main
-                </Button>
-            </div>
+            {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+                <div className="flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
+                    <AppAvatar />
+                    <Button 
+                        onClick={ () => setOpen(true) }
+                        className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
+                    >
+                        Announce something to CvSU Main
+                    </Button>
+                </div>
+            )}
             <div>
                 {announcements.map((item, i) => (
                     <div className="flex flex-col gap-2 bg-slate-50 rounded-md shadow-sm border-slate-300 my-2 p-4" key={i}>
@@ -52,18 +64,18 @@ export function Announcements({ claims, className }: {
                                 <AppAvatar fallback={ `${item.user!.first_name[0]}${item.user!.last_name[0]}` } />
                                 <div className="font-semibold">{ item.user!.first_name } { item.user!.last_name }</div>
                             </div>
-                      
-                                
                                 <AnnouncementBadge 
                                     label={ item.label }
                                     className="ms-auto mr-4"
                                 />
-                                <AppRUDSelection 
-                                    item={ item }
-                                    className="hover:rounded-full hover:bg-slate-200"
-                                    setUpdate={ setUpdate }
-                                    setDelete={ setDelete }
-                                />
+                                { item.user?.id === claims.id && (
+                                    <AppRUDSelection 
+                                        item={ item }
+                                        className="hover:rounded-full hover:bg-slate-200"
+                                        setUpdate={ setUpdate  }
+                                        setDelete={ setDelete }
+                                    />
+                                )}
                         
                         </div>
                         <div className="text-sm">{ item.content }</div>
@@ -114,7 +126,7 @@ export function Announcements({ claims, className }: {
                         <div className="flex justify-between">
                             <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
                             <Link
-                                href={``}
+                                href={`/announcements/${item.id}`}
                                 className="text-xs text-darkgreen font-semibold opacity-80 hover:text-black hover:opacity-100"
                             >
                                 View More

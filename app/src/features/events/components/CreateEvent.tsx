@@ -24,8 +24,6 @@ interface Preview {
     type: string;
 }
 
-const visibilities = ['ALL', 'COORDINATOR', 'MEMBER', 'JOB OFFER'];
-
 export function CreateEvent({ setOpen, selectedDay }: {
     setOpen: Dispatch<SetStateAction<boolean>>
     selectedDay: string
@@ -35,6 +33,8 @@ export function CreateEvent({ setOpen, selectedDay }: {
     const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading: campusLoading } = useFetchData(CampusService.getAllCampus);
 
+    const visibilities = ['ALL', 'COORDINATOR', 'MEMBER', 'JOB OFFER'];
+
     const [onProcess, setProcess] = useState(false)
     const [event, setEvent] = useState<Partial<FCEvent>>({
         title: '',
@@ -42,15 +42,15 @@ export function CreateEvent({ setOpen, selectedDay }: {
         visibility: visibilities[0],
         event_start: undefined,
         event_end: undefined,
-        campus_id: 0
+        campus_id: claims.role === "ADMIN" ? 0 : claims.campus.id
     });
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
 
     const [startDate, setStartDate] = useState<Date | undefined>(date)
     const [endDate, setEndDate] = useState<Date | undefined>(date)
-    const [startTime, setStartTime] = useState<string>("00:00:00")
-    const [endTime, setEndTime] = useState<string>("12:00:00")
+    const [startTime, setStartTime] = useState<string>("06:00:00")
+    const [endTime, setEndTime] = useState<string>("17:00:00")
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -199,6 +199,7 @@ export function CreateEvent({ setOpen, selectedDay }: {
                                 ...prev,
                                 campus_id: Number(value)
                             }))}
+                            disabled={ claims.role === "COORDINATOR" }
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select campus" />

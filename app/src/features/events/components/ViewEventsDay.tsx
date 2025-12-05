@@ -11,6 +11,8 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateEvent } from "./UpdateEvent";
 import { FILE_URL } from "@/lib/urls";
 import { DeleteEvent } from "./DeleteEvent";
+import { useAuth } from "@/hooks/use-auth";
+import { ModalLoader } from "@/components/ui/loader";
 
 export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
     today: string
@@ -18,6 +20,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
     events: FCEvent[]
     setOpen: Dispatch<SetStateAction<boolean>>
 }) {    
+    const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
     const { toUpdate, setUpdate, toDelete, setDelete } = useCrudState<FCEvent>();
     if (toUpdate) return (
@@ -35,22 +38,25 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
             setReload={ setReload }
         />
     )
+    if (authLoading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setSelectedDay(undefined) }}>
             <DialogContent className="reveal">
                 <ModalTitle label={ `Events on ${formatDateToWord(today)}` } />
-                <div className="-mt-2 flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
-                    <AppAvatar />
-                    <Button 
-                        onClick={ () => {
-                            setOpen(true) 
-                            setSelectedDay(undefined)
-                        }}
-                        className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
-                    >
-                        Publish event in { formatDateToWord(today) }
-                    </Button>
-                </div>
+                {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+                    <div className="-mt-2 flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
+                        <AppAvatar />
+                        <Button 
+                            onClick={ () => {
+                                setOpen(true) 
+                                setSelectedDay(undefined)
+                            }}
+                            className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
+                        >
+                            Publish event in { formatDateToWord(today) }
+                        </Button>
+                    </div>
+                )}
                 {events && events.length > 0 ?
                     <div className="h-[60vh] overflow-y-auto">
                         {events.map((item, i) => (
@@ -58,13 +64,15 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                                 <div className="flex-center-y gap-1 mb-2">
                                     <CalendarDays className="w-4 h-4 text-darkgreen" />
                                     <div className="text-sm text-gray-700 font-semibold">{ formatEventRange(item.event_start, item.event_end) }</div>
-                                    <AppRUDSelection 
-                                        className="ms-auto"
-                                        item={ item }
-                                        icon={ Ellipsis }
-                                        setUpdate={ setUpdate }
-                                        setDelete={ setDelete }
-                                    />
+                                    {claims.id === item.user?.id && (
+                                        <AppRUDSelection 
+                                            className="ms-auto"
+                                            item={ item }
+                                            icon={ Ellipsis }
+                                            setUpdate={ setUpdate }
+                                            setDelete={ setDelete }
+                                        />
+                                    )}
                                 </div>
                                 <div className="font-semibold">{ item.title }</div>
                                 <div className="text-sm text-gray">{ item.description }</div>

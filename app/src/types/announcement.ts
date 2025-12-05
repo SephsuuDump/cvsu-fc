@@ -31,6 +31,11 @@ export type Announcement = {
     user_id: number; // fk referenced to user.id
     campus_id: number;
 
+    campus?: {
+        id: number;
+        name: string;
+    }
+
     user?: {
         id: number;
         last_name: string;

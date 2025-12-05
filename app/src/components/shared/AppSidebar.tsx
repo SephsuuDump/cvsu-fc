@@ -2,23 +2,28 @@
 
 import { useAuth } from "@/hooks/use-auth"
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarTrigger, useSidebar } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarTrigger, useSidebar } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { adminRoute, coordinatorRoute, memberRoute } from "@/lib/page-route";
 import { AuthPage } from "@/features/auth/AuthPage";
+import { useEffect, useState } from "react";
 
 export function AppSidebar() {
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
     const pathName = usePathname();
-    if (pathName === '/auth') return null;
 
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    if (pathName === '/auth') return null;
     let route;
     if (!claims) return <AuthPage />;
     if (claims.role === 'ADMIN') route = adminRoute
+
     if (claims.role === 'COORDINATOR') route = coordinatorRoute
     if (claims.role === 'MEMBER' || claims.role === 'JOBORDER') route = memberRoute
 
@@ -63,6 +68,7 @@ export function AppSidebar() {
                         </Link>
                     ))}
                 </SidebarMenu>
+                <SidebarFooter>{ claims.campus.name } { claims.role }</SidebarFooter>
             </SidebarContent>
         </Sidebar>
     )

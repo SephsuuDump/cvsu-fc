@@ -13,6 +13,14 @@ export class AnnouncementService {
         )
     }
 
+    static async getAnnouncementById(id: number) {
+        return await requestData(
+            `${url}/get-by-id?id=${id}`,
+            'GET',
+            { "Accept": "application/json" },
+        )
+    }
+
     static async getAnnouncementsByCampus(id: number) {
         return await requestData(
             `${url}/get-by-campus?campus_id=${id}`,
@@ -21,6 +29,8 @@ export class AnnouncementService {
     }
     
     static async createAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[]) {
+        console.log("user_id:", userId);
+        
         const formData = new FormData();
         formData.append('user_id', userId.toString());
         files.forEach(file => {

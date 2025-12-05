@@ -28,7 +28,11 @@ export function CreateAnnouncement({ setOpen, setReload }: {
     setReload: Dispatch<SetStateAction<boolean>>;
 }) {
     const { claims, loading: authLoading } = useAuth();
-    const [announcement, setAnnouncement] = useState<Partial<Announcement>>(announcementInit);
+    const [announcement, setAnnouncement] = useState<Partial<Announcement>>(
+        claims.role == "ADMIN" 
+            ? announcementInit 
+            : {...announcementInit, campus_id: claims.campus.id}
+        );
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
     const [onProcess, setProcess] = useState(false);
@@ -118,9 +122,12 @@ export function CreateAnnouncement({ setOpen, setReload }: {
                 setReload(prev => !prev);
                 setOpen(false);
             }
-        } catch (error) { toast.error("Failed to create announcement") } 
+        } catch (error) { toast.error(`${error}`) } 
         finally { setProcess(false); }
     }
+
+    console.log(announcement);
+    
 
     if (authLoading || loading) return <ModalLoader />
     return (
@@ -144,23 +151,25 @@ export function CreateAnnouncement({ setOpen, setReload }: {
                             <SelectItem value="URGENT">URGENT</SelectItem>
                         </SelectContent>
                     </Select> 
-                    <Select
-                        value={ announcement.campus_id ? String(announcement.campus_id) : "0" }
-                        onValueChange={ (value) => setAnnouncement(prev => ({
-                            ...prev,
-                            campus_id: Number(value)
-                        }))}
-                    >
-                        <SelectTrigger className="">
-                            <SelectValue placeholder="Select campus" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="0">All Campuses</SelectItem>
-                            {campuses.map((item, i) => (
-                                <SelectItem value={String(item.id)} key={i}>{ item.name.match(/-\s*(.*?)\s*Campus/i)?.[1] }</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    {claims.role === "ADMIN" && (
+                        <Select
+                            value={ announcement.campus_id ? String(announcement.campus_id) : "0" }
+                            onValueChange={ (value) => setAnnouncement(prev => ({
+                                ...prev,
+                                campus_id: Number(value)
+                            }))}
+                        >
+                            <SelectTrigger className="">
+                                <SelectValue placeholder="Select campus" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="0">All Campuses</SelectItem>
+                                {campuses.map((item, i) => (
+                                    <SelectItem value={String(item.id)} key={i}>{ item.name.match(/-\s*(.*?)\s*Campus/i)?.[1] }</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
                 </div>
                 <div className="-mt-2">
                     <Textarea

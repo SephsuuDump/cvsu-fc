@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { CvSULoading } from "@/components/ui/loader";
 import { Announcements } from "./components/Announcements";
 import { Calendar } from "../events/components/Calendar";
-import { Events } from "./components/Events";
 
 export function DashboardPage() {
     const { claims, loading } = useAuth();

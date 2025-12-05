@@ -13,9 +13,9 @@ export class EventService {
         )
     }
 
-    static async getEventsByCampus(campusId: number, month: string, year: string) {
+    static async getEventsByCampus(campusId: number, month: string, year: string, visibility: string) {
         return await requestData(
-            `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}`,
+            `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}&visibility=${visibility}`,
             'GET',
             { "Accept": "application/json" },
         )
@@ -80,7 +80,7 @@ export class EventService {
         }
         
         return await requestData(
-            `${url}/create`,
+            `${url}/update?id=${event.id}`,
             'POST',
             { "Accept": "application/json" },
             formData

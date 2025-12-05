@@ -9,6 +9,7 @@ import { EventService } from "@/services/event.service";
 import { CvSULoading } from "@/components/ui/loader";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateEvent } from "./CreateEvent";
+import { useAuth } from "@/hooks/use-auth";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -19,6 +20,7 @@ export function Calendar({ className }: {
     className?: string;
 }) {
     const today = new Date();
+    const { claims, loading: authLoading } = useAuth();
     const { open, setOpen } = useCrudState();
     const [selectedDay, setSelectedDay] = useState<string | undefined>();
     const [eventDay, setEventDay] = useState<string | undefined>();
@@ -50,15 +52,20 @@ export function Calendar({ className }: {
     const emptyDays = Array.from({ length: firstDay });
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
+    const fetchEventsFn =
+        claims?.role === "ADMIN"
+            ? EventService.getAllEvents                
+            : EventService.getEventsByCampus;          
+
     const { data: events, loading } = useFetchData<FCEvent>(
-        EventService.getAllEvents,
-        [currentMonth, currentYear], 
-        [0, monthNames[currentMonth].toLowerCase(),]
+        fetchEventsFn,
+        [currentMonth, currentYear, claims?.campus?.id],     
+        [claims.role === "ADMIN" ? 0 : claims.campus.id, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
     );
 
     const eventCounts = useEventCounts(events, currentMonth, currentYear);
 
-    if (loading) return <CvSULoading className={ className } />
+    if (loading || authLoading) return <CvSULoading className={ className } />
     return (
         <section className={`${className}`}>
             <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
