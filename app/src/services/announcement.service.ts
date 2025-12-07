@@ -29,6 +29,8 @@ export class AnnouncementService {
     }
     
     static async createAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[]) {
+        console.log(announcement.label);
+        
         console.log("user_id:", userId);
         
         const formData = new FormData();
@@ -39,6 +41,15 @@ export class AnnouncementService {
         formData.append('content', announcement.content!);
         formData.append('label', announcement.label!);
         formData.append('campus_id', String(announcement.campus_id!))
+
+        console.log("===== FormData contents =====");
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(key, "=> FILE:", value.name, "(", value.type, ")");
+            } else {
+                console.log(key, "=>", value);
+            }
+        }
         
         return await requestData(
             `${url}/create`,

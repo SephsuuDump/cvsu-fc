@@ -25,7 +25,7 @@ export function AuthPage() {
             console.log(token);
             
             if (token.token) {
-                localStorage.setItem('token', token);
+                localStorage.setItem('token', token.token);
                 const res = await AuthService.setCookie(token);
                 toast.success(res.message);
                 window.location.href = '/'

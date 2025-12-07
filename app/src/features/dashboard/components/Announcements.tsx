@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAnnouncement } from "./CreateAnnouncement";
 import { AppAvatar } from "@/components/shared/AppAvatar";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Announcement } from "@/types/announcement";
 import { AnnouncementService } from "@/services/announcement.service";
@@ -18,12 +18,14 @@ import { FILE_URL } from "@/lib/urls";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateAnnouncement } from "./UpdateAnnouncement";
 import { DeleteAnnouncement } from "./DeleteAnnouncement";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 export function Announcements({ claims, className }: {
     claims: Claim
     className?: string
 }) {
     const [reload, setReload] = useState(false);
+    const [viewImage, setViewImage] = useState<string | undefined>();
 
     const getAnnouncements = (() => {
         if (claims.role === "ADMIN") return AnnouncementService.getAllAnnouncements;
@@ -90,7 +92,8 @@ export function Announcements({ claims, className }: {
                                         key={file.id}
                                         src={`${FILE_URL}/${file.file_path}`}
                                         alt={file.file_name}
-                                        className="w-32 h-32 object-cover rounded-md border border-slate-200"
+                                        className="w-32 h-32 object-cover rounded-md border border-slate-200 cursor-pointer"
+                                        onClick={ () => setViewImage(`${FILE_URL}/${file.file_path}`) }
                                     />
                                 ) : (
                                     <a
@@ -136,6 +139,13 @@ export function Announcements({ claims, className }: {
                 ))}
             </div>
 
+            {viewImage && (
+                <ImagePreview 
+                    url={ viewImage }
+                    setOpen={ setViewImage }
+                />
+            )}
+
             {open && (
                 <CreateAnnouncement
                     setOpen={ setOpen }
@@ -160,4 +170,30 @@ export function Announcements({ claims, className }: {
             )}
         </ScrollArea>
     )
+}
+
+function ImagePreview({
+    url,
+    setOpen,
+}: {
+    url: string;
+    setOpen: Dispatch<SetStateAction<string | undefined>>;
+}) {
+    return (
+        <Dialog open onOpenChange={(open) => { 
+            if (!open) setOpen(undefined); 
+        }}>
+            <DialogContent className="p-0 max-w-3xl w-full">
+                <DialogTitle className="sr-only">Image Preview</DialogTitle>
+
+                <div className="relative w-full max-h-[90vh] flex items-center justify-center bg-black">
+                    <img
+                        src={url}
+                        alt="Preview"
+                        className="object-contain max-h-[90vh] w-full"
+                    />
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
 }

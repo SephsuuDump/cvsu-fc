@@ -35,7 +35,7 @@ export function CreateAnnouncement({ setOpen, setReload }: {
         );
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<Preview[]>([]);
-    const [onProcess, setProcess] = useState(false);
+    const [onProcess, setProcess] = useState(false);    
 
     const { data: campuses, loading } = useFetchData<Campus>(CampusService.getAllCampus);
 
@@ -106,6 +106,10 @@ export function CreateAnnouncement({ setOpen, setReload }: {
     function handleButtonClick() {
         fileInputRef.current?.click();
     };
+    useEffect(() => {
+        console.log(announcement);
+        
+    }, [announcement])
 
     async function handleSubmit() {
         setProcess(true);
