@@ -78,11 +78,6 @@ export const memberRoute = [
         href: '/',
     },
     { 
-        title: 'Announcements', 
-        icon: Megaphone,
-        href: '/events',
-    },
-    { 
         title: 'Events', 
         icon: CalendarRange,
         href: '/events',

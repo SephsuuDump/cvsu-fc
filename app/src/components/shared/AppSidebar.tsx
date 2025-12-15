@@ -116,7 +116,7 @@ function DropdownFooter({ open, sidebarOpen, setShow, claims, handleLogout }: {
                 <button 
                     className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md ${sidebarOpen ? "p-1.5" : "p-0"}`}
                 >
-                    <AppAvatar fallback="KP"/>
+                    <AppAvatar fallback="FC"/>
                     <div>
                         <div className="font-semibold text-start">{claims.role}</div>
                         <div className="text-xs -mt-0.5 text-start">{claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1]}</div>
@@ -127,7 +127,7 @@ function DropdownFooter({ open, sidebarOpen, setShow, claims, handleLogout }: {
 
             <DropdownMenuContent side="right" align="end" className="w-56 bg-white border-darkgreen">
                 <div className="flex-center-y gap-2 p-2">
-                    <AppAvatar fallback="KP"/>
+                    <AppAvatar fallback="FC"/>
                     <div>
                     <div className="font-semibold text-start">{claims.role}</div>
                     <div className="text-xs text-muted-foreground text-start">{claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1]}</div>

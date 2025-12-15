@@ -122,12 +122,12 @@ export function UsersPage() {
                             </SelectContent>
                         </Select>
                     )}
-                    <Button
+                    {/* <Button
                         className="rounded-full bg-slate-50 shadow-sm text-black"
                         size="sm"
                     >
                         <FileUp /> Export
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 
