@@ -23,13 +23,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Campus } from "@/types/campus";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useAuth } from "@/hooks/use-auth";
+import { AccountPage } from "../account/AccountPage";
+import { useRouter } from "next/navigation";
 
 export function UsersPage() {
+    const router = useRouter();
     const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
     const [selectedCampus, setSelectedCampus] = useState(0);
     const [selectedCollege, setSelectedCollege] = useState(0);
-    const { data: users, loading } = useFetchData<Partial<User>>(UserService.getAllUsers, [reload]);
+    const { data: users, loading } = useFetchData<User>(UserService.getAllUsers, [reload]);
     const { data: campusesOptions, loading: campusesLoading } = useFetchData<Campus>(CampusService.getAllCampus, []);
     const { setSearch, filteredItems } = useSearchFilter<Partial<User>>(users, ["first_name", "last_name"])
 
@@ -57,8 +60,9 @@ export function UsersPage() {
         return true;
     });
     
-    const { open, setOpen, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
 
+    if (toView) router.push(`/users/${toView.id}`)
     if (loading || authLoading) return <CvSULoading />
     return (
         <section className="stack-md reveal">

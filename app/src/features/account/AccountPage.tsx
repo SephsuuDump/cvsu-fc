@@ -9,13 +9,15 @@ import { formatCustomDate } from "@/lib/helper";
 import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
 import { GraduationCap, Mail, Phone, SquarePen, UserRoundCheck } from "lucide-react";
+import { useParams } from "next/navigation";
 
 export function AccountPage() {
+    const { id } = useParams();
     const { claims, loading: authLoading } = useAuth();
     const { data: user, loading } = useFetchOne<User>(
         UserService.getUserById,
-        [claims.id],
-        [claims.id]
+        [id ?? claims.id],
+        [id ?? claims.id]
     )
 
     if (authLoading || loading) return <CvSULoading />
