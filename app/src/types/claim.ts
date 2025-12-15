@@ -6,6 +6,10 @@ type Claim = {
         id: number;
         name: string;
     };
+    college: {
+        id: number;
+        name: string;
+    }
     role: string;
     iat: number;
     exp: number;

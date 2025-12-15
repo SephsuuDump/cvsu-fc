@@ -16,13 +16,13 @@ import { toast } from "sonner";
 
 const roles = ['COORDINATOR', 'MEMBER', 'JOB ORDER'];
 
-export function CreateUser({ setOpen, setReload }:  {
+export function CreateUser({ setOpen, setReload, campusId }:  {
     setOpen: Dispatch<SetStateAction<boolean>>
     setReload: Dispatch<SetStateAction<boolean>>
+    campusId?: number
 }) {
     const { data: campuses, loading } = useFetchData<Partial<Campus>>(CampusService.getAllCampus);
     const { data: colleges, loading: collegeLoading } = useFetchData<Partial<College>>(CollegeService.getAllColleges);
-    console.log(colleges);
     
     const [user, setUser] = useState<Partial<User>>({
         email: '',
@@ -32,15 +32,10 @@ export function CreateUser({ setOpen, setReload }:  {
         middle_name: '',
         last_name: '',
         role: 'MEMBER',
-        campus_id: 0,
+        campus_id: campusId ?? 0,
         college_id: 0
     });
     const [onProcess, setProcess] = useState(false);
-
-    useEffect(() => {
-        console.log(user);
-        
-    }, [user])
 
     async function handleSubmit() {
         try {
@@ -129,10 +124,12 @@ export function CreateUser({ setOpen, setReload }:  {
                 <div className="stack-sm">
                     <Label>Campus</Label>
                     <Select
+                        value={ String(user.campus_id) }
                         onValueChange={ (value) => setUser(prev => ({
                             ...prev,
                             campus_id: Number(value)
                         }))}
+                        disabled={ Boolean(campusId) }
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select campus" />

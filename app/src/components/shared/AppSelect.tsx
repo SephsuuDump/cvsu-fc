@@ -15,9 +15,10 @@ interface GenericSelectProps {
   groupLabel?: string
   placeholder?: string
   items: string[] | { label: string; value: string }[]
-  value: string
+  value?: string
   onChange: (value: string) => void
   className?: string
+  disabled?: boolean
 }
 
 export function AppSelect({
@@ -28,12 +29,13 @@ export function AppSelect({
   value,
   onChange,
   className,
+  disabled
 }: GenericSelectProps) {
   return (
         <div className={`flex flex-col gap-1 ${className ?? ""}`}>
             {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
 
-            <Select value={value} onValueChange={onChange}>
+            <Select value={value} onValueChange={onChange} disabled={disabled}>
                 <SelectTrigger className="w-full border border-gray-300 rounded-md">
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

@@ -47,7 +47,7 @@ export function Announcements({ claims, className }: {
                 label="Recent Announcements" 
                 className="mb-2"
             />
-            {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+            {["ADMIN", "COORDINATOR", "MEMBER"].includes(claims.role) && (
                 <div className="flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
                     <AppAvatar />
                     <Button 

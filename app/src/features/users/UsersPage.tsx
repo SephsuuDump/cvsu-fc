@@ -174,7 +174,7 @@ export function UsersPage() {
                                         <div className="td">
                                             <Tooltip>
                                                 <TooltipTrigger>{ item.college?.abbreviations }</TooltipTrigger>
-                                                <TooltipContent className="bg-darkgreen">{ item.college!.name }</TooltipContent>
+                                                <TooltipContent className="bg-darkgreen">{ item.college!.id }</TooltipContent>
                                             </Tooltip>
                                         </div>
                                     </div>

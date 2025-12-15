@@ -221,3 +221,11 @@ export function mergeFormData(target: FormData, source: FormData) {
     return target;
 }
 
+export function formatToPeso(amount: number): string {
+    return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+    }).format(amount);
+}
+

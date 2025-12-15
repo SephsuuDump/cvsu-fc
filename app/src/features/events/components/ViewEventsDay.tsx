@@ -43,7 +43,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
         <Dialog open onOpenChange={ (open) => { if (!open) setSelectedDay(undefined) }}>
             <DialogContent className="reveal">
                 <ModalTitle label={ `Events on ${formatDateToWord(today)}` } />
-                {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+                {["ADMIN", "COORDINATOR", "MEMBER"].includes(claims.role) && (
                     <div className="-mt-2 flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
                         <AppAvatar />
                         <Button 

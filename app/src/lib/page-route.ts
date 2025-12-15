@@ -1,4 +1,4 @@
-import { CalendarRange, HandCoins, Landmark, LayoutDashboard, Megaphone, MessageSquareText, University, UsersRound } from "lucide-react";
+import { CalendarRange, HandCoins, Landmark, LayoutDashboard, Megaphone, MessageSquareText, PiggyBank, University, UsersRound } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -17,19 +17,24 @@ export const adminRoute = [
         href: '/campuses',
     },
     { 
-        title: 'Contributions', 
-        icon: HandCoins,
-        href: '/contributions',
-    },
-    {
-        title: 'Announcements',
-        icon: Megaphone,
-        href: '/announcements'
+        title: 'Events', 
+        icon: CalendarRange,
+        href: '/events',
     },
     {
         title: 'Messages',
         icon: MessageSquareText,
         href: '/messages',
+    },
+    {
+        title: 'Allocations',
+        icon: PiggyBank,
+        href: '/allocations',
+    },
+    { 
+        title: 'Contributions', 
+        icon: HandCoins,
+        href: '/contributions',
     },
 ]
 
@@ -45,11 +50,6 @@ export const coordinatorRoute = [
         href: '/faculty',
     },
     { 
-        title: 'Announcements', 
-        icon: Megaphone,
-        href: '/',
-    },
-    { 
         title: 'Events', 
         icon: CalendarRange,
         href: '/events',
@@ -58,6 +58,11 @@ export const coordinatorRoute = [
         title: 'Messages',
         icon: MessageSquareText,
         href: '/messages',
+    },
+    {
+        title: 'Allocations',
+        icon: PiggyBank,
+        href: '/allocations',
     },
     {
         title: 'Contributions',
@@ -81,6 +86,11 @@ export const memberRoute = [
         title: 'Events', 
         icon: CalendarRange,
         href: '/events',
+    },
+    {
+        title: 'Allocations',
+        icon: PiggyBank,
+        href: '/allocations',
     },
     {
         title: 'Messages',

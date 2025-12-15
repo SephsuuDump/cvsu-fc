@@ -13,14 +13,29 @@ export class UserService {
         )
     }
 
+    static async getUserById(id: number) {
+        return await requestData(
+            `${url}/get-by-id?id=${id}`,
+            'GET',
+            { "Accept": "application/json" }
+        )
+    } 
+
     static async getUsersByCampus(id: number) {
         return await requestData(
             `${url}/get-by-campus?campus_id=${id}`,
             'GET',
             { "Accept": "application/json" }
         )
-        
     } 
+
+    static async getUserByCampusCollege(campusId: number, collegeId: number) {
+        return await requestData(
+            `${url}/get-by-college?campus_id=${campusId}&college_id=${collegeId}`,
+            'GET',
+            { "Accept": "application/json" }
+        )
+    }
 
     static async updateUser(user: Partial<User>) {
         return await requestData(

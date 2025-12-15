@@ -13,6 +13,10 @@ const claimsInit = {
         id: 0,
         name: '',
     },
+    college: {
+        id: 0,
+        name: '',
+    },
     id: 0,
     firstName: '',
     lastName: '',

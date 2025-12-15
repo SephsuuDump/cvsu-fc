@@ -14,12 +14,14 @@ import { Campus } from "@/types/campus";
 import { CampusService } from "@/services/campus.service";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateContribution } from "./components/UpdateContribution";
+import { useAuth } from "@/hooks/use-auth";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
 const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 export function ContributionPage() {
+    const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(
         new Date().toLocaleString("default", { month: "long" })
@@ -45,6 +47,12 @@ export function ContributionPage() {
         year: string;
         contributed: number;
     }>();
+
+    useEffect(() => {
+        if (claims.role === "ADMIN") return
+        setSelectedCampus(String(claims.campus.id))
+        setSelectedCollege(String(claims.college.id))
+    }, [claims])
 
     // Load campuses and colleges once on mount
     useEffect(() => {
@@ -91,7 +99,7 @@ export function ContributionPage() {
         }
     }, [selectedCampus, selectedCollege, selectedYear, staticLoading, reload]);
 
-    if (staticLoading) return <CvSULoading />
+    if (staticLoading || authLoading) return <CvSULoading />
     
     return (
         <section className="stack-md reveal">
@@ -101,7 +109,10 @@ export function ContributionPage() {
             </div>
             <div className="flex-center-y justify-between">
                 <div className="flex-center-y bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2">
-                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <Select 
+                        value={selectedMonth} 
+                        onValueChange={setSelectedMonth} 
+                    >
                         <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
                             <SelectValue placeholder='Select Month' />
                         </SelectTrigger>
@@ -112,7 +123,10 @@ export function ContributionPage() {
                         </SelectContent>
                     </Select>
 
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <Select 
+                        value={selectedYear} 
+                        onValueChange={setSelectedYear}
+                    >
                         <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
                             <SelectValue placeholder='Select Year' />
                         </SelectTrigger>
@@ -123,7 +137,11 @@ export function ContributionPage() {
                         </SelectContent>
                     </Select>
 
-                    <Select value={selectedCampus} onValueChange={setSelectedCampus}>
+                    <Select 
+                        value={selectedCampus} 
+                        onValueChange={setSelectedCampus}
+                        disabled={claims.role !== "ADMIN"}
+                    >
                         <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
                             <SelectValue placeholder='All Campuses' />
                         </SelectTrigger>
@@ -137,7 +155,11 @@ export function ContributionPage() {
                         </SelectContent>
                     </Select>
 
-                    <Select value={selectedCollege} onValueChange={setSelectedCollege}>
+                    <Select 
+                        value={selectedCollege} 
+                        onValueChange={setSelectedCollege}
+                        disabled={claims.role !== "ADMIN"}
+                    >
                         <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
                             <SelectValue placeholder='All Colleges' />
                         </SelectTrigger>
