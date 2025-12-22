@@ -34,7 +34,7 @@ export function AppDateSelect({
     setOpen(false)
     onChange?.(date)
   }
-
+  const currentYear = new Date().getFullYear()
   return (
         <div className={`stack-md ${className}`}>
             {!noLabel && <Label htmlFor="date-picker">{label}</Label>}
@@ -61,6 +61,8 @@ export function AppDateSelect({
                         captionLayout="dropdown"
                         selected={selectedDate}
                         onSelect={handleSelect}
+                        startMonth={new Date(currentYear - 5, 0)}
+                        endMonth={new Date(currentYear + 10, 11)}
                     />
                 </PopoverContent>
             </Popover>

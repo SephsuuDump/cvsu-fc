@@ -58,7 +58,7 @@ export function Calendar({ className }: {
             : EventService.getEventsByCampus;          
 
     const { data: events, loading } = useFetchData<FCEvent>(
-        fetchEventsFn,
+        EventService.getEventsByCampus,
         [currentMonth, currentYear, claims?.campus?.id],     
         [claims.role === "ADMIN" ? 0 : claims.campus.id, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
     );
