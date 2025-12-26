@@ -1,5 +1,4 @@
 import { AnnouncementBadge } from "@/components/ui/badge";
-import { announcementsMock } from "../../../../public/mock/announcements";
 import { formatCustomDate } from "@/lib/helper";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAnnouncement } from "./CreateAnnouncement";
 import { AppAvatar } from "@/components/shared/AppAvatar";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Announcement } from "@/types/announcement";
 import { AnnouncementService } from "@/services/announcement.service";
@@ -19,6 +18,8 @@ import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateAnnouncement } from "./UpdateAnnouncement";
 import { DeleteAnnouncement } from "./DeleteAnnouncement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ThumbsUp } from "lucide-react";
+import { toast } from "sonner";
 
 export function Announcements({ claims, className }: {
     claims: Claim
@@ -26,11 +27,13 @@ export function Announcements({ claims, className }: {
 }) {
     const [reload, setReload] = useState(false);
     const [viewImage, setViewImage] = useState<string | undefined>();
+    const [localLikes, setLocalLikes] = useState<Record<number, boolean>>({});
+    const [localLikeCount, setLocalLikeCount] = useState<Record<number, number>>({});
 
     const getAnnouncements = (() => {
         if (claims.role === "ADMIN") return AnnouncementService.getAllAnnouncements;
         if (["COORDINATOR", "JOB ORDER", "MEMBER"].includes(claims.role)) return AnnouncementService.getAnnouncementsByCampus;
-        return AnnouncementService.getAllAnnouncements; // fallback
+        return AnnouncementService.getAllAnnouncements; 
     })();
 
     const { data: announcements, loading, error } = useFetchData<Announcement>(
@@ -38,7 +41,57 @@ export function Announcements({ claims, className }: {
         [reload, claims.campus.id],
         [claims.campus.id]
     );
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Announcement>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Announcement>();
+
+    useEffect(() => {
+        if (!toView) return
+        window.location.href = `/announcements/${toView.id}`
+    }, [toView])
+
+    useEffect(() => {
+        if (!announcements) return;
+
+        const initialLikes: Record<number, boolean> = {};
+
+        announcements.forEach(item => {
+            initialLikes[item.id] =
+            item.likes?.some(like => like.id === claims.id) ?? false;
+        });
+
+        setLocalLikes(initialLikes);
+    }, [announcements, claims.id]);
+
+    useEffect(() => {
+        if (!announcements) return;
+
+        const counts: Record<number, number> = {};
+        announcements.forEach(item => {
+            counts[item.id] = item.likes_count;
+        });
+
+        setLocalLikeCount(counts);
+    }, [announcements]);
+
+
+
+    async function likeAnnouncement(id: number) {
+        setLocalLikeCount(prev => ({
+            ...prev,
+            [id]: prev[id] + (localLikes[id] ? -1 : 1),
+        }));
+
+        setLocalLikes(prev => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+
+        const token = localStorage.getItem("token");
+        try {
+            await AnnouncementService.likeAnnouncement(id, token);
+        } catch (error) {   
+            toast.error(`${error}`)
+        }
+    }
 
     if (loading) return <CvSULoading className={ className }  />
     return (
@@ -74,6 +127,7 @@ export function Announcements({ claims, className }: {
                                     <AppRUDSelection 
                                         item={ item }
                                         className="hover:rounded-full hover:bg-slate-200"
+                                        setView={ setView }
                                         setUpdate={ setUpdate  }
                                         setDelete={ setDelete }
                                     />
@@ -128,12 +182,14 @@ export function Announcements({ claims, className }: {
                         <Separator />
                         <div className="flex justify-between">
                             <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
-                            <Link
-                                href={`/announcements/${item.id}`}
-                                className="text-xs text-darkgreen font-semibold opacity-80 hover:text-black hover:opacity-100"
-                            >
-                                View More
-                            </Link>
+                            <div className="flex-center-y gap-2">
+                                <ThumbsUp
+                                    onClick={() => likeAnnouncement(item.id)}
+                                    className="cursor-pointer transition-colors"
+                                    fill={localLikes[item.id] ? "#016630" : "#fff"}
+                                />
+                                <div className="font-semibold mt-1">{ localLikeCount[item.id] }</div>
+                            </div>
                         </div>
                     </div>
                 ))}

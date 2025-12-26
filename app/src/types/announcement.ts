@@ -30,6 +30,11 @@ export type Announcement = {
     is_deleted: string; // boolean
     user_id: number; // fk referenced to user.id
     campus_id: number;
+    likes_count: number;
+    likes: {
+        id: number;
+        name: string;
+    }[];
 
     campus?: {
         id: number;

@@ -59,6 +59,14 @@ export class AnnouncementService {
         )
     }
 
+    static async likeAnnouncement(announcementId: number, token: string | null) {
+        return await requestData(
+            `${url}/${announcementId}/like`,
+            'POST',
+            { "Authorization": `Bearer ${token}`  }
+        )
+    }
+
     static async updateAnnouncement(userId: number, announcement: Partial<Announcement>, files: File[], filesToRemove: FormData) {
         const formData = new FormData();
         formData.append('user_id', userId.toString());
