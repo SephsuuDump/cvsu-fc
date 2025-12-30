@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAnnouncement } from "./CreateAnnouncement";
 import { AppAvatar } from "@/components/shared/AppAvatar";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Announcement } from "@/types/announcement";
 import { AnnouncementService } from "@/services/announcement.service";
@@ -30,11 +30,18 @@ export function Announcements({ claims, className }: {
     const [localLikes, setLocalLikes] = useState<Record<number, boolean>>({});
     const [localLikeCount, setLocalLikeCount] = useState<Record<number, number>>({});
 
-    const getAnnouncements = (() => {
-        if (claims.role === "ADMIN") return AnnouncementService.getAllAnnouncements;
-        if (["COORDINATOR", "JOB ORDER", "MEMBER"].includes(claims.role)) return AnnouncementService.getAnnouncementsByCampus;
-        return AnnouncementService.getAllAnnouncements; 
-    })();
+    const getAnnouncements = useCallback(() => {
+        if (claims.role === "ADMIN") {
+            return AnnouncementService.getAllAnnouncements();
+        }
+
+        if (["COORDINATOR", "JOB ORDER", "MEMBER"].includes(claims.role)) {
+            return AnnouncementService.getAnnouncementsByCampus(claims.campus.id);
+        }
+
+        return AnnouncementService.getAllAnnouncements();
+    }, [claims.role, claims.campus.id]);
+
 
     const { data: announcements, loading, error } = useFetchData<Announcement>(
         getAnnouncements, 
@@ -51,28 +58,18 @@ export function Announcements({ claims, className }: {
     useEffect(() => {
         if (!announcements) return;
 
-        const initialLikes: Record<number, boolean> = {};
-
-        announcements.forEach(item => {
-            initialLikes[item.id] =
-            item.likes?.some(like => like.id === claims.id) ?? false;
-        });
-
-        setLocalLikes(initialLikes);
-    }, [announcements, claims.id]);
-
-    useEffect(() => {
-        if (!announcements) return;
-
+        const likes: Record<number, boolean> = {};
         const counts: Record<number, number> = {};
+
         announcements.forEach(item => {
+            likes[item.id] =
+                item.likes?.some(like => like.id === claims.id) ?? false;
             counts[item.id] = item.likes_count;
         });
 
+        setLocalLikes(likes);
         setLocalLikeCount(counts);
-    }, [announcements]);
-
-
+    }, [announcements, claims.id]);
 
     async function likeAnnouncement(id: number) {
         setLocalLikeCount(prev => ({

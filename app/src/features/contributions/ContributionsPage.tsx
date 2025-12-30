@@ -27,15 +27,13 @@ export function ContributionPage() {
         new Date().toLocaleString("default", { month: "long" })
     );
     const [selectedYear, setSelectedYear] = useState(String(currentYear));
-    const [selectedCampus, setSelectedCampus] = useState<string>("all");
-    const [selectedCollege, setSelectedCollege] = useState<string>("all");
+    const [selectedCampus, setSelectedCampus] = useState<string>("0");
+    const [selectedCollege, setSelectedCollege] = useState<string>("0");
 
-    // Fetch static data (campuses and colleges)
     const [campuses, setCampuses] = useState<Campus[]>([]);
     const [colleges, setColleges] = useState<College[]>([]);
     const [staticLoading, setStaticLoading] = useState(true);
 
-    // Fetch dynamic contributions data
     const [contributions, setContributions] = useState<Contribution[]>([]);
     const [contributionsLoading, setContributionsLoading] = useState(false);
 
@@ -54,7 +52,6 @@ export function ContributionPage() {
         setSelectedCollege(String(claims.college.id))
     }, [claims])
 
-    // Load campuses and colleges once on mount
     useEffect(() => {
         async function loadStaticData() {
             try {
@@ -74,7 +71,6 @@ export function ContributionPage() {
         loadStaticData();
     }, []);
 
-    // Load contributions when filters change
     useEffect(() => {
         async function loadContributions() {
             setContributionsLoading(true);
@@ -146,7 +142,7 @@ export function ContributionPage() {
                             <SelectValue placeholder='All Campuses' />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Campuses</SelectItem>
+                            <SelectItem value="0">All Campuses</SelectItem>
                             {campuses.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
                                     {item.name.match(/-\s*(.*?)\s*Campus/i)?.[1]}
@@ -164,7 +160,7 @@ export function ContributionPage() {
                             <SelectValue placeholder='All Colleges' />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Colleges</SelectItem>
+                            <SelectItem value="0">All Colleges</SelectItem>
                             {colleges.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
                                     {item.abbreviations}
@@ -213,7 +209,7 @@ export function ContributionPage() {
                                     <div className="text-gray text-xs">{item.college_name}</div>
                                 </div>
                                 <div className="td">
-                                    {monthData!.id ? (
+                                    {monthData ? (
                                         <Fragment>
                                             <Button
                                                 onClick={ () => setUpdate({

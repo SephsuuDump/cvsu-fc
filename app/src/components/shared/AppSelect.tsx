@@ -9,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Input } from "../ui/input"
+import { Inbox } from "lucide-react"
 
 interface GenericSelectProps {
   label?: string
@@ -18,7 +20,10 @@ interface GenericSelectProps {
   value?: string
   onChange: (value: string) => void
   className?: string
-  disabled?: boolean
+  disabled?: boolean,
+  searchPlaceholder?: string;
+  search?: string;
+  setSearch?: (i: string) => void
 }
 
 export function AppSelect({
@@ -29,7 +34,10 @@ export function AppSelect({
   value,
   onChange,
   className,
-  disabled
+  disabled,
+  searchPlaceholder,
+  search,
+  setSearch
 }: GenericSelectProps) {
   return (
         <div className={`flex flex-col gap-1 ${className ?? ""}`}>
@@ -42,7 +50,22 @@ export function AppSelect({
 
                 <SelectContent>
                 <SelectGroup>
+                    {setSearch && (
+                        <Input 
+                            value={ search }
+                            placeholder={ searchPlaceholder ?? "Search for an item" }
+                            onChange={ e => setSearch(e.target.value) }
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
+                        />
+                    )}
                     <SelectLabel>{ groupLabel }</SelectLabel>
+                    {items.length === 0 && (
+                        <div className="flex-center flex-col gap-2 my-4">
+                            <Inbox className="text-gray w-10 h-10" />
+                            <div className="text-gray">No items to display</div>
+                        </div>
+                    )}
                     {items.map((item, idx) => {
                         // Handle both string and object items
                         const label = typeof item === "string" ? item : item.label

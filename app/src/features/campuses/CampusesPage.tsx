@@ -12,8 +12,9 @@ import { CampusService } from "@/services/campus.service";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { CvSULoading } from "@/components/ui/loader";
 import { Campus } from "@/types/campus";
+import { OfficersSection } from "./components/OfficerSection";
 
-const tabs = ['Faculty', 'Events', 'Announcements']
+const tabs = ['Faculty', 'Officers', 'Events', 'Announcements']
 
 export function CampusesPage() {
     const { data: campuses, loading } = useFetchData<Campus>(CampusService.getAllCampus);
@@ -63,11 +64,16 @@ export function CampusesPage() {
                 />
             )}
             {tab === tabs[1] && (
-                <EventsSection 
+                <OfficersSection 
                     campusId={ selectedCampus.id }
                 />
             )}
             {tab === tabs[2] && (
+                <EventsSection 
+                    campusId={ selectedCampus.id }
+                />
+            )}
+            {tab === tabs[3] && (
                 <AnnouncementsSection 
                     campusId={ selectedCampus.id }
                 />

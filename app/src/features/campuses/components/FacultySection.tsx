@@ -8,10 +8,12 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import { User } from "@/types/user";
 import { UserService } from "@/services/user.service";
 import { SectionLoading } from "@/components/ui/loader";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, SelectLabel } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { useRouter } from "next/navigation";
 
 
 export function FacultySection({ campusId }: {
@@ -30,6 +32,8 @@ export function FacultySection({ campusId }: {
         faculties,
         ["first_name", "last_name"]
     );
+
+    const { toView, setView } = useCrudState<User>();
 
     const collegeMap = Array.from(
         new Map(
@@ -113,7 +117,7 @@ export function FacultySection({ campusId }: {
                                             Member Since: { formatCustomDate(item.created_at!).replace(/\s+at\s+.*$/, "") }
                                         </div>
                                         <Link
-                                            href={``}
+                                            href={`/users/${item.id}`}
                                             className="text-xs text-darkgreen font-semibold opacity-80 hover:text-black hover:opacity-100"
                                         >
                                             View More

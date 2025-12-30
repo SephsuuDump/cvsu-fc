@@ -52,7 +52,7 @@ export function AccountPage() {
                     className="absolute w-5 h-5 right-4 top-4 cursor-pointer" 
                 />
                 <div className="text-xl font-bold uppercase tracking-wide mt-8">
-                    {`${user?.first_name} ${user?.middle_name ? user?.middle_name + "." : null} ${user?.last_name}`}
+                    {`${user?.first_name} ${user?.middle_name ? user?.middle_name : null} ${user?.last_name}`}
                 </div>
                 <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                     { user?.role }

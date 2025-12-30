@@ -1,4 +1,3 @@
-import { User } from "@/types/user";
 import { requestData } from "./_config";
 import { BASE_URL } from "@/lib/urls";
 import { Allocation } from "@/types/allocation";

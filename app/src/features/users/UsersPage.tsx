@@ -12,7 +12,7 @@ import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
 import { FileUp, Plus, Users } from "lucide-react";
 import { CreateUser } from "./components/CreateUser";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { CvSULoading } from "@/components/ui/loader";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateUser } from "./components/UpdateUser";
@@ -62,7 +62,11 @@ export function UsersPage() {
     
     const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
 
-    if (toView) router.push(`/users/${toView.id}`)
+    useEffect(() => {
+        if (!toView) return;
+        router.push(`/users/${toView.id}`);
+    }, [toView, router]);
+
     if (loading || authLoading) return <CvSULoading />
     return (
         <section className="stack-md reveal">
