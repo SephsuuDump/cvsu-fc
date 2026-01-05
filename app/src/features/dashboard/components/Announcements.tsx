@@ -20,6 +20,7 @@ import { DeleteAnnouncement } from "./DeleteAnnouncement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export function Announcements({ claims, className }: {
     claims: Claim
@@ -29,6 +30,8 @@ export function Announcements({ claims, className }: {
     const [viewImage, setViewImage] = useState<string | undefined>();
     const [localLikes, setLocalLikes] = useState<Record<number, boolean>>({});
     const [localLikeCount, setLocalLikeCount] = useState<Record<number, number>>({});
+    const [localLikeUsers, setLocalLikeUsers] = useState<Record<number, { id: number; name: string }[]>>({});
+
 
     const getAnnouncements = useCallback(() => {
         if (claims.role === "ADMIN") {
@@ -60,35 +63,77 @@ export function Announcements({ claims, className }: {
 
         const likes: Record<number, boolean> = {};
         const counts: Record<number, number> = {};
+        const users: Record<number, { id: number; name: string }[]> = {};
 
-        announcements.forEach(item => {
-            likes[item.id] =
-                item.likes?.some(like => like.id === claims.id) ?? false;
-            counts[item.id] = item.likes_count;
+        announcements.forEach((item) => {
+            likes[item.id] = item.likes?.some((like) => like.id === claims.id) ?? false;
+            counts[item.id] = item.likes_count ?? 0;
+            users[item.id] = item.likes ?? [];
         });
 
         setLocalLikes(likes);
         setLocalLikeCount(counts);
+        setLocalLikeUsers(users);
     }, [announcements, claims.id]);
 
+
     async function likeAnnouncement(id: number) {
-        setLocalLikeCount(prev => ({
+        const wasLiked = localLikes[id] ?? false;
+
+        const currentUserName =
+            (claims as any)?.full_name ||
+            (claims as any)?.name ||
+            `${(claims as any)?.first_name ?? ""} ${(claims as any)?.last_name ?? ""}`.trim() ||
+            "You";
+
+        setLocalLikeCount((prev) => ({
             ...prev,
-            [id]: prev[id] + (localLikes[id] ? -1 : 1),
+            [id]: (prev[id] ?? 0) + (wasLiked ? -1 : 1),
         }));
 
-        setLocalLikes(prev => ({
+        setLocalLikes((prev) => ({
             ...prev,
-            [id]: !prev[id],
+            [id]: !wasLiked,
         }));
 
-        const token = localStorage.getItem("token");
+        setLocalLikeUsers((prev) => {
+            const list = prev[id] ?? [];
+            if (wasLiked) {
+            return { ...prev, [id]: list.filter((u) => u.id !== claims.id) };
+            }
+            return { ...prev, [id]: [...list, { id: claims.id, name: currentUserName }] };
+        });
+
+        const token = localStorage.getItem("token") ?? "";
+
         try {
             await AnnouncementService.likeAnnouncement(id, token);
-        } catch (error) {   
-            toast.error(`${error}`)
+        } catch (error) {
+            toast.error(`${error}`);
+
+            setLocalLikeCount((prev) => ({
+            ...prev,
+            [id]: (prev[id] ?? 0) + (wasLiked ? 1 : -1),
+            }));
+
+            setLocalLikes((prev) => ({
+            ...prev,
+            [id]: wasLiked,
+            }));
+
+            setLocalLikeUsers((prev) => {
+            const list = prev[id] ?? [];
+            if (wasLiked) {
+                const exists = list.some((u) => u.id === claims.id);
+                return exists ? prev : { ...prev, [id]: [...list, { id: claims.id, name: currentUserName }] };
+            }
+            return { ...prev, [id]: list.filter((u) => u.id !== claims.id) };
+            });
+
+            setReload((r) => !r);
         }
     }
+
 
     if (loading) return <CvSULoading className={ className }  />
     return (
@@ -185,7 +230,34 @@ export function Announcements({ claims, className }: {
                                     className="cursor-pointer transition-colors"
                                     fill={localLikes[item.id] ? "#016630" : "#fff"}
                                 />
-                                <div className="font-semibold mt-1">{ localLikeCount[item.id] }</div>
+                                <HoverCard openDelay={150}>
+                                    <HoverCardTrigger asChild>
+                                        <div className="font-semibold mt-1 cursor-default">
+                                            {localLikeCount[item.id] ?? 0}
+                                        </div>
+                                    </HoverCardTrigger>
+
+                                    <HoverCardContent className="w-64 p-3 shadoow shadow-darkgreen">
+                                        <div className="text-sm font-semibold mb-2">
+                                        Liked by
+                                        </div>
+
+                                        {((localLikeUsers[item.id] ?? []).length === 0) ? (
+                                        <div className="text-xs text-gray-500">No likes yet</div>
+                                        ) : (
+                                        <ScrollArea className="max-h-48 pr-2">
+                                            <div className="flex flex-col gap-1">
+                                            {(localLikeUsers[item.id] ?? []).map((u) => (
+                                                <div key={u.id} className="text-sm">
+                                                {u.name}
+                                                </div>
+                                            ))}
+                                            </div>
+                                        </ScrollArea>
+                                        )}
+                                    </HoverCardContent>
+                                </HoverCard>
+
                             </div>
                         </div>
                     </div>

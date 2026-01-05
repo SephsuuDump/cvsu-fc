@@ -25,6 +25,9 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useAuth } from "@/hooks/use-auth";
 import { AccountPage } from "../account/AccountPage";
 import { useRouter } from "next/navigation";
+import { usePagination } from "@/hooks/use-pagination";
+import { TablePagination } from "@/components/shared/TablePagination";
+import { AppPagination } from "@/components/shared/AppPagination";
 
 export function UsersPage() {
     const router = useRouter();
@@ -34,7 +37,7 @@ export function UsersPage() {
     const [selectedCollege, setSelectedCollege] = useState(0);
     const { data: users, loading } = useFetchData<User>(UserService.getAllUsers, [reload]);
     const { data: campusesOptions, loading: campusesLoading } = useFetchData<Campus>(CampusService.getAllCampus, []);
-    const { setSearch, filteredItems } = useSearchFilter<Partial<User>>(users, ["first_name", "last_name"])
+    const { search, setSearch, filteredItems } = useSearchFilter<Partial<User>>(users, ["first_name", "last_name"])
 
     const campuses = [{ id: 0, name: "All Campuses" }, ...campusesOptions];
 
@@ -59,6 +62,8 @@ export function UsersPage() {
         if (selectedCollege !== 0) return u.college?.id === selectedCollege;
         return true;
     });
+
+    const { page, setPage, size, setSize, paginated } = usePagination(finalFilteredUsers, 10); 
     
     const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Partial<User>>();
 
@@ -146,13 +151,13 @@ export function UsersPage() {
                     <div className="th w-10"></div>
                 </div>
                 <Separator className="h-3 bg-slate-300" />
-                {finalFilteredUsers.length === 0 && (
+                {paginated.length === 0 && (
                     <div className="py-10 flex flex-col items-center justify-center text-slate-500">
                         <Users className="h-10 w-10 mb-2 opacity-60" />
                         <p className="text-sm">No users found.</p>
                     </div>
                 )}
-                {finalFilteredUsers.map((item, i) => {
+                {paginated.map((item, i) => {
                     const loggedUser = claims.id;
                     return (
                         <Fragment key={i}>
@@ -208,6 +213,13 @@ export function UsersPage() {
                     )
                 })}
             </div>
+
+            <AppPagination 
+                totalItems={ users.length }
+                itemsPerPage={ 10 }
+                currentPage={ page }
+                onPageChange={ setPage }
+            />
 
             {open && (
                 <CreateUser 

@@ -8,6 +8,7 @@ import { AuthPage } from "../auth/AuthPage";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import CampusAllocationPie from "./components/CampusAllocationPie";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const tabs = ["Events and Announcements", "Allocations Graph"]
 
@@ -20,7 +21,7 @@ export function DashboardPage() {
     return (
         <section className="stack-md reveal">
             <div className="flex-center-y gap-8">
-                {tabs.map((item) => (
+                {/* {tabs.map((item) => (
                     <button 
                         key={item}
                         onClick={ () => setTab(item) }
@@ -28,10 +29,10 @@ export function DashboardPage() {
                     >
                         { item }
                     </button>
-                ))}
+                ))} */}
             </div>
 
-            <Separator className="h-2 bg-gray-300" />
+            {/* <Separator className="h-2 bg-gray-300" /> */}
 
             {tab === tabs[0] && (
                 <div className="grid grid-cols-2 gap-4 reveal">
@@ -40,9 +41,12 @@ export function DashboardPage() {
                         className="w-full"
                     />
                         
-                    <Calendar
-                        className="w-full"
-                    />
+                    <ScrollArea className="h-screen">
+                        <CampusAllocationPie />
+                        <Calendar
+                            className="w-full mt-4"
+                        />
+                    </ScrollArea>
                 </div>
             )}
 

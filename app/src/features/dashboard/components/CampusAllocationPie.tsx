@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Campus } from "@/types/campus";
 import { CampusService } from "@/services/campus.service";
+import { AppHeader } from "@/components/shared/AppHeader";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 
 const months = [
     "January","February","March","April","May","June",
@@ -95,6 +98,7 @@ function ScrollLegend({
 }
 
 export default function CampusAndCollegeAllocationPie() {
+    const [refreshFilter, setRefreshFilter] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(
         new Date().toLocaleString("default", { month: "long" })
     );
@@ -108,14 +112,13 @@ export default function CampusAndCollegeAllocationPie() {
 
     const { data: allocations = [], loading } = useFetchData(
         AllocationService.getAllocations,
-        [selectedCampus, selectedYear, selectedMonth],
+        [refreshFilter],
         [Number(selectedCampus), 0, selectedYear, selectedMonth]
     );
 
     const campusShortName = (fullName: string) =>
         fullName.match(/University\s*-\s*(.+)/i)?.[1] ?? fullName;
 
-    /* ===== CAMPUS DATA ===== */
     const campusChartData: ChartItem[] = useMemo(() => {
         const totals: Record<string, number> = {};
 
@@ -132,7 +135,6 @@ export default function CampusAndCollegeAllocationPie() {
 
     const campusTotal = campusChartData.reduce((a, b) => a + b.value, 0);
 
-    /* ===== COLLEGE DATA ===== */
     const collegeChartData: ChartItem[] = useMemo(() => {
         const totals: Record<string, number> = {};
         allocations.forEach((item) => {
@@ -149,8 +151,6 @@ export default function CampusAndCollegeAllocationPie() {
     }, [allocations]);
 
     const collegeTotal = collegeChartData.reduce((a, b) => a + b.value, 0);
-
-    if (loading) return <SectionLoading />;
 
     return (
         <section className="space-y-6">
@@ -194,110 +194,117 @@ export default function CampusAndCollegeAllocationPie() {
                         ))}
                     </SelectContent>
                 </Select>
+
+                <Button
+                    onClick={ () => setRefreshFilter(prev => !prev) }
+                    className="!bg-darkgreen hover:opacity-90 rounded-full shadow"
+                    size="sm"
+                >
+                    <RefreshCcw /> Refresh Filter
+                </Button>
             </div>
 
-            {/* ===== GRAPHS ===== */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* CAMPUS CARD */}
-                <div className="h-[380px] bg-white rounded-xl shadow-md p-4 overflow-hidden">
-                    <h2 className="text-center font-semibold mb-3">
-                        Total Allocation per Campus
-                    </h2>
+            {loading ? (
+                <SectionLoading />
+            ) : (
+                <div className="grid grid-cols-1 gap-4 reveal">
+                    {/* CAMPUS CARD */}
+                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                        <AppHeader label="Total Allocation per Campus" />
 
-                    <div className="flex flex-col md:flex-row gap-4 h-[320px]">
-                        {/* Chart area */}
-                        <div className="flex-1 min-w-0">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={campusChartData}
-                                        dataKey="value"
-                                        nameKey="name"
-                                        innerRadius="55%"
-                                        outerRadius="80%"
-                                        stroke="#fff"
-                                        strokeWidth={2}
-                                        isAnimationActive={false}
-                                    >
-                                        {campusChartData.map((_, i) => (
-                                            <Cell
-                                                key={i}
-                                                fill={GREEN_COLORS[i % GREEN_COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
+                        <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                            {/* Chart area */}
+                            <div className="flex-1 min-w-0">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={campusChartData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius="55%"
+                                            outerRadius="80%"
+                                            stroke="#fff"
+                                            strokeWidth={2}
+                                            isAnimationActive={false}
+                                        >
+                                            {campusChartData.map((_, i) => (
+                                                <Cell
+                                                    key={i}
+                                                    fill={GREEN_COLORS[i % GREEN_COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
 
-                                    <Tooltip
-                                        formatter={(v) =>
-                                            typeof v === "number" ? peso(v) : v
-                                        }
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                        <Tooltip
+                                            formatter={(v) =>
+                                                typeof v === "number" ? peso(v) : v
+                                            }
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
 
-                            <p className="text-center text-sm text-gray-600 mt-2">
-                                Total:{" "}
-                                <span className="font-semibold">
-                                    {peso(campusTotal)}
-                                </span>
-                            </p>
+                                <p className="text-center text-sm text-gray-600 mt-2">
+                                    Total:{" "}
+                                    <span className="font-semibold">
+                                        {peso(campusTotal)}
+                                    </span>
+                                </p>
+                            </div>
+
+                            {/* Scrollable legend */}
+                            <ScrollLegend items={campusChartData} title="Campuses" />
                         </div>
+                    </div>
 
-                        {/* Scrollable legend */}
-                        <ScrollLegend items={campusChartData} title="Campuses" />
+                    {/* COLLEGE CARD */}
+                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                        <AppHeader label="Allocation per College" />
+
+                        <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                            {/* Chart area */}
+                            <div className="flex-1 min-w-0">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={collegeChartData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius="55%"
+                                            outerRadius="80%"
+                                            stroke="#fff"
+                                            strokeWidth={2}
+                                            isAnimationActive={false}
+                                        >
+                                            {collegeChartData.map((_, i) => (
+                                                <Cell
+                                                    key={i}
+                                                    fill={GREEN_COLORS[i % GREEN_COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
+
+                                        <Tooltip
+                                            formatter={(v) =>
+                                                typeof v === "number" ? peso(v) : v
+                                            }
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+
+                                <p className="text-center text-sm text-gray-600 mt-2">
+                                    Total:{" "}
+                                    <span className="font-semibold">
+                                        {peso(collegeTotal)}
+                                    </span>
+                                </p>
+                            </div>
+
+                            {/* Scrollable legend */}
+                            <ScrollLegend items={collegeChartData} title="Colleges / Campus-level" />
+                        </div>
                     </div>
                 </div>
-
-                {/* COLLEGE CARD */}
-                <div className="h-[380px] bg-white rounded-xl shadow-md p-4 overflow-hidden">
-                    <h2 className="text-center font-semibold mb-3">
-                        Allocation per College
-                    </h2>
-
-                    <div className="flex flex-col md:flex-row gap-4 h-[320px]">
-                        {/* Chart area */}
-                        <div className="flex-1 min-w-0">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={collegeChartData}
-                                        dataKey="value"
-                                        nameKey="name"
-                                        innerRadius="55%"
-                                        outerRadius="80%"
-                                        stroke="#fff"
-                                        strokeWidth={2}
-                                        isAnimationActive={false}
-                                    >
-                                        {collegeChartData.map((_, i) => (
-                                            <Cell
-                                                key={i}
-                                                fill={GREEN_COLORS[i % GREEN_COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-
-                                    <Tooltip
-                                        formatter={(v) =>
-                                            typeof v === "number" ? peso(v) : v
-                                        }
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-
-                            <p className="text-center text-sm text-gray-600 mt-2">
-                                Total:{" "}
-                                <span className="font-semibold">
-                                    {peso(collegeTotal)}
-                                </span>
-                            </p>
-                        </div>
-
-                        {/* Scrollable legend */}
-                        <ScrollLegend items={collegeChartData} title="Colleges / Campus-level" />
-                    </div>
-                </div>
-            </div>
+            )}
         </section>
     );
 }

@@ -10,6 +10,7 @@ import { CvSULoading } from "@/components/ui/loader";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateEvent } from "./CreateEvent";
 import { useAuth } from "@/hooks/use-auth";
+import { AppHeader } from "@/components/shared/AppHeader";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -68,7 +69,7 @@ export function Calendar({ className }: {
     if (loading || authLoading) return <CvSULoading className={ className } />
     return (
         <section className={`${className}`}>
-            <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
+            <AppHeader label="Events Calendar" />
             <div className={`bg-slate-50 my-2 p-4`}>
                 <div className="flex justify-between items-center p-4">
                     <button onClick={handlePrev} className="p-2 hover:bg-gray-100 rounded">
