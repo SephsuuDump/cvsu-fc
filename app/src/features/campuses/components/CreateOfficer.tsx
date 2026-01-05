@@ -22,8 +22,8 @@ export function CreateOfficer({ setOpen, setReload }: {
     setReload: Dispatch<SetStateAction<boolean>>;
 }) {
     const { isoDate } = useToday();
-    const [comfirm, setConfirm] = useState(false);
-    const [isUniquePosition, setIsUniquePosition] = useState(false);
+    const [toConfirm, setConfirm] = useState(false);
+    const [isUniquePosition, setIsUniquePosition] = useState(0);
     const [onProcess, setProcess] = useState(false);
     const [finalUsers, setFinalUsers] = useState<User[]>([]);
     const [officer, setOfficer] = useState<Partial<Officer>>({
@@ -80,82 +80,119 @@ export function CreateOfficer({ setOpen, setReload }: {
     return (
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent>
-                <div>
-
-                </div>
-                <ModalTitle label="Assign an Officer" />
-                <div className="flex flex-col gap-2">
-                    <AppSelect 
-                        label="Campus"
-                        groupLabel="CvSU Campuses"
-                        items={ filteredCampus.map((item) => ({
-                            label: item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.name,
-                            value: String(item.id)
-                        })) }
-                        placeholder="Select campus"
-                        onChange={ (value) => setOfficer((prev) => ({
-                            ...prev,
-                            campus_id: Number(value)
-                        })) }
-                        searchPlaceholder="Search for a campus"
-                        search={ campusSearch }
-                        setSearch={ setCampusSearch }
-                    />
-
-                    <AppSelect 
-                        label="Position"
-                        groupLabel="Positions"
-                        items={ filteredPositions.map((item) => ({
-                            label: item.position,
-                            value: String(item.id)
-                        })) }
-                        placeholder="Select position"
-                        onChange={ (value) =>  {
-                            setOfficer((prev) => ({
+                <div className={`flex flex-col gap-2 ${toConfirm && "relative"}`}>
+                    {toConfirm && (
+                        <div className="reveal flex flex-col justify-between mt-4 z-50 h-full w-full opacity-100 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white shadow-xs shadow-darkgreen p-4">
+                            <div className="text-semibold">
+                                This selected user for the selected position will replace the current assigned officer if the position is not vacant. 
+                                <br />
+                                <div className="mt-4 font-semibold">Are you sure to replace?</div>
+                            </div>
+                            <form
+                                onSubmit={ e => {
+                                    e.preventDefault();
+                                    handleSubmit();
+                                }}
+                                className="flex-center-y justify-end gap-4"
+                            >   
+                                <div 
+                                    className="cursor-pointer" 
+                                    onClick={() => setConfirm(false)}
+                                >
+                                    Cancel
+                                </div>
+                                <AddButton
+                                    type="submit"
+                                    label="Confirm"
+                                    loadingLabel="Assigning Officer"
+                                    onProcess={ onProcess }
+                                />
+                            </form>
+                        </div>
+                    )}
+                    {!toConfirm && <ModalTitle label="Assign an Officer" />}
+                    <div className="flex flex-col gap-2 mt-4">
+                        <AppSelect 
+                            label="Campus"
+                            groupLabel="CvSU Campuses"
+                            items={ filteredCampus.map((item) => ({
+                                label: item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.name,
+                                value: String(item.id)
+                            })) }
+                            placeholder="Select campus"
+                            onChange={ (value) => setOfficer((prev) => ({
                                 ...prev,
-                                position_id: Number(value)
-                            }
-                            // setIsUniquePosition(positions.find(i => i.is))
-                        )) }}
-                        searchPlaceholder="Search for a position"
-                        search={ positionSeach }
-                        setSearch={ setPositionSearch }
-                    />
+                                campus_id: Number(value)
+                            })) }
+                            searchPlaceholder="Search for a campus"
+                            search={ campusSearch }
+                            setSearch={ setCampusSearch }
+                        />
 
-                    <AppSelect 
-                        label="Faculty Member"
-                        groupLabel="Faculty Members"
-                        items={ filteredUsers.map((item) => ({
-                            label: item.first_name + " " + item.last_name,
-                            value: String(item.id)
-                        })) }
-                        placeholder="Select faculty member"
-                        onChange={ (value) => setOfficer((prev) => ({
-                            ...prev,
-                            user_id: Number(value)
-                        })) }
-                        searchPlaceholder="Search for faculty member"
-                        search={ userSearch }
-                        setSearch={ setUserSearch }
-                        disabled={ officer.campus_id === 0 }
-                    />
-                    
+                        <AppSelect 
+                            label="Position"
+                            groupLabel="Positions"
+                            items={ filteredPositions.map((item) => ({
+                                label: item.position,
+                                value: String(item.id)
+                            })) }
+                            placeholder="Select position"
+                            onChange={(value) => {
+                                setOfficer((prev) => ({
+                                    ...prev,
+                                    position_id: Number(value),
+                                }));
+
+                                const selected = positions.find(
+                                    (i) => i.id === Number(value)
+                                );
+
+                                setIsUniquePosition(selected?.is_unique ?? 0);
+                            }}
+                            searchPlaceholder="Search for a position"
+                            search={ positionSeach }
+                            setSearch={ setPositionSearch }
+                        />
+
+                        <AppSelect 
+                            label="Faculty Member"
+                            groupLabel="Faculty Members"
+                            items={ filteredUsers.map((item) => ({
+                                label: item.first_name + " " + item.last_name,
+                                value: String(item.id)
+                            })) }
+                            placeholder="Select faculty member"
+                            onChange={ (value) => setOfficer((prev) => ({
+                                ...prev,
+                                user_id: Number(value)
+                            })) }
+                            searchPlaceholder="Search for faculty member"
+                            search={ userSearch }
+                            setSearch={ setUserSearch }
+                            disabled={ officer.campus_id === 0 }
+                        />
+                        
+                    </div>
+                    <form
+                        onSubmit={ e => {
+                            e.preventDefault();
+                            if (isUniquePosition !== 1) {
+                                handleSubmit();
+                            } else {
+                                setConfirm(true);
+                            }
+                        }}
+                        className="flex justify-end gap-4 mt-2"
+                    >   
+                        <DialogClose>Cancel</DialogClose>
+                        <AddButton
+                            type="submit"
+                            label="Assign Officer"
+                            loadingLabel="Assigning Officer"
+                            onProcess={ onProcess }
+                        />
+                    </form>
                 </div>
-                <form
-                    onSubmit={ e => {
-                        e.preventDefault();
-                        handleSubmit();
-                    }}
-                    className="flex justify-end gap-4 mt-2"
-                >   
-                    <DialogClose>Cancel</DialogClose>
-                    <AddButton
-                        type="submit"
-                        label="Assign Officer"
-                        loadingLabel="Assigning Officer"
-                        onProcess={ onProcess }
-                    />
-                </form>
             </DialogContent>
         </Dialog>
     )

@@ -36,7 +36,6 @@ export function ViewAnnouncementPage() {
         { year: "numeric", month: "long", day: "numeric" }
     );
 
-    // 🔍 Detect file types
     const imageFiles = data!.files!.filter((f) =>
         /\.(jpg|jpeg|png|gif|webp)$/i.test(f.file_name)
     );
@@ -48,12 +47,10 @@ export function ViewAnnouncementPage() {
     return (
         <section className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
-            {/* Announcement Title */}
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                 {data?.content ?? "Announcement"}
             </h1>
 
-            {/* Meta info */}
             <div className="flex flex-col gap-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                     <CalendarDays className="w-4 h-4" />
@@ -75,7 +72,6 @@ export function ViewAnnouncementPage() {
 
             <Separator />
 
-            {/* Image Preview Section */}
             {imageFiles.length > 0 && (
                 <div className="space-y-2">
                     <h2 className="font-semibold text-gray-700">Attached Images</h2>
@@ -112,7 +108,6 @@ export function ViewAnnouncementPage() {
                 </div>
             )}
 
-            {/* Document Files Section */}
             {documentFiles.length > 0 && (
                 <div className="space-y-3">
                     <h2 className="font-semibold text-gray-700">Attached Documents</h2>
@@ -139,7 +134,6 @@ export function ViewAnnouncementPage() {
 
             <Separator />
 
-            {/* Back Button */}
             <Button
                 onClick={() => history.back()}
                 className="w-20 !bg-darkgreen hover:opacity-90"

@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { HandCoins, Landmark, Plus, Search, University } from "lucide-react";
+import { FileUp, HandCoins, Landmark, Plus, RefreshCcw, Search, University } from "lucide-react";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { Campus } from "@/types/campus";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -29,48 +29,42 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { match } from "assert";
 import { formatToPeso } from "@/lib/helper";
 import { useAuth } from "@/hooks/use-auth";
+import { AllocationExportMonthRange } from "./components/ExportDateRange";
 
 type AllocationLevel = "COLLEGE" | "CAMPUS";
-
-const monthOptions = [
-    { value: "01", label: "January" },
-    { value: "02", label: "February" },
-    { value: "03", label: "March" },
-    { value: "04", label: "April" },
-    { value: "05", label: "May" },
-    { value: "06", label: "June" },
-    { value: "07", label: "July" },
-    { value: "08", label: "August" },
-    { value: "09", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
-];
-const yearOptions = ["2025", "2024", "2023", "2022", "2021", "2020"];
-
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const currentYear = new Date().getFullYear();
+const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 export default function AllocationPage() {
     const { claims, loading: authLoading } = useAuth();
+    const [refreshFilter, setRefreshFilter] = useState(false);
     const [reload, setReload] = useState(false);
     const [search, setSearch] = useState("");
     const [levelFilter, setLevelFilter] = useState<AllocationLevel | "ALL">("ALL");
     const [selectedCampus, setSelectedCampus] = useState(0);
     const [selectedCollege, setSelectedCollege] = useState(0);
 
+    const [selectedMonth, setSelectedMonth] = useState(
+        new Date().toLocaleString("default", { month: "long" })
+    );
+    const [selectedYear, setSelectedYear] = useState(String(currentYear));
+
     const { data: campuses, loading: campusesLoading } = useFetchData<Campus>(CampusService.getAllCampus, []);
     const { data: colleges, loading: collegesLoading } = useFetchData<College>(CollegeService.getAllColleges, []);
     const { data: allocations, loading: allocationLoading } = useFetchData(
-        AllocationService.getAllocationsByCampusCollege,
-        [selectedCampus, selectedCollege, reload],
-        [selectedCampus, selectedCollege]
+        AllocationService.getAllocations,
+        [refreshFilter],
+        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
     )
     const { data: budget, loading: budgetLoading } = useFetchOne(
         AllocationService.getCollegeBudget,
-        [selectedCampus, selectedCollege],
-        [selectedCampus, selectedCollege]
+        [refreshFilter],
+        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
     )
     
     const { open, setOpen } = useCrudState();
+    const { open: openExport, setOpen: setOpenExport } = useCrudState();
 
     useEffect(() => {
         if (claims.role === "ADMIN") return
@@ -155,16 +149,61 @@ export default function AllocationPage() {
                             </SelectContent>
                         </Select>
                     )}
-                </div>
-                {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+
+                    <Select 
+                        value={selectedMonth} 
+                        onValueChange={setSelectedMonth} 
+                    >
+                        <SelectTrigger className="w-40 rounded-full">
+                            <SelectValue placeholder='Select Month' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {months.map((item, i) => (
+                                <SelectItem value={item} key={i}>{item}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select 
+                        value={selectedYear} 
+                        onValueChange={setSelectedYear}
+                    >
+                        <SelectTrigger className="w-40 rounded-full">
+                            <SelectValue placeholder='Select Year' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {pastFiveYears.map((item, i) => (
+                                <SelectItem value={String(item)} key={i}>{item}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
                     <Button
-                        onClick={ () => setOpen(true) }
-                        className="!bg-darkgreen hover:opacity-90"
+                        onClick={ () => setRefreshFilter(prev => !prev) }
+                        className="!bg-darkgreen hover:opacity-90 rounded-full shadow"
                         size="sm"
                     >
-                        <Plus className="w-4 h-4" /> Add Allocation
+                        <RefreshCcw /> Refresh Filter
                     </Button>
-                )}
+                </div>
+                <div className="flex-center-y gap-2">
+                    <Button 
+                        onClick={ () => setOpenExport(true) }
+                        className="bg-slate-50 shadow-sm text-black" 
+                    >
+                        <FileUp /> Export
+                    </Button>
+                    {["ADMIN", "COORDINATOR"].includes(claims.role) && (
+                        <Button
+                            onClick={ () => setOpen(true) }
+                            className="!bg-darkgreen hover:opacity-90"
+                            size="sm"
+                        >
+                            <Plus className="w-4 h-4" /> Add Allocation
+                        </Button>
+                    )}
+                </div>
+                
             </div>
     
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,7 +236,7 @@ export default function AllocationPage() {
 
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div className="flex flex-col md:flex-row gap-3 items-center">
 
                 {/* SEARCH */}
                 <div className="relative w-full md:w-[300px]">
@@ -217,7 +256,7 @@ export default function AllocationPage() {
                         setLevelFilter(value as AllocationLevel | "ALL")
                     }
                 >
-                    <SelectTrigger className="w-[180px] rounded-full">
+                    <SelectTrigger className="w-[180px] rounded-full ms-auto">
                         <SelectValue placeholder="Filter Level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -291,6 +330,12 @@ export default function AllocationPage() {
                     claims={ claims }
                     setOpen={ setOpen }
                     setReload={ setReload }
+                />
+            )}
+
+            {openExport && (
+                <AllocationExportMonthRange 
+                    setOpen={ setOpenExport }
                 />
             )}
         </section>

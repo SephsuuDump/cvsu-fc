@@ -2,7 +2,7 @@ import { User } from "@/types/user";
 import { requestData } from "./_config";
 import { BASE_URL } from "@/lib/urls";
 import { Allocation } from "@/types/allocation";
-import { Officer } from "@/types/officer";
+import { CreatePositionType, Officer } from "@/types/officer";
 
 const positionUrl = `${BASE_URL}/position`;
 const officerUrl = `${BASE_URL}/position-assignment`;
@@ -40,6 +40,32 @@ export class PositionService {
             `${positionUrl}/get-members`,
             'GET',
             { "Accept": "application/json" }
+        )
+    }
+
+    static async createPosition(position: CreatePositionType | Omit<CreatePositionType, "parent_position_id">) {
+        return await requestData(
+            `${positionUrl}/create`,
+            'POST',
+            { "Accept": "application/json" },
+            position
+        )
+    }
+
+    static async updatePosition(position: CreatePositionType | Omit<CreatePositionType, "parent_position_id">, positionId: number) {
+        return await requestData(
+            `${positionUrl}/update?id=${positionId}`,
+            'POST',
+            { "Accept": "application/json" },
+            position
+        )
+    }
+
+    static async deletePosition(positionId: number) {
+        return await requestData(
+            `${positionUrl}/delete?id=${positionId}`,
+            'POST',
+            { "Accept": "application/json" },
         )
     }
 }

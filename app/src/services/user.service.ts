@@ -46,6 +46,14 @@ export class UserService {
         )
     }
 
+    static async updateProfileImage(id: number, file: File) {
+        return await requestData(
+            `${url}/update`,
+            'POST',
+            { "Accept": "application/json" },
+        )
+    }
+
     static async deleteUser(id: number) {
         return await requestData(
             `${url}/delete?id=${id}`,

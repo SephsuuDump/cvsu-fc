@@ -40,13 +40,19 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
     async function handleSubmit() {
         try {
             setProcess(true)
-            if (hasEmptyField(user, ["middle_name"])) {
+            const notRequired: (keyof User)[] = ["middle_name"];
+            if (user.role === "COORDINATOR") notRequired.push("college_id");            
+            if (hasEmptyField(user, notRequired)) {
                 return toast.warning('PLEASE FILL UP ALL THE FIELDS')
             }
             if (user.password !== user.confirmPassword) {
                 return toast.warning('password do not matched.')
             }
-            const data = await AuthService.register(user);
+            const payload = {
+                ...user,
+                college_id: user.college_id === 0 ? null : user.college_id,
+            };
+            const data = await AuthService.register(payload);
             if (data) {
                 toast.success('User added successfully.')
                 setReload(prev => !prev)
@@ -153,6 +159,9 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
                             <SelectValue placeholder="Select college" />
                         </SelectTrigger>
                         <SelectContent>
+                            {user.role === "COORDINATOR" && 
+                                <SelectItem value="0">All Colleges</SelectItem>
+                            }
                             {colleges.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
                                     { item.name } ({ item.abbreviations })

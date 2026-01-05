@@ -44,7 +44,7 @@ export function useFetchData<T>(
         return () => {
             isMounted = false;
         };
-    }, [page, size, JSON.stringify(args), JSON.stringify(deps)]);
+    }, [page, size, JSON.stringify(deps)]);
 
     const data = Array.isArray(items) ? items : [];
     return { data, loading, error };

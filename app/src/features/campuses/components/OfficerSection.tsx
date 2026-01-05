@@ -13,6 +13,7 @@ import { useFetchOne } from "@/hooks/use-fetch-one";
 import { OfficerList } from "./OfficerList";
 import { PositionList } from "./PositionList";
 import { Button } from "@/components/ui/button";
+import { CreatePosition } from "./CreatePosition";
 
 export function OfficersSection({ campusId }: {
     campusId: number
@@ -73,20 +74,27 @@ export function OfficersSection({ campusId }: {
             {tab === "OFFICER LIST" && (
                 <OfficerList 
                     items={ officers! }
+                    setReload={ setReload }
                 />
             )}
 
             {tab === "POSITIONS" && (
                 <PositionList 
                     items={ positions }
+                    setReload={ setReload }
                 />
             )}
-
-            
             
             {openOfficer && (
                 <CreateOfficer  
                     setOpen={ setOpenOfficer }
+                    setReload={ setReload }
+                />
+            )}
+
+            {openPosition && (
+                <CreatePosition  
+                    setOpen={ setOpenPosition }
                     setReload={ setReload }
                 />
             )}

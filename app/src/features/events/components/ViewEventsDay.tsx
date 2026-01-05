@@ -1,11 +1,10 @@
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
-import { formatCustomDate, formatDateToWord, formatEventRange } from "@/lib/helper";
-import { CalendarDays, CalendarOff, CalendarX2, Ellipsis } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
-import { CreateEvent } from "./CreateEvent";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { formatDateToWord, formatEventRange } from "@/lib/helper";
+import { CalendarDays, CalendarX2, Ellipsis } from "lucide-react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateEvent } from "./UpdateEvent";
@@ -22,7 +21,13 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
 }) {    
     const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
-    const { toUpdate, setUpdate, toDelete, setDelete } = useCrudState<FCEvent>();
+    const { toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<FCEvent>();
+
+    useEffect(() => {
+        if (!toView) return
+        window.location.href = `/events/${toView.id}`
+    }, [toView])
+
     if (toUpdate) return (
         <UpdateEvent
             toUpdate={ toUpdate }
@@ -69,6 +74,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                                             className="ms-auto"
                                             item={ item }
                                             icon={ Ellipsis }
+                                            setView={ setView }
                                             setUpdate={ setUpdate }
                                             setDelete={ setDelete }
                                         />

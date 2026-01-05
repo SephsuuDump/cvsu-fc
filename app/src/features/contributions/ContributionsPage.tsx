@@ -15,6 +15,8 @@ import { CampusService } from "@/services/campus.service";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateContribution } from "./components/UpdateContribution";
 import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { ContributionExportMonthRange } from "./components/ExportDateRange";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
@@ -36,6 +38,8 @@ export function ContributionPage() {
 
     const [contributions, setContributions] = useState<Contribution[]>([]);
     const [contributionsLoading, setContributionsLoading] = useState(false);
+
+    const { open, setOpen } = useCrudState();
 
     const { toUpdate, setUpdate } = useCrudState<{
         first_name: string;
@@ -171,10 +175,11 @@ export function ContributionPage() {
                 </div>
 
                 <div className="ms-auto flex-center-y gap-1.5">
-                    <button className="rounded-full p-2 bg-slate-50 shadow-sm">
-                        <SlidersHorizontal className="w-4 h-4" />
-                    </button>
-                    <Button className="rounded-full bg-slate-50 shadow-sm text-black" size="sm">
+                    <Button 
+                        onClick={ () => setOpen(!open) }
+                        className="rounded-full bg-slate-50 shadow-sm text-black" 
+                        size="sm"
+                    >
                         <FileUp /> Export
                     </Button>
                 </div>
@@ -269,6 +274,12 @@ export function ContributionPage() {
                         )
                     })}
                 </div>
+            )}
+
+            {open && (
+                <ContributionExportMonthRange 
+                    setOpen={ setOpen }
+                />
             )}
 
             {toUpdate && (

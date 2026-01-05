@@ -26,12 +26,13 @@ export type User = {
     last_name:string;
     role: string;
     campus_id: number;
-    college_id: number;
+    college_id: number | null;
     contact: string;
     highest_educational_attainment: string;
     created_at: string;
     updated_at: string;
     is_deleted: string;
+    image_url: string;
 
     campus: {
         id: number;

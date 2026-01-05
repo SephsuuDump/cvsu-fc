@@ -14,7 +14,7 @@ export type Officer = {
         is_unique: boolean;
         position_id: number;
         position_name: string;
-    }[]
+    }[],
 
     user_id: number;
     position_id: number;
@@ -25,9 +25,17 @@ export type Officer = {
 export type Position = {
     id: number;
     position: string;
+    is_unique: number;
+    parent_position_id: number;
     users: {
         name: string;
         campus: string;
         date_assigned: string;
     }[]
+}
+
+export type CreatePositionType = {
+    name: string;
+    parent_position_id: number | null;
+    is_unique: boolean;
 }

@@ -24,4 +24,12 @@ export class ContributionService {
             { "Accept": "application/json" },
         )
     }
+
+    static async exportContributions(startDate: string, endDate: string, year: string, campusId: number, collegeId: number) {
+        return await requestData(
+            `${url}/export?start_date=${startDate}&year=${year}&college_id=${collegeId}&campus_id=${campusId}&end_date=${endDate}`,
+            'GET',
+            { "Accept": "application/json" },
+        )
+    }
 }

@@ -106,7 +106,7 @@ export function FacultySection({ campusId }: {
                                         </div>
                                     </div>
                                     <div className="rounded-md  border-1 border-gray-300 px-4 py-2 bg-white">
-                                        <div className="text-xs uppercase">{ item.college!.name }</div>
+                                        <div className="text-xs uppercase">{ item.college!.name ?? "" }</div>
                                         <div className="text-[10px] text-darkgreen font-semibold">COLLEGE</div>
                                         <Separator className="bg-slate-300 my-2" />
                                         <div className="text-sm"><AtSign className="w-4 h-4 inline-block" />{ item.email }</div>

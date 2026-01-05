@@ -178,11 +178,20 @@ export function UsersPage() {
                                             </TooltipTrigger>
                                             <TooltipContent>{ item.email }</TooltipContent>
                                         </Tooltip>
-                                        <div className="td">{ item.campus!.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.campus?.name }</div>
+                                        <div className="td">
+                                            { item.campus!.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.campus?.name }
+                                        </div>
                                         <div className="td">
                                             <Tooltip>
-                                                <TooltipTrigger>{ item.college?.abbreviations }</TooltipTrigger>
-                                                <TooltipContent className="bg-darkgreen">{ item.college!.id }</TooltipContent>
+                                                <TooltipTrigger>
+                                                    { item.college?.abbreviations ?? "ALL COLLEGES" }
+                                                </TooltipTrigger>
+                                                <TooltipContent className="bg-darkgreen">
+                                                    { item.college 
+                                                        ? item.college.id 
+                                                        : "ALL_COLLEGES" 
+                                                    } 
+                                                </TooltipContent>
                                             </Tooltip>
                                         </div>
                                     </div>

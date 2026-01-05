@@ -25,5 +25,21 @@ type FCEvent = {
     campus?: {
         id: number;
         name: string;
+    },
+
+    accomplishment_report: {
+        id: number;
+        title: string;
+        introduction: string;
+        objectives: string;
+        accomplishments: string;
     }
+}
+
+type AccomplishmentReport = {
+    id: number;
+    title: string;
+    introduction: string;
+    objectives: string;
+    accomplishments: string;
 }

@@ -13,11 +13,48 @@ export class EventService {
         )
     }
 
+    static async getEventById(id: number) {
+        return await requestData(
+            `${url}/get-by-id?id=${id}`,
+            'GET',
+            { "Accept": "application/json" },
+        )
+    }
+
     static async getEventsByCampus(campusId: number, month: string, year: string, visibility: string) {
         return await requestData(
             `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}&visibility=${visibility}`,
             'GET',
             { "Accept": "application/json" },
+        )
+    }
+
+    static async editAccomplishmentReport(report: {
+        title: string;
+        introduction: string;
+        objectives: string;
+        accomplishments: string;
+    }) {
+        return await requestData(
+            `${url}/accomplishment-reports/create`,
+            'POST',
+            { "Accept": "application/json" },
+            report
+        )
+    }
+
+    static async updateAccomplishmentReport(report: {
+        id: number;
+        title: string;
+        introduction: string;
+        objectives: string;
+        accomplishments: string;
+    }) {
+        return await requestData(
+            `${url}/accomplishment-reports/update?id=${report.id}`,
+            'POST',
+            { "Accept": "application/json" },
+            report
         )
     }
 
@@ -85,6 +122,19 @@ export class EventService {
             { "Accept": "application/json" },
             formData
         )
+    }
+
+    static async exportAccomplishmentReport(id: number) {
+        const response = await fetch(
+            `${BASE_URL}/api/events/accomplishment-reports/export/${id}`,
+            {
+                method: "GET",
+                headers: {
+                "Accept": "application/json",
+                },
+            }
+        );
+     
     }
 
     static async deleteEvent(id: number) {

@@ -10,6 +10,7 @@ type AppTextareaProps = {
     value?: string | number
     onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
     height?: number
+    readonly?: false | true 
 }
 
 export function AppTextarea({
@@ -20,6 +21,7 @@ export function AppTextarea({
     value,
     onChange,
     height,
+    readonly
 }: AppTextareaProps) {
     return (
         <div className={`${className} stack-sm`}>
@@ -29,6 +31,7 @@ export function AppTextarea({
             value={value ?? ""}
             onChange={ onChange }
             className={`h-${height}`}
+            readOnly={ readonly }
         />
         </div>
     )

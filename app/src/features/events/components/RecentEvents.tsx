@@ -6,7 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 export function RecentEvents({ className }: {
     className?: string;
 }) {
+
+
     return (
+        
         <ScrollArea className={`${className}`}>
             <div className="flex-center-y gap-1 text-lg font-bold">Recent Events</div>
             {octoberEvents.map((item, i) => (

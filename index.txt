@@ -1,52 +1,35 @@
-const [selectedMonth, setSelectedMonth] = useState(() => {
-    const month = new Date().getMonth() + 1; 
-    return String(month).padStart(2, "0");  
-});
-const [selectedYear, setSelectedYear] = useState(() => {
-    return String(new Date().getFullYear()); // e.g. "2025"
-});
-
-<Select
-    value={selectedMonth}
-    onValueChange={(value) => setSelectedMonth(value)}
->
-    <SelectTrigger className="rounded-full w-40 truncate">
-        <SelectValue placeholder="Select Month" />
-    </SelectTrigger>
-    <SelectContent>
-        <SelectGroup>
-            <SelectLabel>Months</SelectLabel>
-            {monthOptions.map((month) => (
-                <SelectItem key={month.value} value={month.value}>
-                    {month.label}
-                </SelectItem>
-            ))}
-        </SelectGroup>
-    </SelectContent>
-</Select>
-
-<Select
-    value={selectedYear}
-    onValueChange={(value) => setSelectedYear(value)}
->
-    <SelectTrigger className="rounded-full w-30 truncate">
-        <SelectValue placeholder="Year" />
-    </SelectTrigger>
-    <SelectContent>
-        <SelectGroup>
-            <SelectLabel>Years</SelectLabel>
-            {yearOptions.map((year) => (
-                <SelectItem key={year} value={year}>
-                    {year}
-                </SelectItem>
-            ))}
-        </SelectGroup>
-    </SelectContent>
-</Select>
-
-gantto kasi sana 
-campus_id = 0, college_id = 0: budget of all campuses
-
-campus_id = 1, college_id = 0: budget ng Main Campus (all colleges)
-
-campus_id = 1, college_id = 1: budget ng Main Campus (CAFENR only)
+{
+  "id": 12,
+  "title": "TEST",
+  "description": "TEST",
+  "visibility": "ALL",
+  "event_start": "2025-12-17 06:00:00",
+  "event_end": "2025-12-17 17:00:00",
+  "is_deleted": 0,
+  "user": {
+    "id": 1,
+    "first_name": "Juan",
+    "middle_name": "A",
+    "last_name": "User",
+    "campus": {
+      "id": 1,
+      "name": "Cavite State University - Main Campus"
+    }
+  },
+  "files": [
+    {
+      "id": 7,
+      "file_name": "peso.png",
+      "file_path": "events/V9nmWQ9VWVJORWEvaY9tfNIMvdcbApYsRLVORuFT.png"
+    }
+  ],
+  "campus": {
+    "id": 1,
+    "name": "Cavite State University - Main Campus"
+  },
+  "accomplishment_report": {
+    "introduction": "INTRODUCTION",
+    "objectives": "OBJECTIVES",
+    "accomplishment": "ACCOMPLISHMENT"
+  }
+}
