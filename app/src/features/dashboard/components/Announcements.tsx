@@ -32,7 +32,6 @@ export function Announcements({ claims, className }: {
     const [localLikeCount, setLocalLikeCount] = useState<Record<number, number>>({});
     const [localLikeUsers, setLocalLikeUsers] = useState<Record<number, { id: number; name: string }[]>>({});
 
-
     const getAnnouncements = useCallback(() => {
         if (claims.role === "ADMIN") {
             return AnnouncementService.getAllAnnouncements();
@@ -129,6 +128,9 @@ export function Announcements({ claims, className }: {
             setReload((r) => !r);
         }
     }
+
+    console.log(announcements);
+    
 
 
     if (loading) return <CvSULoading className={ className }  />

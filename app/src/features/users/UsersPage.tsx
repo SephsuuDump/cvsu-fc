@@ -238,7 +238,7 @@ export function UsersPage() {
             </div>
 
             <AppPagination 
-                totalItems={ users.length }
+                totalItems={ finalFilteredUsers.length }
                 itemsPerPage={ 10 }
                 currentPage={ page }
                 onPageChange={ setPage }
