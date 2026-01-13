@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { updateField } from "@/lib/helper";
 import { User } from "@/types/user";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { campusesMock } from "../../../public/mock/campuses";
 import { AddButton } from "@/components/ui/button";
 import { toast } from "sonner";
 
