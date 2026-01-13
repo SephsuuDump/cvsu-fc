@@ -86,7 +86,7 @@ export function ViewEventPage() {
             if (!data?.accomplishment_report) {
                 return toast.error("This event has no accomplishment report.")
             }
-            const url = `${FILE_URL}/events/accomplishment-reports/export/${data!.accomplishment_report.id}`
+            const url = `${BASE_URL}/events/accomplishment-reports/export/${data!.accomplishment_report.id}`
 
             window.open(url, "_blank");
         } catch (error) {

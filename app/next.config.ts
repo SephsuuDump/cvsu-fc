@@ -8,9 +8,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "nutten-strings-lie-exams.trycloudflare.com",
+        hostname: "faculty-connect-app-cxk36.ondigitalocean.app",
         port: "",
         pathname: "/storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "juodgawtdmfeqfxiwisb.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
