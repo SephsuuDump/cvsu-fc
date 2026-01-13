@@ -2,7 +2,6 @@
 
 import { AppHeader } from "@/components/shared/AppHeader";
 import { AppSelect } from "@/components/shared/AppSelect";
-import { campusesMock } from "../../../public/mock/campuses";
 import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { FacultySection } from "./components/FacultySection";
@@ -40,7 +39,7 @@ export function CampusesPage() {
                     }))}
                     value={String(selectedCampus.id)}
                     onChange={(value) => {
-                        const campus = campusesMock.find((c) => String(c.id) === value)
+                        const campus = campuses.find((c) => String(c.id) === value)
                         if (campus) setSelectedCampus(campus)
                     }}
                 />
