@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { messagesMock } from "../../../../public/mock/messages";
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import { formatMessageDateTime } from "@/lib/helper";
 import { SectionLoading } from "@/components/ui/loader";
