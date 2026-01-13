@@ -33,6 +33,7 @@ export type User = {
     updated_at: string;
     is_deleted: string;
     image_url: string;
+    sex: string;
 
     campus: {
         id: number;

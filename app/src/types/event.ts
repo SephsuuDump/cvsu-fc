@@ -33,6 +33,10 @@ type FCEvent = {
         introduction: string;
         objectives: string;
         accomplishments: string;
+        images: {
+            id: number;
+            image_path: string;
+        } []
     }
 }
 
@@ -42,4 +46,8 @@ type AccomplishmentReport = {
     introduction: string;
     objectives: string;
     accomplishments: string;
+    images: {
+        id: number;
+        image_path: string;
+    } []
 }

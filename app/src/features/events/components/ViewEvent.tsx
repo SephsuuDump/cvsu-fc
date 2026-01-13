@@ -231,7 +231,6 @@ export function ViewEventPage() {
 
             <Separator className="h-2 bg-gray" />
 
-            {/* Back button */}
             <Button
                 onClick={() => history.back()}
                 className="w-20 !bg-gray-700 hover:opacity-90"

@@ -268,7 +268,6 @@ export function CreateEvent({ setOpen, selectedDay }: {
                             {previews.map((preview, idx) => (
                                 <div key={idx} className="relative group">
                                     {preview.type.startsWith("image/") ? (
-                                        // 🖼️ Image preview
                                         <img
                                             src={preview.url}
                                             alt={preview.name}

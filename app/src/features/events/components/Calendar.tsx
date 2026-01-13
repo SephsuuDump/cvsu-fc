@@ -69,7 +69,7 @@ export function Calendar({ className }: {
     if (loading || authLoading) return <CvSULoading className={ className } />
     return (
         <section className={`${className}`}>
-            <AppHeader label="Events Calendar" />
+            <div className="text-xl font-semibold">Events Calendar</div>
             <div className={`bg-slate-50 my-2 p-4`}>
                 <div className="flex justify-between items-center p-4">
                     <button onClick={handlePrev} className="p-2 hover:bg-gray-100 rounded">

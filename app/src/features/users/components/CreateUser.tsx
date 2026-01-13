@@ -31,6 +31,7 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
         first_name: '',
         middle_name: '',
         last_name: '',
+        sex: '',
         role: 'MEMBER',
         campus_id: campusId ?? 0,
         college_id: 0
@@ -108,24 +109,46 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
                         onChange={ e => updateField(setUser, 'last_name', e.target.value) }
                     />
                 </div>
-                <div className="stack-sm">
-                    <Label>Role</Label>
-                    <Select
-                        value={ user.role }
-                        onValueChange={ (value) => setUser(prev => ({
-                            ...prev,
-                            role: value
-                        }))}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select campus" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {roles.map((item, i) => (
-                                <SelectItem value={ item } key={i}>{ item }</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <div className="row-md">
+                    <div className="stack-sm w-full">
+                        <Label>Role</Label>
+                        <Select
+                            value={ user.role }
+                            onValueChange={ (value) => setUser(prev => ({
+                                ...prev,
+                                role: value
+                            }))}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select campus" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {roles.map((item, i) => (
+                                    <SelectItem value={ item } key={i}>{ item }</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="stack-sm w-full">
+                        <Label>Sex</Label>
+                        <Select
+                            value={ user.sex }
+                            onValueChange={ (value) => setUser(prev => ({
+                                ...prev,
+                                sex: value
+                            }))}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select sex" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {["Male", "Female"].map((item, i) => (
+                                    <SelectItem value={ item } key={i}>{ item }</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <div className="stack-sm">
                     <Label>Campus</Label>

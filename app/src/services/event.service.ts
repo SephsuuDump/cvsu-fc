@@ -29,12 +29,7 @@ export class EventService {
         )
     }
 
-    static async editAccomplishmentReport(report: {
-        title: string;
-        introduction: string;
-        objectives: string;
-        accomplishments: string;
-    }) {
+    static async editAccomplishmentReport(report: FormData) {
         return await requestData(
             `${url}/accomplishment-reports/create`,
             'POST',
@@ -43,15 +38,9 @@ export class EventService {
         )
     }
 
-    static async updateAccomplishmentReport(report: {
-        id: number;
-        title: string;
-        introduction: string;
-        objectives: string;
-        accomplishments: string;
-    }) {
+    static async updateAccomplishmentReport(id: number, report: FormData) {
         return await requestData(
-            `${url}/accomplishment-reports/update?id=${report.id}`,
+            `${url}/accomplishment-reports/update?id=${id}`,
             'POST',
             { "Accept": "application/json" },
             report

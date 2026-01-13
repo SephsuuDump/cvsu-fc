@@ -33,6 +33,7 @@ export function UsersPage() {
     const router = useRouter();
     const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
+    const [selectedRole, setSelectedRole] = useState("COORDINATOR");
     const [selectedCampus, setSelectedCampus] = useState(0);
     const [selectedCollege, setSelectedCollege] = useState(0);
     const { data: users, loading } = useFetchData<User>(UserService.getAllUsers, [reload]);
@@ -42,9 +43,11 @@ export function UsersPage() {
     const campuses = [{ id: 0, name: "All Campuses" }, ...campusesOptions];
 
     const filteredUsers = filteredItems.filter((u) => {
-        if (selectedCampus !== 0) return u.campus?.id === selectedCampus;
+        if (selectedRole !== "ALL" && u.role !== selectedRole) return false;
+        if (selectedCampus !== 0 && u.campus?.id !== selectedCampus) return false;
         return true;
     });
+
 
     const collegeMap = Array.from(
         new Map(
@@ -77,12 +80,32 @@ export function UsersPage() {
         <section className="stack-md reveal">
             <AppHeader label="CvSU FC Users" />
             <div className="flex">
-                <div className="bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2">
+                <div className="flex-center-y gap-2 bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2">
                     <Input
                         placeholder="Search for a user"
                         onChange={ e => setSearch(e.target.value) }
                         className="w-100"
                     />
+                    <Select
+                        value={selectedRole}
+                        onValueChange={(value) => setSelectedRole(value)}
+                    >
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>User Roles</SelectLabel>
+                                <SelectItem value="ALL">All Roles</SelectItem>
+                                {["COORDINATOR", "MEMBER", "JOBORDER"].map((item) => (
+                                    <SelectItem key={item} value={item}>
+                                        {item}
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+
                 </div>
                 <div className="ms-auto flex-center-y gap-1.5">
                     <button

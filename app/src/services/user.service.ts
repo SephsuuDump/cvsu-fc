@@ -37,6 +37,14 @@ export class UserService {
         )
     }
 
+    static async getGenderCount() {
+        return await requestData(
+            `${url}/gender-count`,
+            'GET',
+            { "Accept": "application/json" }
+        )
+    } 
+
     static async updateUser(user: Partial<User>) {
         return await requestData(
             `${url}/update?id=${user.id}`,

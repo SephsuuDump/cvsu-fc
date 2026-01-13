@@ -225,11 +225,13 @@ export function Announcements({ claims, className }: {
                         <div className="flex justify-between">
                             <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
                             <div className="flex-center-y gap-2">
-                                <ThumbsUp
-                                    onClick={() => likeAnnouncement(item.id)}
-                                    className="cursor-pointer transition-colors"
-                                    fill={localLikes[item.id] ? "#016630" : "#fff"}
-                                />
+                                {claims.role !== "ADMIN" && (
+                                    <ThumbsUp
+                                        onClick={() => likeAnnouncement(item.id)}
+                                        className="cursor-pointer transition-colors"
+                                        fill={localLikes[item.id] ? "#016630" : "#fff"}
+                                    />
+                                )}
                                 <HoverCard openDelay={150}>
                                     <HoverCardTrigger asChild>
                                         <div className="font-semibold mt-1 cursor-default">
