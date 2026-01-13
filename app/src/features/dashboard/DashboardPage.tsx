@@ -23,7 +23,7 @@ export function DashboardPage() {
     )
 
     if (!claims) return <AuthPage />
-    if (loading) return <CvSULoading />
+    if (loading || loadingGenderCounts) return <CvSULoading />
     return (
         <section className="stack-md reveal">
             {loadingGenderCounts ? (
