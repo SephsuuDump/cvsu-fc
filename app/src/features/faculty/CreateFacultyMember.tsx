@@ -9,6 +9,8 @@ import { User } from "@/types/user";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AddButton } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { CampusService } from "@/services/campus.service";
 
 export function CreateFacultyMember({ setOpen, setReload }: {
     setOpen: Dispatch<SetStateAction<boolean>>;
@@ -24,6 +26,10 @@ export function CreateFacultyMember({ setOpen, setReload }: {
         campus_id: 0,
     });
     const [onProcess, setProcess] = useState(false);
+
+    const { data: campuses, loading: loadingCampuses } = useFetchData(
+        CampusService.getAllCampus
+    )
 
     useEffect(() => {
         console.log(user);
@@ -91,7 +97,7 @@ export function CreateFacultyMember({ setOpen, setReload }: {
                             <SelectValue placeholder="Select a campus" />
                         </SelectTrigger>
                         <SelectContent>
-                            {campusesMock.map((item, i) => (
+                            {campuses.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>{ item.name }</SelectItem>
                             ))}
                         </SelectContent>
