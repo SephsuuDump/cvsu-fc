@@ -165,7 +165,7 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
                         </SelectTrigger>
                         <SelectContent>
                             {campuses.map((item, i) => (
-                                <SelectItem value={String(item.id)} key={i}>{ item.name }</SelectItem>
+                                <SelectItem value={String(item.id)} key={i}>{ item.name?.match(/University\s*-\s*(.+)/i)?.[1] ?? "No campus assigned" }</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
