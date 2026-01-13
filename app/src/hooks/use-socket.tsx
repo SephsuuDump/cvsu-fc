@@ -1,11 +1,10 @@
 // hooks/useSocket.ts - FIXED VERSION
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { Message } from '@/types/messaging';
 
 interface UseSocketProps {
   userId: number;
-  onNewMessage?: (message: Message, conversationId: number) => void;
+  onNewMessage?: (message: any, conversationId: number) => void;
   onUserTyping?: (userId: number, conversationId: number) => void;
   onUserStoppedTyping?: (userId: number, conversationId: number) => void;
 }
@@ -89,7 +88,7 @@ export const useSocket = ({ userId, onNewMessage, onUserTyping, onUserStoppedTyp
     });
 
     // Message handlers - Use refs to access current callbacks
-    socket.on('new_message', (data: { message: Message; conversationId: number }) => {
+    socket.on('new_message', (data: { message: any; conversationId: number }) => {
       console.log('New message received:', data);
       onNewMessageRef.current?.(data.message, data.conversationId);
     });
