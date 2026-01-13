@@ -119,7 +119,7 @@ function DropdownFooter({ open, sidebarOpen, setShow, claims, handleLogout }: {
                     <AppAvatar fallback="FC"/>
                     <div>
                         <div className="font-semibold text-start">{claims.role}</div>
-                        <div className="text-xs -mt-0.5 text-start">{claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1]}</div>
+                        <div className="text-xs -mt-0.5 text-start">{claims.campus ? claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1] : "No Campus"}</div>
                     </div>
                     <ChevronsUpDown className="ms-auto w-4 h-4" />
                 </button>
@@ -130,7 +130,7 @@ function DropdownFooter({ open, sidebarOpen, setShow, claims, handleLogout }: {
                     <AppAvatar fallback="FC"/>
                     <div>
                     <div className="font-semibold text-start">{claims.role}</div>
-                    <div className="text-xs text-muted-foreground text-start">{claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1]}</div>
+                    <div className="text-xs text-muted-foreground text-start">{claims.campus ? claims.campus.name.match(/University\s*-\s*(.+)/i)?.[1] : "No Campus"}</div>
                     </div>
                 </div>
                 <DropdownMenuSeparator />

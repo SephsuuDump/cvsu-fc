@@ -35,7 +35,7 @@ export function CampusesPage() {
                 <div className="text-lg font-bold">{ selectedCampus.name ?? '...' }</div>
                 <AppSelect
                     items={campuses.map((item) => ({
-                        label: item.name.match(/University\s*-\s*(.+)/i)?.[1]!,
+                        label: item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? "",
                         value: String(item.id),
                     }))}
                     value={String(selectedCampus.id)}

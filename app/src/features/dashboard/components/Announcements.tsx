@@ -39,17 +39,17 @@ export function Announcements({ claims, className }: {
         }
 
         if (["COORDINATOR", "JOB ORDER", "MEMBER"].includes(claims.role)) {
-            return AnnouncementService.getAnnouncementsByCampus(claims.campus.id);
+            return AnnouncementService.getAnnouncementsByCampus(claims?.campus?.id ?? 0);
         }
 
         return AnnouncementService.getAllAnnouncements();
-    }, [claims.role, claims.campus.id]);
+    }, [claims.role, claims?.campus?.id]);
 
 
     const { data: announcements, loading, error } = useFetchData<Announcement>(
         getAnnouncements, 
-        [reload, claims.campus.id],
-        [claims.campus.id]
+        [reload, claims?.campus?.id],
+        [claims?.campus?.id ?? 0]
     );
     const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Announcement>();
 
@@ -80,11 +80,7 @@ export function Announcements({ claims, className }: {
     async function likeAnnouncement(id: number) {
         const wasLiked = localLikes[id] ?? false;
 
-        const currentUserName =
-            (claims as any)?.full_name ||
-            (claims as any)?.name ||
-            `${(claims as any)?.first_name ?? ""} ${(claims as any)?.last_name ?? ""}`.trim() ||
-            "You";
+        const currentUserName = `${claims.firstName} + ${claims.lastName}`;
 
         setLocalLikeCount((prev) => ({
             ...prev,

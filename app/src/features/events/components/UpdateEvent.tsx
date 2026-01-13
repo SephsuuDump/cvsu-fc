@@ -324,7 +324,7 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
                         <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
                         <p className="text-gray-500 text-sm mb-1">No images selected</p>
                         <p className="text-xs text-gray-400">
-                        Click "Add Images" to upload multiple images (max 10MB each)
+                        Click &quot;Add Images&quot; to upload multiple images (max 10MB each)
                         </p>
                     </button>
                 )}

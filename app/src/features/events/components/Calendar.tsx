@@ -61,7 +61,7 @@ export function Calendar({ className }: {
     const { data: events, loading } = useFetchData<FCEvent>(
         EventService.getEventsByCampus,
         [currentMonth, currentYear, claims?.campus?.id],     
-        [claims.role === "ADMIN" ? 0 : claims.campus.id, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
+        [claims.role === "ADMIN" ? 0 : claims?.campus?.id ?? 0, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
     );
 
     const eventCounts = useEventCounts(events, currentMonth, currentYear);
