@@ -17,6 +17,8 @@ import { UpdateContribution } from "./components/UpdateContribution";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ContributionExportMonthRange } from "./components/ExportDateRange";
+import { usePagination } from "@/hooks/use-pagination";
+import { AppPagination } from "@/components/shared/AppPagination";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
@@ -53,7 +55,7 @@ export function ContributionPage() {
     useEffect(() => {
         if (claims.role === "ADMIN") return
         setSelectedCampus(String(claims.campus.id))
-        setSelectedCollege(String(claims.college.id))
+        setSelectedCollege(String(claims.college.id ?? "0"))
     }, [claims])
 
     useEffect(() => {
@@ -98,6 +100,8 @@ export function ContributionPage() {
             loadContributions();
         }
     }, [selectedCampus, selectedCollege, selectedYear, staticLoading, reload]);
+
+    const { page, setPage, size, setSize, paginated } = usePagination(contributions, 10); 
 
     if (staticLoading || authLoading) return <CvSULoading />
     
@@ -149,7 +153,7 @@ export function ContributionPage() {
                             <SelectItem value="0">All Campuses</SelectItem>
                             {campuses.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
-                                    {item.name.match(/-\s*(.*?)\s*Campus/i)?.[1]}
+                                    {item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? item.name}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -194,13 +198,13 @@ export function ContributionPage() {
                         <div className="th col-span-2">Contribution for {selectedYear}</div>
                     </div>
                     <Separator className="h-3 bg-slate-300" />
-                    {contributions.length === 0 && (
+                    {paginated.length === 0 && (
                         <div className="py-16 flex flex-col items-center justify-center text-slate-500">
                             <FileQuestion className="w-12 h-12 mb-3 opacity-50" />
                             <p className="text-sm">No contributions found.</p>
                         </div>
                     )}
-                    {contributions.map((item, i) => {
+                    {paginated.map((item, i) => {
                         const monthData = item.contributions.find(
                             (c) => c.month.slice(0, 3).toUpperCase() === selectedMonth.slice(0,3).toUpperCase() && 
                                    String(c.year) === selectedYear
@@ -275,6 +279,13 @@ export function ContributionPage() {
                     })}
                 </div>
             )}
+
+            <AppPagination 
+                totalItems={ contributions.length }
+                itemsPerPage={ 10 }
+                currentPage={ page }
+                onPageChange={ setPage }
+            />
 
             {open && (
                 <ContributionExportMonthRange 

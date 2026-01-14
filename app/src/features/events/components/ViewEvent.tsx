@@ -24,9 +24,11 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAccomplishmentReport } from "./CreateAccomplishmentreport";
 import { UpdateAccomplishmentReport } from "./UpdateAccomplishmentReport";
 import { ViewAccomplishmentReport } from "./ViewAccomplishmentReport";
+import { useAuth } from "@/hooks/use-auth";
 
 export function ViewEventPage() {
     const { id } = useParams();
+    const { claims, loading: authLoading } = useAuth();
     const router = useRouter();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [reload, setReload] = useState(false)
@@ -39,7 +41,7 @@ export function ViewEventPage() {
 
     const { open, setOpen, toView, setView, toUpdate, setUpdate } = useCrudState<AccomplishmentReport>();
 
-    if (loading) return <CvSULoading />;
+    if (loading || authLoading) return <CvSULoading />;
 
     const startDate = new Date(data!.event_start)
     const endDate = new Date(data!.event_end)
@@ -212,18 +214,22 @@ export function ViewEventPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40 border-1 border-darkgreen bg-white">
                         <DropdownMenuItem onClick={ () => setView(data.accomplishment_report) }>View Report</DropdownMenuItem>
-                        <DropdownMenuItem 
-                            onClick={() => setOpen(true)}
-                            disabled={ data.accomplishment_report !== null }
-                        >
-                            Create Report
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                            onClick={() => setUpdate(data.accomplishment_report)}
-                            disabled={ data.accomplishment_report === null }
-                        >
-                            Update Report
-                        </DropdownMenuItem>
+                        {claims.id === data.user?.id || claims.role === "ADMIN" && (
+                            <DropdownMenuItem 
+                                onClick={() => setOpen(true)}
+                                disabled={ data.accomplishment_report !== null }
+                            >
+                                Create Report
+                            </DropdownMenuItem>
+                        )}
+                        {claims.id === data.user?.id || claims.role === "ADMIN" && (
+                            <DropdownMenuItem 
+                                onClick={() => setUpdate(data.accomplishment_report)}
+                                disabled={ data.accomplishment_report === null }
+                            >
+                                Update Report
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={exportReport}>Export Report</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -48,11 +48,14 @@ const MONTHS = [
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
 
-export function AllocationExportMonthRange({ setOpen }: {
+export function AllocationExportMonthRange({ claims, setOpen, defaultCampus, defaultCollege }: {
+    claims: Claim
     setOpen: (i:boolean) => void
+    defaultCampus: null | number
+    defaultCollege: null | number
 }) {
-    const [selectedCampus, setSelectedCampus] = useState("0");
-    const [selectedCollege, setSelectedCollege] = useState("0");
+    const [selectedCampus, setSelectedCampus] = useState(defaultCampus && defaultCampus !== 0 ? defaultCampus :claims.role !== "ADMIN" ? claims.campus.id : "0");
+    const [selectedCollege, setSelectedCollege] = useState(defaultCollege ?? "0");
     const [startMonth, setStartMonth] = React.useState("January");
     const [endMonth, setEndMonth] = React.useState("December");
     const [year, setYear] = React.useState(String(CURRENT_YEAR));
@@ -107,7 +110,9 @@ export function AllocationExportMonthRange({ setOpen }: {
                             }))
                         ] }
                         placeholder="Select campus"
+                        value={ String(selectedCampus) }
                         onChange={ (value) => setSelectedCampus(value) }
+                        disabled={ claims.role !== "ADMIN" }
                         searchPlaceholder="Search for a campus"
                     />
                     <AppSelect 
@@ -121,7 +126,9 @@ export function AllocationExportMonthRange({ setOpen }: {
                             }))
                         ] }
                         placeholder="Select campus"
+                        value={ String(selectedCollege) }
                         onChange={ (value) => setSelectedCollege(value) }
+                        disabled={ claims.role !== "ADMIN" }
                         searchPlaceholder="Search for a campus"
                     />
                     <div className="space-y-1">

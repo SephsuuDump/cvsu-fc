@@ -16,19 +16,21 @@ import { Campus } from "@/types/campus";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export function CreateAllocation({ claims, setOpen, setReload }: {
+export function CreateAllocation({ claims, setOpen, setReload, defaultCampus, defaultCollege }: {
     claims: Claim
     setOpen: Dispatch<SetStateAction<boolean>>
     setReload: Dispatch<SetStateAction<boolean>>
+    defaultCampus: null | number
+    defaultCollege: null | number
 }) {
     const [onProcess, setProcess] = useState(false)
     const [allocation, setAllocation] = useState<Partial<Allocation>>({
         title: '',
         description: '',
         amount: 0,
-        level: claims.role === "ADMIN" ? "CAMPUS" : "COLLEGE",
-        campus_id: claims.role !== "ADMIN" ? claims.campus.id : 1,
-        college_id: claims.role !== "ADMIN" ? claims.college.id : null,
+        level: defaultCollege === 0 ? "CAMPUS" : defaultCollege !== 0 ? "COLLEGE" : claims.role === "ADMIN" ? "CAMPUS" : "COLLEGE",
+        campus_id: defaultCampus && defaultCampus !== 0 ? defaultCampus :claims.role !== "ADMIN" ? claims.campus.id : 1,
+        college_id: defaultCollege && defaultCollege !== 0 ? defaultCollege : claims.role !== "ADMIN" ? claims.college.id : null,
     })
 
     const { data: campuses, loading: campusesLoading } = useFetchData<Campus>(CampusService.getAllCampus, []);
@@ -88,6 +90,7 @@ export function CreateAllocation({ claims, setOpen, setReload }: {
                 />
                 <AppSelect
                     label="Allocation Level"
+                    disabled={ claims.role !== "ADMIN" }
                     items={["CAMPUS", "COLLEGE"]}
                     value={ allocation.level! }
                     groupLabel="Allocation Level"

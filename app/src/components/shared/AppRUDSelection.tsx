@@ -14,6 +14,8 @@ type AppRUDSelectionProps<T> = {
     setDelete?: (item: T) => void;
     className?: string,
     icon?: LucideIcon
+    hideUpdate?: false | true
+    hideDelete?: false | true
 };
 
 export function AppRUDSelection<T>({
@@ -22,7 +24,9 @@ export function AppRUDSelection<T>({
     setUpdate,
     setDelete,
     className,
-    icon
+    icon,
+    hideUpdate,
+    hideDelete
 }: AppRUDSelectionProps<T>) {
     const Icon = icon ?? EllipsisVertical;
     return (
@@ -40,13 +44,13 @@ export function AppRUDSelection<T>({
                     </DropdownMenuItem>
                 )}
 
-                {setUpdate && (
+                {setUpdate && !hideUpdate && (
                     <DropdownMenuItem onClick={() => setUpdate(item)}>
                         Update
                     </DropdownMenuItem>
                 )}
 
-                {setDelete && (
+                {setDelete && !hideDelete && (
                     <DropdownMenuItem
                         className="text-darkred focus:text-darkred"
                         onClick={() => setDelete(item)}

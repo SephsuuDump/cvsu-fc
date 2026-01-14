@@ -26,8 +26,10 @@ import {
     SelectValue,
     SelectLabel
 } from "@/components/ui/select";
+import { usePagination } from "@/hooks/use-pagination";
+import { AppPagination } from "@/components/shared/AppPagination";
 
-const tabs = ['COORDINATOR', 'MEMBER', 'JOB OFFER'];
+const tabs = ['COORDINATOR', 'MEMBER', 'JOBORDER'];
 
 export function FacultyPage() {
     const { claims, loading: authLoading } = useAuth();
@@ -37,8 +39,8 @@ export function FacultyPage() {
 
     const { data: faculties, loading } = useFetchData<User>(
         UserService.getUserByCampusCollege,
-        [claims.campus.id, claims.college.id],
-        [claims.campus.id, claims.college.id]
+        [claims.campus.id, claims?.college?.id],
+        [claims.campus.id, claims?.college?.id ?? 0]
     );
 
     const { setSearch, filteredItems } = useSearchFilter<Partial<User>>(
@@ -82,6 +84,7 @@ export function FacultyPage() {
         return matchesCollege && matchesRole;
     });
 
+    const { page, setPage, size, setSize, paginated } = usePagination(finalFilteredFaculties, 10); 
 
     if (authLoading || loading) return <CvSULoading />;
 
@@ -111,7 +114,6 @@ export function FacultyPage() {
                         <Plus className="w-4 h-4 text-slate-50" />
                     </button>
 
-                    {/* ✅ COLLEGE FILTER */}
                     {collegeMap.length > 0 && (
                         <Select onValueChange={(value) => setSelectedCollege(Number(value))}>
                             <SelectTrigger className="rounded-full w-40 truncate">
@@ -160,7 +162,7 @@ export function FacultyPage() {
                     <div className="th">College</div>
                 </div>
 
-                {finalFilteredFaculties.length === 0 && (
+                {paginated.length === 0 && (
                     <div className="py-10 flex flex-col items-center justify-center text-slate-500">
                         <Users className="h-10 w-10 mb-2 opacity-60" />
                         <p className="text-sm">No faculty members found.</p>
@@ -172,13 +174,21 @@ export function FacultyPage() {
 
                 <Separator className="h-3 bg-slate-300" />
 
-                {finalFilteredFaculties.map((item, i) => (
+                {paginated.map((item, i) => (
                     <div className="tdata grid grid-cols-4" key={i}>
                         <div className="td flex-center-y gap-2">
-                            <AppAvatar className="inline-block" />
-                            {`${item.last_name}, ${item.first_name} ${item.middle_name ? item.middle_name : ""}`}
+                            <Tooltip>
+                                <TooltipTrigger className="p-0 m-0">
+                                    <AppAvatar 
+                                        className="inline-block"
+                                        fallbackClassName={` text-white ${ item.role === "JOBORDER" ? "!bg-[#58804D] text-white" : item.role === "COORDINATOR" ? "bg-white text-darkgreen font-bold border-1" : "bg-darkgreen" }`}
+                                        fallback={ `${item.first_name![0]}${item.last_name![0]}` } 
+                                    /> 
+                                </TooltipTrigger>
+                                <TooltipContent>{ item.role }</TooltipContent>
+                            </Tooltip>
+                            { item.last_name }, { item.first_name }
                         </div>
-
                         <div>
                             <Tooltip>
                                 <TooltipTrigger className="td h-full flex-center-y">
@@ -193,6 +203,13 @@ export function FacultyPage() {
                     </div>
                 ))}
             </div>
+
+            <AppPagination 
+                totalItems={ finalFilteredFaculties.length }
+                itemsPerPage={ 10 }
+                currentPage={ page }
+                onPageChange={ setPage }
+            />
 
             {open && (
                 <CreateUser 

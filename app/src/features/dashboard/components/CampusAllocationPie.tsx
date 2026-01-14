@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionLoading } from "@/components/ui/loader";
+import { CvSULoading, SectionLoading } from "@/components/ui/loader";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { AllocationService } from "@/services/allocation.service";
 import { useMemo, useState } from "react";
@@ -25,6 +25,10 @@ import { CampusService } from "@/services/campus.service";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
+import { UserService } from "@/services/user.service";
+import { useFetchOne } from "@/hooks/use-fetch-one";
+import { formatToPeso } from "@/lib/helper";
+import { useAuth } from "@/hooks/use-auth";
 
 const months = [
     "January","February","March","April","May","June",
@@ -44,6 +48,7 @@ const GREEN_COLORS = [
     "#86efac",
     "#bbf7d0",
 ];
+const SEX_COLORS = ["#6495ed", "#ec4899"]; 
 
 const peso = (value: number) => `₱${value.toLocaleString()}`;
 
@@ -55,9 +60,11 @@ type ChartItem = {
 function ScrollLegend({
     items,
     title = "Legend",
+    sexColors
 }: {
     items: ChartItem[];
     title?: string;
+    sexColors?: string[]
 }) {
     return (
         <div className="w-full md:w-[42%] lg:w-[40%]">
@@ -73,7 +80,8 @@ function ScrollLegend({
                             className="mt-1 inline-block h-3 w-3 rounded-sm flex-shrink-0"
                             style={{
                                 backgroundColor:
-                                    GREEN_COLORS[i % GREEN_COLORS.length],
+                                    sexColors ? sexColors[i % sexColors.length]
+                                    : GREEN_COLORS[i % GREEN_COLORS.length],
                             }}
                         />
                         <div className="min-w-0">
@@ -81,7 +89,7 @@ function ScrollLegend({
                                 {it.name}
                             </div>
                             <div className="text-[11px] text-gray-600">
-                                {peso(it.value)}
+                                {sexColors ? it.value : formatToPeso(it.value)}
                             </div>
                         </div>
                     </div>
@@ -98,12 +106,19 @@ function ScrollLegend({
 }
 
 export default function CampusAndCollegeAllocationPie() {
+    const { claims, loading: authLoading } = useAuth();
     const [refreshFilter, setRefreshFilter] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(
         new Date().toLocaleString("default", { month: "long" })
     );
     const [selectedYear, setSelectedYear] = useState(String(currentYear));
-    const [selectedCampus, setSelectedCampus] = useState<string>("0");
+    const [selectedCampus, setSelectedCampus] = useState<string>(
+        claims.role === "ADMIN" ? "0" : String(claims.campus.id)
+    );
+
+    const { data: genderCounts, loading: loadingGenderCounts } = useFetchOne(
+        UserService.getGenderCount
+    )
 
     const { data: campuses = [] } = useFetchData<Campus>(
         CampusService.getAllCampus,
@@ -112,7 +127,7 @@ export default function CampusAndCollegeAllocationPie() {
 
     const { data: allocations = [], loading } = useFetchData(
         AllocationService.getAllocations,
-        [refreshFilter],
+        [refreshFilter, claims.campus.id],
         [Number(selectedCampus), 0, selectedYear, selectedMonth]
     );
 
@@ -150,14 +165,21 @@ export default function CampusAndCollegeAllocationPie() {
             .sort((a, b) => b.value - a.value);
     }, [allocations]);
 
-    const collegeTotal = collegeChartData.reduce((a, b) => a + b.value, 0);
+    const genderChartData = [
+        { name: "Male", value: genderCounts?.Male ?? 0 },
+        { name: "Female", value: genderCounts?.Female ?? 0 },
+    ];
 
+    const collegeTotal = collegeChartData.reduce((a, b) => a + b.value, 0);
+    const totalGender = genderChartData.reduce((sum, d) => sum + d.value, 0);
+
+    if (authLoading) return <CvSULoading />
     return (
         <section className="space-y-6">
             {/* ===== FILTERS ===== */}
             <div className="flex-center-y gap-2">
-                <Select value={selectedCampus} onValueChange={setSelectedCampus}>
-                    <SelectTrigger className="rounded-full w-44 truncate">
+                <Select value={selectedCampus} onValueChange={setSelectedCampus} disabled={ claims.role !== "ADMIN" }>
+                    <SelectTrigger className="rounded-full w-44 truncate disabled:text-gray">
                         <SelectValue placeholder="Select Campus" />
                     </SelectTrigger>
                     <SelectContent>
@@ -166,7 +188,7 @@ export default function CampusAndCollegeAllocationPie() {
                             <SelectItem value="0">All Campuses</SelectItem>
                             {campuses.map((campus) => (
                                 <SelectItem key={campus.id} value={String(campus.id)}>
-                                    {campus.name}
+                                    {campus.name.match(/University\s*-\s*(.+)/i)?.[1] ?? campus?.name}
                                 </SelectItem>
                             ))}
                         </SelectGroup>
@@ -203,6 +225,53 @@ export default function CampusAndCollegeAllocationPie() {
                     <RefreshCcw /> Refresh Filter
                 </Button>
             </div>
+            
+            {loadingGenderCounts ? (
+                <SectionLoading />
+            ) : (
+                <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                    <AppHeader label="Gender Distribution" />
+
+                    <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                        {/* Chart */}
+                        <div className="flex-1 min-w-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={genderChartData}
+                                        dataKey="value"
+                                        nameKey="name"
+                                        innerRadius="55%"
+                                        outerRadius="80%"
+                                        stroke="#fff"
+                                        strokeWidth={2}
+                                        isAnimationActive={false}
+                                    >
+                                        {genderChartData.map((_, i) => (
+                                            <Cell
+                                                key={i}
+                                                fill={SEX_COLORS[i % SEX_COLORS.length]}
+                                            />
+                                        ))}
+                                    </Pie>
+
+                                    <Tooltip formatter={(v) => v} />
+                                </PieChart>
+                            </ResponsiveContainer>
+
+                            <p className="text-center text-sm text-gray-600 mt-2">
+                                Total:{" "}
+                                <span className="font-semibold">
+                                    {totalGender}
+                                </span>
+                            </p>
+                        </div>
+
+                        <ScrollLegend items={genderChartData} title="Sex" sexColors={ SEX_COLORS } />
+                    </div>
+                </div>
+
+            )}
 
             {loading ? (
                 <SectionLoading />

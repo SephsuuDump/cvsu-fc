@@ -163,15 +163,15 @@ export function Announcements({ claims, className }: {
                                     label={ item.label }
                                     className="ms-auto mr-4"
                                 />
-                                { item.user?.id === claims.id && (
-                                    <AppRUDSelection 
-                                        item={ item }
-                                        className="hover:rounded-full hover:bg-slate-200"
-                                        setView={ setView }
-                                        setUpdate={ setUpdate  }
-                                        setDelete={ setDelete }
-                                    />
-                                )}
+                                <AppRUDSelection 
+                                    item={ item }
+                                    className="hover:rounded-full hover:bg-slate-200"
+                                    setView={ setView }
+                                    setUpdate={ setUpdate  }
+                                    setDelete={ setDelete }
+                                    hideUpdate={ item.user?.id !== claims.id }
+                                    hideDelete={ item.user?.id !== claims.id }
+                                />
                         
                         </div>
                         <div className="text-sm">{ item.content }</div>
@@ -223,11 +223,14 @@ export function Announcements({ claims, className }: {
                         <div className="flex justify-between">
                             <div className="text-xs text-gray-500">{ formatCustomDate(item.created_at) }</div>
                             <div className="flex-center-y gap-2">
-                                {claims.role !== "ADMIN" && (
+                                {claims.role !== "ADMIN" ? (
                                     <ThumbsUp
                                         onClick={() => likeAnnouncement(item.id)}
                                         className="cursor-pointer transition-colors"
                                         fill={localLikes[item.id] ? "#016630" : "#fff"}
+                                    />
+                                ) : (
+                                    <ThumbsUp
                                     />
                                 )}
                                 <HoverCard openDelay={150}>

@@ -69,16 +69,16 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                                 <div className="flex-center-y gap-1 mb-2">
                                     <CalendarDays className="w-4 h-4 text-darkgreen" />
                                     <div className="text-sm text-gray-700 font-semibold">{ formatEventRange(item.event_start, item.event_end) }</div>
-                                    {claims.id === item.user?.id && (
-                                        <AppRUDSelection 
-                                            className="ms-auto"
-                                            item={ item }
-                                            icon={ Ellipsis }
-                                            setView={ setView }
-                                            setUpdate={ setUpdate }
-                                            setDelete={ setDelete }
-                                        />
-                                    )}
+                                    <AppRUDSelection 
+                                        className="ms-auto"
+                                        item={ item }
+                                        icon={ Ellipsis }
+                                        setView={ setView }
+                                        setUpdate={ setUpdate }
+                                        setDelete={ setDelete }
+                                        hideUpdate={ claims.id !== item.user?.id }
+                                        hideDelete={ claims.id !== item.user?.id }
+                                    />
                                 </div>
                                 <div className="font-semibold">{ item.title }</div>
                                 <div className="text-sm text-gray">{ item.description }</div>

@@ -69,7 +69,7 @@ export default function AllocationPage() {
     useEffect(() => {
         if (claims.role === "ADMIN") return
         setSelectedCampus(claims.campus.id)
-        setSelectedCollege(claims.college.id)
+        setSelectedCollege(claims.college.id ?? 0)
     }, [claims])
 
     const filteredAllocations = useMemo(() => {
@@ -111,13 +111,13 @@ export default function AllocationPage() {
                             onValueChange={(value) => setSelectedCampus(Number(value))}
                             disabled={ claims.role !== "ADMIN" }
                         >
-                            <SelectTrigger className="rounded-full w-40 truncate reveal">
+                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray">
                                 <SelectValue placeholder="Select Campus" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Colleges</SelectLabel>
-                                    <SelectItem value="0">All Colleges</SelectItem>
+                                    <SelectItem value="0">All Campuses</SelectItem>
                                     {campuses.map((col) => (
                                         <SelectItem key={col.id} value={String(col.id)}>
                                             {col.name.match(/University\s*-\s*(.+)/i)?.[1]}
@@ -133,7 +133,7 @@ export default function AllocationPage() {
                             onValueChange={(value) => setSelectedCollege(Number(value))}
                             disabled={ claims.role !== "ADMIN" }
                         >
-                            <SelectTrigger className="rounded-full w-40 truncate reveal">
+                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray">
                                 <SelectValue placeholder="Select College" />
                             </SelectTrigger>
                             <SelectContent>
@@ -330,12 +330,17 @@ export default function AllocationPage() {
                     claims={ claims }
                     setOpen={ setOpen }
                     setReload={ setReload }
+                    defaultCampus={ selectedCampus }
+                    defaultCollege={ selectedCollege }
                 />
             )}
 
             {openExport && (
                 <AllocationExportMonthRange 
+                    claims={ claims }
                     setOpen={ setOpenExport }
+                    defaultCampus={ selectedCampus }
+                    defaultCollege={ selectedCollege }
                 />
             )}
         </section>
