@@ -21,9 +21,9 @@ export class EventService {
         )
     }
 
-    static async getEventsByCampus(campusId: number, month: string, year: string, visibility: string) {
+    static async getEventsByCampus(campusId: number, month: string, year: string, visibility: string, page: number, limit: number) {
         return await requestData(
-            `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}&visibility=${visibility}`,
+            `${url}/get-by-campus?campus_id=${campusId}&month=${month}&year=${year}&visibility=${visibility}&page=${page}&limit=${limit}`,
             'GET',
             { "Accept": "application/json" },
         )
@@ -74,6 +74,11 @@ export class EventService {
         files.forEach(file => {
             formData.append('files[]', file); 
         });
+
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
         
         return await requestData(
             `${url}/create`,

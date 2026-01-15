@@ -31,22 +31,17 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
     toUpdate: FCEvent
     setUpdate: Dispatch<SetStateAction<FCEvent | undefined>>
     setReload: Dispatch<SetStateAction<boolean>>
-}) {
-    console.log(toUpdate);
-    
+}) { 
     const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading: campusLoading } = useFetchData(CampusService.getAllCampus);
 
-    const [datePartStart, timePartStart] = toUpdate.event_start.split(" ");
-    const [datePartEnd, timePartEnd] = toUpdate.event_end.split(" ");
     const [onProcess, setProcess] = useState(false)
-    const [event, setEvent] = useState<FCEvent>({...toUpdate, campus_id: toUpdate.campus!.id});
+    const [event, setEvent] = useState<FCEvent>(toUpdate);
     const [existingFiles, setExistingFiles] = useState(toUpdate.files || []);
     const [newFiles, setNewFiles] = useState<File[]>([]);
-    const [previews, setPreviews] = useState<Preview[]>([]);
+    const [previews, setPreviews] = useState<Preview[]>([]);    
 
     const removedFileDataRef = useRef<FormData>(new FormData());
-
 
     const [startDate, setStartDate] = useState<Date | undefined>()
     const [endDate, setEndDate] = useState<Date | undefined>()
@@ -56,11 +51,29 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        setStartDate(new Date(datePartStart));
-        setEndDate(new Date(datePartEnd));
-        setStartTime(timePartStart);
-        setEndTime(timePartEnd);
-    }, [datePartStart, datePartEnd, timePartStart, timePartEnd])
+        if (!toUpdate) return;
+
+        setEvent({
+            ...toUpdate,
+            campus_id: toUpdate.campus?.id ?? 0,
+        });
+    }, [toUpdate]);
+
+
+    useEffect(() => {
+        const [startDatePart, startTimePart] = toUpdate.event_start.split(" ");
+        const [endDatePart, endTimePart] = toUpdate.event_end.split(" ");
+
+        setEvent({
+            ...toUpdate,
+            campus_id: toUpdate.campus?.id ?? 0,
+        });
+
+        setStartDate(new Date(startDatePart));
+        setEndDate(new Date(endDatePart));
+        setStartTime(startTimePart);
+        setEndTime(endTimePart);
+    }, [toUpdate])
 
     useEffect(() => {
         const previews = [
@@ -159,6 +172,11 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
         finally { setProcess(false) }
     }
 
+    useEffect(() => {
+        console.log(event);
+        
+    }, [event])
+
     if (authLoading || campusLoading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
@@ -198,11 +216,13 @@ export function UpdateEvent({ toUpdate, setUpdate, setReload }: {
                     <div className="stack-sm">
                         <Label>Campus</Label>
                         <Select
-                            value={ event.campus_id ? String(event.campus_id) : "0" }
-                            onValueChange={ (value) => setEvent(prev => ({
-                                ...prev,
-                                campus_id: Number(value)
-                            }))}
+                            value={String(event.campus_id ?? 0)}
+                            onValueChange={(value) =>
+                                setEvent(prev => ({
+                                    ...prev,
+                                    campus_id: Number(value),
+                                }))
+                            }
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select campus" />
