@@ -214,7 +214,7 @@ export function ViewEventPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40 border-1 border-darkgreen bg-white">
                         <DropdownMenuItem onClick={ () => setView(data.accomplishment_report) }>View Report</DropdownMenuItem>
-                        {claims.id === data.user?.id || claims.role === "ADMIN" && (
+                        {(claims.id === data.user?.id || claims.role === "ADMIN") && (
                             <DropdownMenuItem 
                                 onClick={() => setOpen(true)}
                                 disabled={ data.accomplishment_report !== null }
@@ -222,7 +222,7 @@ export function ViewEventPage() {
                                 Create Report
                             </DropdownMenuItem>
                         )}
-                        {claims.id === data.user?.id || claims.role === "ADMIN" && (
+                        {(claims.id === data.user?.id || claims.role === "ADMIN") && (
                             <DropdownMenuItem 
                                 onClick={() => setUpdate(data.accomplishment_report)}
                                 disabled={ data.accomplishment_report === null }

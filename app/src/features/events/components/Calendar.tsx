@@ -23,6 +23,7 @@ export function Calendar({ className }: {
     const today = new Date();
     const { claims, loading: authLoading } = useAuth();
     const { open, setOpen } = useCrudState();
+    const [reload, setReload] = useState(false);
     const [selectedDay, setSelectedDay] = useState<string | undefined>();
     const [eventDay, setEventDay] = useState<string | undefined>();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -60,7 +61,7 @@ export function Calendar({ className }: {
 
     const { data: events, loading } = useFetchData<FCEvent>(
         EventService.getEventsByCampus,
-        [currentMonth, currentYear, claims?.campus?.id],     
+        [currentMonth, currentYear, claims?.campus?.id, reload],     
         [claims.role === "ADMIN" ? 0 : claims?.campus?.id ?? 0, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
     );
 
@@ -148,6 +149,7 @@ export function Calendar({ className }: {
             {open && (
                 <CreateEvent
                     setOpen={ setOpen }
+                    setReload={ setReload }
                     selectedDay={ eventDay! }
                 />
             )}

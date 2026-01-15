@@ -3,6 +3,7 @@ import { AppAvatar } from "@/components/shared/AppAvatar";
 import { formatMessageDateTime } from "@/lib/helper";
 import { SectionLoading } from "@/components/ui/loader";
 import { Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export function MessageSidebar({ claims, className, conversations, selectedConv, setSelectedConv, setShowModal }: {
     className?: string;
@@ -13,6 +14,25 @@ export function MessageSidebar({ claims, className, conversations, selectedConv,
     setShowModal: any
 
 }) {
+    const [search, setSearch] = useState("");
+
+    const filteredConversations = useMemo(() => {
+        if (!search.trim()) return conversations;
+
+        return conversations.filter((item: any) => {
+            const partner = item.participants?.find(
+                (p: any) => p.id !== claims.id
+            );
+
+            if (!partner) return false;
+
+            const fullName = `${partner.first_name} ${partner.last_name}`.toLowerCase();
+
+            return fullName.includes(search.toLowerCase());
+        });
+    }, [search, conversations, claims.id]);
+
+
     return (
         <section className={`${className} stack-md bg-slate-50 shadow-sm border-r-1 border-r-slate-300 p-4`}>
             <div className="flex-center-y justify-between">
@@ -26,13 +46,15 @@ export function MessageSidebar({ claims, className, conversations, selectedConv,
             </div>
             <Input
                 placeholder="Search for a member" 
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
             />
             <div className="row-lg">
                 <div className="text-[10px]">COORDINATOR</div>
                 <div className="text-[10px]">MEMBER</div>
             </div>
-            {!conversations && <SectionLoading />}
-            {conversations.map((item: any, i: number) => {
+            {!filteredConversations && <SectionLoading />}
+            {filteredConversations.map((item: any, i: number) => {
                 const partner = item.participants?.find(
                     (p: any) => p.id !== claims.id
             );

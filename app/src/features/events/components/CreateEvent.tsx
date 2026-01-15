@@ -24,8 +24,9 @@ interface Preview {
     type: string;
 }
 
-export function CreateEvent({ setOpen, selectedDay }: {
+export function CreateEvent({ setOpen, selectedDay, setReload }: {
     setOpen: Dispatch<SetStateAction<boolean>>
+    setReload: Dispatch<SetStateAction<boolean>>
     selectedDay: string
 }) {
     const date = new Date(selectedDay); 
@@ -144,6 +145,7 @@ export function CreateEvent({ setOpen, selectedDay }: {
             const data = await EventService.createEvent(claims.id, event, selectedFiles);
             if (data) {
                 toast.success('Event created successfully.');
+                setReload(prev => !prev)
                 setOpen(prev => !prev);
             }
         } catch (error) { toast.error(`${error}`) }

@@ -45,6 +45,8 @@ export function MessagesPage() {
     
         load();
     }, [claims?.id]);
+    console.log(conversations);
+    
 
     useEffect(() => {
         if (!selectedConv) return;
