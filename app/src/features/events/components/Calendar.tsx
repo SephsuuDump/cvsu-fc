@@ -118,7 +118,7 @@ export function Calendar({ className }: {
                                     `}
                                 >
                                     <div className="text-lg font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
-                                    {eventCount > 0 ? (
+                                    {eventCount === 0 ? (
                                         <div></div>
                                     ) : (
                                         <div className="text-xs font-bold tracking-wider">{eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}</div>
