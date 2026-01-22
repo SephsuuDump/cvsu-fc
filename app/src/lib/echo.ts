@@ -18,16 +18,21 @@ export function getEcho() {
   if (!window.Echo) {
     window.Echo = new Echo({
       broadcaster: "reverb",
+
       key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
 
       wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
-      wsPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT),
-      wsPath: process.env.NEXT_PUBLIC_REVERB_PATH,
-      forceTLS: false,
+      wsPath: "/ws",
+      wsPort: 443,
+      wssPort: 443,
 
-      enabledTransports: ["ws"],
+      forceTLS: true,
+      encrypted: true,
+
+      enabledTransports: ["ws", "wss"],
 
       authEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`,
+
       auth: {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
