@@ -21,14 +21,13 @@ export function getEcho() {
       key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
 
       wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
-      wsPort: 443,
-      wssPort: 443,
+      wsPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT),
+      wsPath: process.env.NEXT_PUBLIC_REVERB_PATH,
+      forceTLS: false,
 
-      forceTLS: true,
-      enabledTransports: ["ws", "wss"],
+      enabledTransports: ["ws"],
 
       authEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`,
-
       auth: {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
