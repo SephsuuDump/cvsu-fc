@@ -31,6 +31,10 @@ export function CreateEvent({ setOpen, selectedDay, setReload }: {
 }) {
     const date = new Date(selectedDay); 
 
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+
     const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading: campusLoading } = useFetchData(CampusService.getAllCampus);
 
@@ -61,15 +65,21 @@ export function CreateEvent({ setOpen, selectedDay, setReload }: {
     }, [selectedDay])
 
     const handleStartChange = (date?: Date, time?: string) => {
-        if (!date && !time) return
-        const t = time ?? startTime
-        if (!/^\d{2}:\d{2}(:\d{2})?$/.test(t)) return
-        const finalDate = new Date(date ?? startDate ?? new Date())
-        const [hours, minutes, seconds] = t.split(":").map(Number)
-        finalDate.setHours(hours, minutes, seconds || 0, 0)
-        setStartDate(finalDate)
-        setEvent(prev => ({ ...prev, event_start: finalDate.toISOString() }))
-    }
+        if (!date && !time) return;
+
+        const t = time ?? startTime;
+        if (!/^\d{2}:\d{2}(:\d{2})?$/.test(t)) return;
+
+        const finalDate = new Date(date ?? startDate ?? new Date());
+        const [hours, minutes, seconds] = t.split(":").map(Number);
+        finalDate.setHours(hours, minutes, seconds || 0, 0);
+
+        setStartDate(finalDate);
+        setEvent(prev => ({ ...prev, event_start: finalDate.toISOString() }));
+
+        handleEndChange(finalDate, endTime);
+    };
+
     
     const handleEndChange = (date?: Date, time?: string) => {
         if (!date && !time) return
@@ -219,6 +229,7 @@ export function CreateEvent({ setOpen, selectedDay, setReload }: {
                     <div className="stack-md">
                         <AppDateSelect
                             label="Event Start Date"
+                            minDate={startOfToday}
                             value={startDate}
                             onChange={(date) => handleStartChange(date, startTime)}
                         />
@@ -233,7 +244,9 @@ export function CreateEvent({ setOpen, selectedDay, setReload }: {
                     </div>
                     <div className="stack-md">
                         <AppDateSelect
+                            key={startDate?.toISOString()}   
                             label="Event End Date"
+                            minDate={startDate}
                             value={endDate}
                             onChange={(date) => handleEndChange(date, endTime)}
                         />

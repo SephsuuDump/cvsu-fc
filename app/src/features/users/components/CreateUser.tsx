@@ -182,9 +182,7 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
                             <SelectValue placeholder="Select college" />
                         </SelectTrigger>
                         <SelectContent>
-                            {user.role === "COORDINATOR" && 
-                                <SelectItem value="0">All Colleges</SelectItem>
-                            }
+                            <SelectItem value="0">All Colleges</SelectItem>
                             {colleges.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
                                     { item.name } ({ item.abbreviations })

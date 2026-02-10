@@ -2,7 +2,7 @@ import { AppAvatar } from "@/components/shared/AppAvatar";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { formatDateToWord, formatEventRange } from "@/lib/helper";
+import { formatCustomDate, formatDateToWord, formatEventRange } from "@/lib/helper";
 import { CalendarDays, CalendarX2, Ellipsis } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
@@ -21,6 +21,14 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
 }) {    
     const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const selectedDate = new Date(today);
+    const isPastDate = selectedDate < startOfToday;
+
+
     const { toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<FCEvent>();
 
     useEffect(() => {
@@ -52,13 +60,14 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                     <div className="-mt-2 flex-center-y gap-2 bg-white py-3 px-4 rounded-md shadow-sm">
                         <AppAvatar />
                         <Button 
+                            disabled={isPastDate}
                             onClick={ () => {
                                 setOpen(true) 
                                 setSelectedDay(undefined)
                             }}
                             className="justify-start flex-1 !bg-slate-50 h-8 text-gray shadow-sm rounded-full"
                         >
-                            Publish event in { formatDateToWord(today) }
+                            {isPastDate ? "Cannot create event on this day." :`Publish event in ${formatDateToWord(today)}`}
                         </Button>
                     </div>
                 )}
@@ -122,8 +131,12 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                                         })}
                                     </div>
                                     )}
+                                <div className="text-xs text-gray-500 text-right">
+                                    { formatCustomDate(item.created_at) }
+                                </div>
                             </div>
                         ))}
+                        
                     </div>
                     :
                     <div className="flex-center flex-col mt-4 mb-8">

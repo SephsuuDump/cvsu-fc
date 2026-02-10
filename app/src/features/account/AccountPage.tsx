@@ -20,7 +20,7 @@ export function AccountPage() {
     const { claims, loading: authLoading } = useAuth();
     const { data: user, loading } = useFetchOne<User>(
         UserService.getUserById,
-        [id ?? claims.id, reload],
+        [id ?? claims.id, reload, claims],
         [id ?? claims.id]
     )
     const { toUpdate, setUpdate } = useCrudState<Partial<User>>();
@@ -97,10 +97,12 @@ export function AccountPage() {
             </div>
 
             <div className="relative bg-white rounded-xl shadow-md p-6 text-center space-y-1 -mt-2">
-                <SquarePen
-                    onClick={ () => setUpdate(user!) }
-                    className="absolute w-5 h-5 right-4 top-4 cursor-pointer" 
-                />
+                {(claims.role === "ADMIN" || claims.id === user?.id) && (
+                    <SquarePen
+                        onClick={ () => setUpdate(user!) }
+                        className="absolute w-5 h-5 right-4 top-4 cursor-pointer" 
+                    />
+                )}
                 <div className="text-xl font-bold uppercase tracking-wide mt-8">
                     {`${user?.first_name} ${user?.middle_name ? user?.middle_name : null} ${user?.last_name}`}
                 </div>

@@ -2,40 +2,41 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 
 declare global {
-  interface Window {
-    Echo?: Echo<"reverb">;
-    Pusher?: typeof Pusher;
-  }
+    interface Window {
+        Echo?: Echo<"reverb">;
+        Pusher?: typeof Pusher;
+    }
 }
 
 export function getEcho() {
-  if (typeof window === "undefined") return null;
+    if (typeof window === "undefined") return null;
 
-  if (!window.Pusher) {
-    window.Pusher = Pusher;
-  }
+    if (!window.Pusher) {
+        window.Pusher = Pusher;
+    }
 
-  if (!window.Echo) {
-    window.Echo = new Echo({
-      broadcaster: "reverb",
-      key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
+    const scheme = process.env.NEXT_PUBLIC_REVERB_SCHEME ?? "http";
+    const isSecure = scheme === "https";
 
-      wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
-      wsPort: 443,
-      wssPort: 443,
+    const token = localStorage.getItem("token") ?? "";
 
-      forceTLS: true,
-      enabledTransports: ["ws", "wss"],
+    if (!window.Echo) {
+        window.Echo = new Echo({
+            broadcaster: "reverb",
+            key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
+            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
+            wsPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT),
+            wssPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT),
+            forceTLS: isSecure,
+            enabledTransports: ["ws", "wss"],
+            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`,
+            auth: {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                },
+            },
+        });
+    }
 
-      authEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`,
-
-      auth: {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      },
-    });
-  }
-
-  return window.Echo;
+    return window.Echo;
 }

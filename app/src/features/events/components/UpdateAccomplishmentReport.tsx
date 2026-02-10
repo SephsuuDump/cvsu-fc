@@ -73,7 +73,7 @@ export function UpdateAccomplishmentReport({
 
         if (preview.type === "existing") {
             removedImageIdsRef.current.append(
-                "remove_image_ids[]",
+                "remove_file_id[]",
                 String(preview.id)
             );
             setExistingImages(prev => prev.filter(img => img.id !== preview.id));
@@ -92,7 +92,6 @@ export function UpdateAccomplishmentReport({
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     };
 
-    /* ===================== SUBMIT ===================== */
     async function handleSubmit() {
         try {
             setProcess(true);

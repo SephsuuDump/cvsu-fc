@@ -6,10 +6,10 @@ export async function requestData(
     headers?: HeadersInit,
     body?: any
 ) {
-    console.log('Endpoint:', url);
-    console.log('Method:', method);
-    console.log('Headers:', headers);
-    console.log('Body:', body);
+    // console.log('Endpoint:', url);
+    // console.log('Method:', method);
+    // console.log('Headers:', headers);
+    // console.log('Body:', body);
     let finalHeaders: HeadersInit = headers || {};
 
     if (!(body instanceof FormData)) {
@@ -30,11 +30,11 @@ export async function requestData(
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || err.message || "Request failed");
     }
-    console.log('Response:', res);
+    // console.log('Response:', res);
     
     const response = await res.json();
 
-    console.log('Response Body:', response);
+    // console.log('Response Body:', response);
 
     return response;
 }

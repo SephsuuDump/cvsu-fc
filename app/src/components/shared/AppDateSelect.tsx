@@ -16,7 +16,8 @@ interface AppDateSelectProps {
   value?: Date
   onChange?: (date: Date | undefined) => void
   className?: string
-  noLabel?: boolean
+  noLabel?: boolean;
+  minDate?: Date;
 }
 
 export function AppDateSelect({
@@ -24,7 +25,8 @@ export function AppDateSelect({
   value,
   onChange,
   className = "",
-  noLabel = false
+  noLabel = false,
+  minDate
 }: AppDateSelectProps) {
   const [open, setOpen] = React.useState(false)
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(value)
@@ -35,6 +37,15 @@ export function AppDateSelect({
     onChange?.(date)
   }
   const currentYear = new Date().getFullYear()
+
+  const normalizedMinDate = minDate
+    ? new Date(
+        minDate.getFullYear(),
+        minDate.getMonth(),
+        minDate.getDate()
+      )
+    : undefined;
+
   return (
         <div className={`stack-md ${className}`}>
             {!noLabel && <Label htmlFor="date-picker">{label}</Label>}
@@ -63,6 +74,9 @@ export function AppDateSelect({
                         onSelect={handleSelect}
                         startMonth={new Date(currentYear - 5, 0)}
                         endMonth={new Date(currentYear + 10, 11)}
+                        disabled={(date) =>
+                            normalizedMinDate ? date < normalizedMinDate : false
+                        }
                     />
                 </PopoverContent>
             </Popover>

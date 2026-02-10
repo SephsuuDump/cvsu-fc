@@ -17,7 +17,7 @@ export function EventsSection({ campusId }: {
     const { data: events, loading } = useFetchData<FCEvent>(    
         EventService.getEventsByCampus,
         [campusId, reload],
-        [campusId, '', '']
+        [campusId, 'ALL', '', '']
     );
     const { toUpdate, setUpdate, toDelete, setDelete } = useCrudState<FCEvent>()
 

@@ -97,7 +97,7 @@ export function UsersPage() {
                             <SelectGroup>
                                 <SelectLabel>User Roles</SelectLabel>
                                 <SelectItem value="ALL">All Roles</SelectItem>
-                                {["COORDINATOR", "MEMBER", "JOBORDER"].map((item) => (
+                                {["COORDINATOR", "MEMBER", "JOB ORDER"].map((item) => (
                                     <SelectItem key={item} value={item}>
                                         {item}
                                     </SelectItem>
@@ -186,7 +186,7 @@ export function UsersPage() {
                                                 <TooltipTrigger className="p-0 m-0">
                                                     <AppAvatar 
                                                         className="inline-block"
-                                                        fallbackClassName={` text-white ${ item.role === "JOBORDER" ? "!bg-[#58804D] text-white" : item.role === "COORDINATOR" ? "bg-white text-darkgreen font-bold border-1" : "bg-darkgreen" }`}
+                                                        fallbackClassName={` text-white ${ item.role === "JOB ORDER" ? "!bg-[#58804D] text-white" : item.role === "COORDINATOR" ? "bg-white text-darkgreen font-bold border-1" : "bg-darkgreen" }`}
                                                         fallback={ `${item.first_name![0]}${item.last_name![0]}` } 
                                                     /> 
                                                 </TooltipTrigger>

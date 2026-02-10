@@ -1,11 +1,11 @@
 type FCEvent = {
     id: number;
-    title: string; // varchar | not null
-    description: string; // text | nullable
-    visibility: string; // role e.g. COORDINATOR, MEMBER
-    user_id: number; // refrenced on users | not null
-    event_start: string; //datetime
-    event_end: string; // datetime
+    title: string; 
+    description: string; 
+    visibility: string;
+    user_id: number;
+    event_start: string; 
+    event_end: string; 
     campus_id: number;
     created_at: string;
     updated_at: string;

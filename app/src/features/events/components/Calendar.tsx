@@ -117,11 +117,13 @@ export function Calendar({ className }: {
                                         ${eventCount > 0 && "!text-green-600"}
                                     `}
                                 >
-                                    <div className="text-lg font-bold tracking-widest">{String(day).padStart(2, "0")}</div>
+                                    <div className="text-lg font-bold tracking-widest max-[1160px]:text-[16px]">{String(day).padStart(2, "0")}</div>
                                     {eventCount === 0 ? (
                                         <div></div>
                                     ) : (
-                                        <div className="text-xs font-bold tracking-wider">{eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}</div>
+                                        <div className="text-xs font-bold tracking-wider max-[1160px]:text-[10px]">
+                                            {eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}
+                                        </div>
                                     )}
                                 </button>
                             );

@@ -12,7 +12,6 @@ export function MessageSidebar({ claims, className, conversations, selectedConv,
     selectedConv: any
     setSelectedConv: any
     setShowModal: any
-
 }) {
     const [search, setSearch] = useState("");
 
@@ -49,10 +48,10 @@ export function MessageSidebar({ claims, className, conversations, selectedConv,
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
-            <div className="row-lg">
+            {/* <div className="row-lg">
                 <div className="text-[10px]">COORDINATOR</div>
                 <div className="text-[10px]">MEMBER</div>
-            </div>
+            </div> */}
             {!filteredConversations && <SectionLoading />}
             {filteredConversations.map((item: any, i: number) => {
                 const partner = item.participants?.find(

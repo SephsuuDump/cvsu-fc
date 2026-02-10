@@ -2,9 +2,11 @@ import { AppInput } from "@/components/shared/AppInput";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AddButton, UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModalLoader } from "@/components/ui/loader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { hasEmptyField, updateField } from "@/lib/helper";
 import { CampusService } from "@/services/campus.service";
@@ -12,6 +14,7 @@ import { CollegeService } from "@/services/college.service";
 import { UserService } from "@/services/user.service";
 import { Campus } from "@/types/campus";
 import { User } from "@/types/user";
+import { Value } from "@radix-ui/react-select";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,6 +25,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
     setUpdate: Dispatch<SetStateAction<Partial<User> | undefined>>
     setReload: Dispatch<SetStateAction<boolean>>
 }) {
+    const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading } = useFetchData<Partial<Campus>>(CampusService.getAllCampus);
     const { data: colleges, loading: collegeLoading } = useFetchData<Partial<College>>(CollegeService.getAllColleges);
     console.log(colleges);
@@ -37,13 +41,12 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
     async function handleSubmit() {
         try {
             setProcess(true)
-            if (hasEmptyField(user, ["middle_name", "is_deleted"])) {
+            if (hasEmptyField(user, ["middle_name", "is_deleted", "college_id"])) {
                 return toast.warning('PLEASE FILL UP ALL THE FIELDS')
             }
             const {
                 campus,
                 college,
-                highest_educational_attainment,
                 created_at,
                 updated_at,
                 is_deleted,
@@ -69,7 +72,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
         }
     }, [toUpdate]);
     
-    if (loading || collegeLoading) return <ModalLoader />
+    if (loading || collegeLoading || authLoading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
             <DialogContent className="overflow-y-auto h-9/10">
@@ -105,25 +108,48 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
                         onChange={ e => updateField(setUser, 'last_name', e.target.value) }
                     />
                 </div>
-                <div className="stack-sm">
-                    <Label>Role</Label>
-                    <Select
-                        value={ user.role }
-                        onValueChange={ (value) => setUser(prev => ({
-                            ...prev,
-                            role: value
-                        }))}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select campus" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {roles.map((item, i) => (
-                                <SelectItem value={ item } key={i}>{ item }</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <div className="row-md">
+                    <div className={`w-full stack-sm`}>
+                        <Label>Contact Number</Label>
+                        <div className="flex-center-y bg-white rounded-md shadow-sm border border-gray-300">
+                            <input value="+63" readOnly className="w-10 text-center" />
+                            <Input
+                                value={user.contact}
+                                onChange={ e => setUser(prev => ({
+                                    ...prev,
+                                    contact: e.target.value
+                                })) }
+                            />
+                        </div>
+                    </div>
+                    <AppInput
+                        className="w-full"
+                        label="Highest Educational Attainment"
+                        value={ user.highest_educational_attainment }
+                        onChange={ e => updateField(setUser, 'highest_educational_attainment', e.target.value) }
+                    />
                 </div>
+                {(claims.role === "ADMIN" && claims.id !== toUpdate.id) && (
+                    <div className="stack-sm">
+                        <Label>Role</Label>
+                        <Select
+                            value={ user.role }
+                            onValueChange={ (value) => setUser(prev => ({
+                                ...prev,
+                                role: value
+                            }))}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select campus" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {roles.map((item, i) => (
+                                    <SelectItem value={ item } key={i}>{ item }</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
                 <div className="stack-sm">
                     <Label>Campus</Label>
                     <Select
@@ -132,6 +158,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
                             ...prev,
                             campus_id: Number(value)
                         }))}
+                        disabled={claims.role !== "ADMIN"}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select campus" />
@@ -151,6 +178,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
                             ...prev,
                             college_id: Number(value)
                         }))}
+                        disabled={claims.role !== "ADMIN"}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select college" />
@@ -169,7 +197,7 @@ export function UpdateUser({ toUpdate, setUpdate, setReload }:  {
                         e.preventDefault();
                         handleSubmit();
                     }}
-                    className="flex justify-end gap-4"
+                    className="flex-center-y justify-end gap-4"
                 >   
                     <DialogClose>Cancel</DialogClose>
                     <UpdateButton

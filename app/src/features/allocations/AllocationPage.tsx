@@ -55,12 +55,12 @@ export default function AllocationPage() {
     const { data: allocations, loading: allocationLoading } = useFetchData(
         AllocationService.getAllocations,
         [refreshFilter],
-        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
+        [selectedCampus, 0, selectedYear, selectedMonth]
     )
     const { data: budget, loading: budgetLoading } = useFetchOne(
         AllocationService.getCollegeBudget,
         [refreshFilter],
-        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
+        [selectedCampus, 0, selectedYear, selectedMonth]
     )
     
     const { open, setOpen } = useCrudState();
@@ -69,7 +69,6 @@ export default function AllocationPage() {
     useEffect(() => {
         if (claims.role === "ADMIN") return
         setSelectedCampus(claims.campus.id)
-        setSelectedCollege(claims.college.id ?? 0)
     }, [claims])
 
     const filteredAllocations = useMemo(() => {
@@ -131,7 +130,6 @@ export default function AllocationPage() {
                         <Select 
                             value={ String(selectedCollege) }
                             onValueChange={(value) => setSelectedCollege(Number(value))}
-                            disabled={ claims.role !== "ADMIN" }
                         >
                             <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray">
                                 <SelectValue placeholder="Select College" />

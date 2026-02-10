@@ -243,10 +243,10 @@ export function ContributionPage() {
                                                     year: String(monthData!.year),
                                                     contributed: monthData!.contributed
                                                 }) }
-                                                className={`bg-darkred font-semibold w-25 opacity-30 rounded-none ${!isContributed && '!opacity-100'}`}
+                                                className={`bg-yellow-700 font-semibold w-25 opacity-30 rounded-none ${!isContributed && '!opacity-100'}`}
                                                 disabled={!isContributed}
                                             >
-                                                UNPAID
+                                                PENDING
                                             </Button>
                                         </Fragment>
                                     ) : (
