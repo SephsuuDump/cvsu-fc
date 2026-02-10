@@ -46,7 +46,7 @@ export function AppSidebar() {
     if (claims.role === 'ADMIN') route = adminRoute
 
     if (claims.role === 'COORDINATOR') route = coordinatorRoute
-    if (claims.role === 'MEMBER' || claims.role === 'JOBORDER') route = memberRoute
+    if (claims.role === 'MEMBER' || claims.role === 'JOB ORDER') route = memberRoute
 
     return (
         <Sidebar

@@ -18,7 +18,7 @@ export function DashboardPage() {
     const { claims, loading } = useAuth();
     const [tab, setTab] = useState(tabs[0]);
 
-    if (!claims) return <AuthPage />
+    if (!claims || claims.role === '') return <AuthPage />
     if (loading) return <CvSULoading />
     return (
         <section className="stack-md reveal">
