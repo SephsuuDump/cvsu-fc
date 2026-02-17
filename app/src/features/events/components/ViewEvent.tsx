@@ -1,9 +1,9 @@
 "use client";
 
-import { CvSULoading, SectionLoading } from "@/components/ui/loader";
+import { CvSULoading } from "@/components/ui/loader";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { EventService } from "@/services/event.service";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +29,6 @@ import { useAuth } from "@/hooks/use-auth";
 export function ViewEventPage() {
     const { id } = useParams();
     const { claims, loading: authLoading } = useAuth();
-    const router = useRouter();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [reload, setReload] = useState(false)
 
@@ -97,7 +96,7 @@ export function ViewEventPage() {
     }
 
     return (
-        <section className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <section className="max-w-3xl mx-auto px-4 py-6 space-y-6 max-md:mt-15">
 
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                 {data.title}

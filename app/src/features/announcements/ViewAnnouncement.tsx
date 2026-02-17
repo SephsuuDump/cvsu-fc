@@ -45,7 +45,7 @@ export function ViewAnnouncementPage() {
     );
 
     return (
-        <section className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <section className="max-w-3xl mx-auto px-4 py-6 space-y-6 max-md:mt-15">
 
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                 {data?.content ?? "Announcement"}
