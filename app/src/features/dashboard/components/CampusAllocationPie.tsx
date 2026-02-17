@@ -29,6 +29,7 @@ import { UserService } from "@/services/user.service";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { formatToPeso } from "@/lib/helper";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const months = [
     "January","February","March","April","May","June",
@@ -106,7 +107,9 @@ function ScrollLegend({
 }
 
 export default function CampusAndCollegeAllocationPie() {
+    const isMobile = useIsMobile();
     const { claims, loading: authLoading } = useAuth();
+
     const [refreshFilter, setRefreshFilter] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(
         new Date().toLocaleString("default", { month: "long" })
@@ -117,7 +120,9 @@ export default function CampusAndCollegeAllocationPie() {
     );
 
     const { data: genderCounts, loading: loadingGenderCounts } = useFetchOne(
-        UserService.getGenderCount
+        UserService.getGenderCount,
+        [claims.campus.id],
+        [claims.role === "ADMIN" ? 0 : claims.campus.id]
     )
 
     const { data: campuses = [] } = useFetchData<Campus>(
@@ -173,13 +178,16 @@ export default function CampusAndCollegeAllocationPie() {
     const collegeTotal = collegeChartData.reduce((a, b) => a + b.value, 0);
     const totalGender = genderChartData.reduce((sum, d) => sum + d.value, 0);
 
+    console.log(collegeChartData);
+    
+
     if (authLoading) return <CvSULoading />
     return (
         <section className="space-y-6">
             {/* ===== FILTERS ===== */}
-            <div className="flex-center-y gap-2">
+            <div className="flex-center-y gap-2 max-sm:grid! max-md:grid-cols-2">
                 <Select value={selectedCampus} onValueChange={setSelectedCampus} disabled={ claims.role !== "ADMIN" }>
-                    <SelectTrigger className="rounded-full w-44 truncate disabled:text-gray">
+                    <SelectTrigger className="rounded-full w-44 truncate disabled:text-gray max-sm:w-full">
                         <SelectValue placeholder="Select Campus" />
                     </SelectTrigger>
                     <SelectContent>
@@ -196,7 +204,7 @@ export default function CampusAndCollegeAllocationPie() {
                 </Select>
 
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                    <SelectTrigger className="w-40 rounded-full">
+                    <SelectTrigger className="w-40 rounded-full max-sm:w-full">
                         <SelectValue placeholder="Month" />
                     </SelectTrigger>
                     <SelectContent>
@@ -207,7 +215,7 @@ export default function CampusAndCollegeAllocationPie() {
                 </Select>
 
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                    <SelectTrigger className="w-32 rounded-full">
+                    <SelectTrigger className="w-32 rounded-full max-sm:w-full">
                         <SelectValue placeholder="Year" />
                     </SelectTrigger>
                     <SelectContent>
@@ -219,7 +227,7 @@ export default function CampusAndCollegeAllocationPie() {
 
                 <Button
                     onClick={ () => setRefreshFilter(prev => !prev) }
-                    className="!bg-darkgreen hover:opacity-90 rounded-full shadow"
+                    className="!bg-darkgreen hover:opacity-90 rounded-full shadow max-sm:w-full"
                     size="sm"
                 >
                     <RefreshCcw /> Refresh Filter
@@ -229,10 +237,10 @@ export default function CampusAndCollegeAllocationPie() {
             {loadingGenderCounts ? (
                 <SectionLoading />
             ) : (
-                <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden max-md:h-150">
                     <AppHeader label="Gender Distribution" />
 
-                    <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                    <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
                         {/* Chart */}
                         <div className="flex-1 min-w-0">
                             <ResponsiveContainer width="100%" height="100%">
@@ -266,9 +274,22 @@ export default function CampusAndCollegeAllocationPie() {
                                 </span>
                             </p>
                         </div>
-
-                        <ScrollLegend items={genderChartData} title="Sex" sexColors={ SEX_COLORS } />
+                        {!isMobile && (
+                            <ScrollLegend 
+                                items={genderChartData}
+                                title="Sex" 
+                                sexColors={ SEX_COLORS } 
+                            />
+                        )}
                     </div>
+
+                    {isMobile && (
+                        <ScrollLegend 
+                            items={genderChartData}
+                            title="Sex" 
+                            sexColors={ SEX_COLORS } 
+                        />
+                    )}
                 </div>
 
             )}
@@ -278,10 +299,10 @@ export default function CampusAndCollegeAllocationPie() {
             ) : (
                 <div className="grid grid-cols-1 gap-4 reveal">
                     {/* CAMPUS CARD */}
-                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 max-md:h-full">
                         <AppHeader label="Total Allocation per Campus" />
 
-                        <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                        <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
                             {/* Chart area */}
                             <div className="flex-1 min-w-0">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -319,19 +340,26 @@ export default function CampusAndCollegeAllocationPie() {
                                     </span>
                                 </p>
                             </div>
-
-                            {/* Scrollable legend */}
-                            <ScrollLegend items={campusChartData} title="Campuses" />
+                            {!isMobile && (
+                                <ScrollLegend 
+                                    items={campusChartData} 
+                                    title="Campuses" 
+                                />
+                            )}
                         </div>
+                        
+                        {isMobile && (
+                            <ScrollLegend items={campusChartData} title="Campuses" />
+                        )}
                     </div>
 
                     {/* COLLEGE CARD */}
-                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden">
+                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 max-md:h-fit">
                         <AppHeader label="Allocation per College" />
 
-                        <div className="flex flex-col md:flex-row gap-4 h-[320px]">
+                        <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
                             {/* Chart area */}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 h-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -366,11 +394,19 @@ export default function CampusAndCollegeAllocationPie() {
                                         {peso(collegeTotal)}
                                     </span>
                                 </p>
-                            </div>
-
-                            {/* Scrollable legend */}
-                            <ScrollLegend items={collegeChartData} title="Colleges / Campus-level" />
+                            </div> 
+                            {!isMobile && (
+                                <ScrollLegend 
+                                    items={collegeChartData} 
+                                    title="Campuses" 
+                                />
+                            )}
                         </div>
+
+                        {isMobile && (
+                            <ScrollLegend items={collegeChartData} title="Campuses" />
+                        )}
+                        
                     </div>
                 </div>
             )}

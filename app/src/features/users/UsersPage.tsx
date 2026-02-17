@@ -33,7 +33,7 @@ export function UsersPage() {
     const router = useRouter();
     const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("COORDINATOR");
+    const [selectedRole, setSelectedRole] = useState("ALL");
     const [selectedCampus, setSelectedCampus] = useState(0);
     const [selectedCollege, setSelectedCollege] = useState(0);
     const { data: users, loading } = useFetchData<User>(UserService.getAllUsers, [reload]);
@@ -77,20 +77,20 @@ export function UsersPage() {
 
     if (loading || authLoading) return <CvSULoading />
     return (
-        <section className="stack-md reveal">
+        <section className="stack-md reveal max-md:mt-15 max-md:overflow-hidden">
             <AppHeader label="CvSU FC Users" />
-            <div className="flex">
+            <div className="flex justify-between max-sm:grid!">
                 <div className="flex-center-y gap-2 bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2">
                     <Input
                         placeholder="Search for a user"
                         onChange={ e => setSearch(e.target.value) }
-                        className="w-100"
+                        className="w-100 max-md:w-full"
                     />
                     <Select
                         value={selectedRole}
                         onValueChange={(value) => setSelectedRole(value)}
                     >
-                        <SelectTrigger className="w-40">
+                        <SelectTrigger className="w-40 max-sm-full">
                             <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
@@ -107,7 +107,7 @@ export function UsersPage() {
                     </Select>
 
                 </div>
-                <div className="ms-auto flex-center-y gap-1.5">
+                <div className="flex-center-y gap-1.5 max-sm:my-2">
                     <button
                         onClick={ () => setOpen(!open) }
                         className="rounded-full p-2 bg-darkgreen shadow-sm"
@@ -118,7 +118,7 @@ export function UsersPage() {
                         <Skeleton className="w-10" />
                     ) : (
                         <Select onValueChange={(value) => setSelectedCampus(Number(value))}>
-                            <SelectTrigger className="rounded-full w-40 truncate">
+                            <SelectTrigger className="rounded-full w-40 truncate max-sm:w-full">
                                 <SelectValue placeholder="Select Campus" />
                             </SelectTrigger>
                             <SelectContent>
@@ -138,7 +138,7 @@ export function UsersPage() {
                     )}
                     {collegeMap.length > 0 && (
                         <Select onValueChange={(value) => setSelectedCollege(Number(value))}>
-                            <SelectTrigger className="rounded-full w-40 truncate">
+                            <SelectTrigger className="rounded-full w-40 truncate max-sm:w-full">
                                 <SelectValue placeholder="Select College" />
                             </SelectTrigger>
                             <SelectContent>
@@ -157,9 +157,9 @@ export function UsersPage() {
                 </div>
             </div>
 
-            <div className="bg-slate-50 -mt-2">
-                <div className="flex-center-y">
-                    <div className="thead w-full grid grid-cols-4">
+            <div className="table-wrapper bg-slate-50 -mt-2">
+                <div className="thead flex-center-y max-md:w-250!">
+                    <div className="w-full grid grid-cols-4">
                         <div className="th">Member Name</div>
                         <div className="th">Email Address</div>
                         <div className="th">Campus</div>
@@ -179,7 +179,7 @@ export function UsersPage() {
                     return (
                         <Fragment key={i}>
                             {loggedUser !== item.id && (
-                                <div className="tdata flex-center-y">
+                                <div className="tdata flex-center-y max-md:w-250!">
                                     <div className="w-full grid grid-cols-4">
                                         <div className="td flex-center-y gap-2">
                                             <Tooltip>
@@ -210,7 +210,7 @@ export function UsersPage() {
                                                 </TooltipTrigger>
                                                 <TooltipContent className="bg-darkgreen">
                                                     { item.college 
-                                                        ? item.college.id 
+                                                        ? item.college.name
                                                         : "ALL_COLLEGES" 
                                                     } 
                                                 </TooltipContent>

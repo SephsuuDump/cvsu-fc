@@ -55,10 +55,10 @@ export function FacultySection({ campusId }: {
         return true;
     });
 
-    if (loading) return <SectionLoading />
+    if (loading || authLoading) return <SectionLoading />
     return (
         <section className="stack-md reveal">
-            <div className="flex-center-y justify-between">
+            <div className="flex-center-y justify-between gap-2">
                 <Input
                     placeholder="Search for a member"
                     className="w-100"
@@ -66,7 +66,7 @@ export function FacultySection({ campusId }: {
                 />
                 {collegeMap.length > 0 && (
                     <Select onValueChange={(value) => setSelectedCollege(Number(value))}>
-                        <SelectTrigger className="rounded-full w-40 truncate">
+                        <SelectTrigger className="rounded-full w-40 truncate max-sm:w-full">
                             <SelectValue placeholder="Select College" />
                         </SelectTrigger>
                         <SelectContent>
@@ -89,7 +89,7 @@ export function FacultySection({ campusId }: {
                     <p className="text-sm">No faculty members found.</p>
                 </div>
             )}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 max-md:grid-cols-2 max-sm:grid-cols-1">
                 {finalFilteredUsers.map((item, i) => {
                     const loggedUser = claims.id;
                     return (

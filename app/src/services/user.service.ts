@@ -37,9 +37,9 @@ export class UserService {
         )
     }
 
-    static async getGenderCount() {
+    static async getGenderCount(campusId: number) {
         return await requestData(
-            `${url}/gender-count`,
+            `${url}/gender-count?campus_id=${campusId}`,
             'GET',
             { "Accept": "application/json" }
         )
@@ -55,10 +55,15 @@ export class UserService {
     }
 
     static async updateProfileImage(id: number, file: File) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('id', String(id));
+        
         return await requestData(
-            `${url}/update`,
+            `${url}/upload`,
             'POST',
             { "Accept": "application/json" },
+            formData
         )
     }
 

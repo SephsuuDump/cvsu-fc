@@ -38,11 +38,14 @@ const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 export default function AllocationPage() {
     const { claims, loading: authLoading } = useAuth();
+
+    if (authLoading) return <CvSULoading />
+
     const [refreshFilter, setRefreshFilter] = useState(false);
     const [reload, setReload] = useState(false);
     const [search, setSearch] = useState("");
     const [levelFilter, setLevelFilter] = useState<AllocationLevel | "ALL">("ALL");
-    const [selectedCampus, setSelectedCampus] = useState(0);
+    const [selectedCampus, setSelectedCampus] = useState(claims ? claims.campus.id : 0);
     const [selectedCollege, setSelectedCollege] = useState(0);
 
     const [selectedMonth, setSelectedMonth] = useState(
@@ -66,11 +69,6 @@ export default function AllocationPage() {
     const { open, setOpen } = useCrudState();
     const { open: openExport, setOpen: setOpenExport } = useCrudState();
 
-    useEffect(() => {
-        if (claims.role === "ADMIN") return
-        setSelectedCampus(claims.campus.id)
-    }, [claims])
-
     const filteredAllocations = useMemo(() => {
         if (!allocations) return [];
 
@@ -88,15 +86,13 @@ export default function AllocationPage() {
         });
     }, [allocations, search, levelFilter]);
 
-
-    if (authLoading) return <CvSULoading />
     return (
-        <section className="stack-md reveal">
+        <section className="stack-md reveal max-md:mt-15 max-md:overflow-hidden">
 
             <AppHeader label="Allocations"/>
             
-            <div className="flex-center-y justify-between">
-                <div className="flex-center-y gap-2">
+            <div className="flex-center-y flex-wrap justify-between">
+                <div className="flex-center-y gap-2 max-md:grid! max-md:grid-cols-5 max-sm:grid-cols-2 max-sm:w-full">
                     {campusesLoading && (
                         <Skeleton className="h-9 rounded-full w-40 bg-green-200" />
                     )}
@@ -110,7 +106,7 @@ export default function AllocationPage() {
                             onValueChange={(value) => setSelectedCampus(Number(value))}
                             disabled={ claims.role !== "ADMIN" }
                         >
-                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray">
+                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray max-md:w-full">
                                 <SelectValue placeholder="Select Campus" />
                             </SelectTrigger>
                             <SelectContent>
@@ -131,7 +127,7 @@ export default function AllocationPage() {
                             value={ String(selectedCollege) }
                             onValueChange={(value) => setSelectedCollege(Number(value))}
                         >
-                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray">
+                            <SelectTrigger className="rounded-full w-40 truncate reveal disabled:text-gray max-md:w-full">
                                 <SelectValue placeholder="Select College" />
                             </SelectTrigger>
                             <SelectContent>
@@ -152,7 +148,7 @@ export default function AllocationPage() {
                         value={selectedMonth} 
                         onValueChange={setSelectedMonth} 
                     >
-                        <SelectTrigger className="w-40 rounded-full">
+                        <SelectTrigger className="w-40 rounded-full max-md:w-full">
                             <SelectValue placeholder='Select Month' />
                         </SelectTrigger>
                         <SelectContent>
@@ -166,7 +162,7 @@ export default function AllocationPage() {
                         value={selectedYear} 
                         onValueChange={setSelectedYear}
                     >
-                        <SelectTrigger className="w-40 rounded-full">
+                        <SelectTrigger className="w-40 rounded-full max-md:w-full">
                             <SelectValue placeholder='Select Year' />
                         </SelectTrigger>
                         <SelectContent>
@@ -178,13 +174,13 @@ export default function AllocationPage() {
 
                     <Button
                         onClick={ () => setRefreshFilter(prev => !prev) }
-                        className="!bg-darkgreen hover:opacity-90 rounded-full shadow"
+                        className="!bg-darkgreen hover:opacity-90 rounded-full shadow max-sm:col-span-2"
                         size="sm"
                     >
                         <RefreshCcw /> Refresh Filter
                     </Button>
                 </div>
-                <div className="flex-center-y gap-2">
+                <div className="flex-center-y gap-2 max-md:my-2">
                     <Button 
                         onClick={ () => setOpenExport(true) }
                         className="bg-slate-50 shadow-sm text-black" 
@@ -204,7 +200,7 @@ export default function AllocationPage() {
                 
             </div>
     
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-md:gap-2">
 
                 <div className="rounded-lg border-[1.5px] border-darkgreen bg-white p-4 shadow-sm hover:shadow-sm hover:shadow-darkgreen">
                     <div className="text-xs text-muted-foreground reveal">

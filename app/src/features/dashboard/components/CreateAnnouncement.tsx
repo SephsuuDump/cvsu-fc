@@ -23,7 +23,8 @@ interface Preview {
 }
 
 
-export function CreateAnnouncement({ setOpen, setReload }: {
+export function 
+CreateAnnouncement({ setOpen, setReload }: {
     setOpen: Dispatch<SetStateAction<boolean>>;
     setReload: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -130,16 +131,13 @@ export function CreateAnnouncement({ setOpen, setReload }: {
         finally { setProcess(false); }
     }
 
-    console.log(announcement);
-    
-
     if (authLoading || loading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent className="overflow-y-auto h-9/10">
                 <ModalTitle label="Create an announcement" />
-                <div className="flex-center-y text-sm gap-2">
-                    <div>Announcement Label:</div>
+                <div className="flex-center-y flex-wrap text-sm gap-2">
+                    <div className="max-sm:w-full">Announcement Label:</div>
                     <Select
                         value={ announcement.label }
                         onValueChange={ (value) => setAnnouncement(prev => ({

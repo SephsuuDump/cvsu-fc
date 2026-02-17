@@ -17,7 +17,7 @@ export function OfficerList({ items, setReload }: {
         assigned_date: string;
     }>();
     return (
-        <div className="bg-slate-50 -mt-2">
+        <div className="bg-slate-50 -mt-2 table-wrapper">
             <div className="thead flex-center-y">
                 <div className="w-full grid grid-cols-3">
                     <div className="th">Position</div>

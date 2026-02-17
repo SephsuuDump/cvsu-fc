@@ -106,18 +106,18 @@ export function ContributionPage() {
     if (staticLoading || authLoading) return <CvSULoading />
     
     return (
-        <section className="stack-md reveal">
+        <section className="stack-md reveal max-md:mt-15 max-md:overflow-hidden">
             <AppHeader label="Monthly Contributions" />
             <div className="text-lg font-bold">
                 Contributions for month of <span className="text-darkgreen">{ selectedMonth.toUpperCase() }</span>
             </div>
-            <div className="flex-center-y justify-between">
-                <div className="flex-center-y bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2">
+            <div className="w-full flex-center-y max-sm:grid!">
+                <div className="flex-center-y flex-wrap bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2 max-sm:grid! max-sm:grid-cols-2 max-sm:w-full">
                     <Select 
                         value={selectedMonth} 
                         onValueChange={setSelectedMonth} 
                     >
-                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
+                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
                             <SelectValue placeholder='Select Month' />
                         </SelectTrigger>
                         <SelectContent>
@@ -131,7 +131,7 @@ export function ContributionPage() {
                         value={selectedYear} 
                         onValueChange={setSelectedYear}
                     >
-                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
+                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
                             <SelectValue placeholder='Select Year' />
                         </SelectTrigger>
                         <SelectContent>
@@ -146,7 +146,7 @@ export function ContributionPage() {
                         onValueChange={setSelectedCampus}
                         disabled={claims.role !== "ADMIN"}
                     >
-                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
+                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
                             <SelectValue placeholder='All Campuses' />
                         </SelectTrigger>
                         <SelectContent>
@@ -164,7 +164,7 @@ export function ContributionPage() {
                         onValueChange={setSelectedCollege}
                         disabled={claims.role !== "ADMIN"}
                     >
-                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4">
+                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
                             <SelectValue placeholder='All Colleges' />
                         </SelectTrigger>
                         <SelectContent>
@@ -178,10 +178,10 @@ export function ContributionPage() {
                     </Select>
                 </div>
 
-                <div className="ms-auto flex-center-y gap-1.5">
+                <div className="ms-auto flex-center-y gap-1.5 max-sm:w-full">
                     <Button 
                         onClick={ () => setOpen(!open) }
-                        className="rounded-full bg-slate-50 shadow-sm text-black" 
+                        className="rounded-full bg-slate-50 shadow-sm text-black w-full max-sm:rounded-none" 
                         size="sm"
                     >
                         <FileUp /> Export
@@ -191,8 +191,8 @@ export function ContributionPage() {
             {contributionsLoading ? (
                 <SectionLoading />
             ) : (
-                <div className="bg-slate-50 -mt-2">
-                    <div className="thead grid grid-cols-4">
+                <div className="bg-slate-50 -mt-2 table-wrapper">
+                    <div className="thead grid grid-cols-4 max-md:w-250!">
                         <div className="th">Member Name</div>
                         <div className="th">Status</div>
                         <div className="th col-span-2">Contribution for {selectedYear}</div>
@@ -212,7 +212,7 @@ export function ContributionPage() {
                         const isContributed = monthData?.contributed === 1;
                         
                         return (
-                            <div className="tdata grid grid-cols-4" key={i}>
+                            <div className="tdata grid grid-cols-4 max-md:w-250!" key={i}>
                                 <div className="td">
                                     <div>{`${item.first_name}, ${item.last_name}`}</div>
                                     <div className="text-gray text-xs">{item.college_name}</div>

@@ -6,30 +6,37 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { useFetchOne } from "@/hooks/use-fetch-one";
-import { formatCustomDate } from "@/lib/helper";
+import { formatCustomDate, formatDateToWord } from "@/lib/helper";
 import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
 import { Camera, GraduationCap, Mail, Phone, SquarePen, UserRoundCheck } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { UpdateUser } from "../users/components/UpdateUser";
+import { toast } from "sonner";
 
 export function AccountPage() {
     const { id } = useParams();
+    console.log(id);
+    
     const [reload, setReload] = useState(false);
     const { claims, loading: authLoading } = useAuth();
+    
+
+    const finalId = id ? Number(id) : claims?.id // use route param if present, else claims.id
+    const canFetch = !authLoading && !!finalId
+
     const { data: user, loading } = useFetchOne<User>(
         UserService.getUserById,
-        [id ?? claims.id, reload, claims],
-        [id ?? claims.id]
+        [finalId, reload],                
+        canFetch ? [finalId] : undefined    
     )
+    
     const { toUpdate, setUpdate } = useCrudState<Partial<User>>();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
-
-    if (authLoading || loading) return <CvSULoading />;
 
     const handleAvatarClick = () => {
         fileInputRef.current?.click();
@@ -47,13 +54,18 @@ export function AccountPage() {
 
         try {
             setUploading(true);
-        await UserService.updateProfileImage(user!.id, file);
+            const data = await UserService.updateProfileImage(user!.id, file);
+            if (data) {
+                toast.success('profile image updated.')
+                setReload(prev => !prev)
+            }
+
         } finally {
             setUploading(false);
         }
     };
 
-    if (authLoading || loading) return <CvSULoading />
+    if (authLoading || loading || user?.id === 0) return <CvSULoading />;
     return (
         <section className="mx-auto max-w-[1024px] stack-md reveal">
 
@@ -76,7 +88,7 @@ export function AccountPage() {
                 >
                     <AppAvatar
                         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${user?.image_url}`}
-                        className="w-28 h-28 border-4 border-white shadow-lg"
+                        className="w-28 h-28 border-4 border-white shadow-lg object-cover"
                         fallbackClassName="bg-green-900 text-3xl text-slate-50"
                     />
 
@@ -150,7 +162,7 @@ export function AccountPage() {
                         <UserRoundCheck className="w-4 h-4 text-green-700" />
                         <span className="font-medium text-gray-600">Member Since</span>
                         <span className="ml-auto text-gray-900 font-semibold">
-                            { formatCustomDate(user!.created_at!)  }
+                            { user === null ? "No user found" : formatDateToWord(user!.created_at!)  }
                         </span>
                     </div>
                     <Separator className="h-2 bg-slate-200 mt-2" />
@@ -162,7 +174,6 @@ export function AccountPage() {
                     toUpdate={ toUpdate }
                     setUpdate={ setUpdate }
                     setReload={ setReload }
-                    
                 />
             )}
         </section>

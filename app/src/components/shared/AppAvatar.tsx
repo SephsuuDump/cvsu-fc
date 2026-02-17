@@ -12,6 +12,7 @@ export function AppAvatar({ src, alt, className, fallback, fallbackClassName }: 
             <AvatarImage
                 src={ src }
                 alt={ alt }
+                className="object-cover"
             />
             <AvatarFallback className={`${fallbackClassName ?? "bg-darkgreen text-slate-50"}`}>{ fallback ?? 'FC' }</AvatarFallback>
         </Avatar>

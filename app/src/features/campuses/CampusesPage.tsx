@@ -28,10 +28,10 @@ export function CampusesPage() {
     
     if (loading || !selectedCampus) return <CvSULoading />
     return (
-        <section className="stack-md reveal">
+        <section className="stack-md reveal max-md:mt-15 max-md:overflow-hidden">
             <AppHeader label="CvSU Campuses" />
             <div className="flex-center-y justify-between">
-                <div className="text-lg font-bold">{ selectedCampus.name ?? '...' }</div>
+                <div className="text-lg font-bold max-sm:hidden">{ selectedCampus.name ?? '...' }</div>
                 <AppSelect
                     items={campuses.map((item) => ({
                         label: item.name.match(/University\s*-\s*(.+)/i)?.[1] ?? "",
@@ -42,9 +42,10 @@ export function CampusesPage() {
                         const campus = campuses.find((c) => String(c.id) === value)
                         if (campus) setSelectedCampus(campus)
                     }}
+                    triggerClassName="max-sm:text-lg max-sm:font-semibold max-sm:my-2"
                 />
             </div>
-            <div className="flex-center-y gap-8">
+            <div className="flex-center-y gap-8 overflow-x-auto max-sm:pb-2">
                 {tabs.map((item, i) => (
                     <button
                         onClick={ () => setTab(item) }

@@ -121,7 +121,7 @@ export function Calendar({ className }: {
                                     {eventCount === 0 ? (
                                         <div></div>
                                     ) : (
-                                        <div className="text-xs font-bold tracking-wider max-[1160px]:text-[10px]">
+                                        <div className="text-xs font-bold tracking-wider max-[1160px]:text-[10px] max-sm:hidden">
                                             {eventCount} {eventCount === 1 ? "EVENT" : "EVENTS"}
                                         </div>
                                     )}

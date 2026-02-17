@@ -24,3 +24,4 @@ export function usePagination<T>(items: T[] = [], defaultSize: number = 10) {
         totalPages,
     };
 }
+

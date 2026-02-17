@@ -23,7 +23,8 @@ interface GenericSelectProps {
   disabled?: boolean,
   searchPlaceholder?: string;
   search?: string;
-  setSearch?: (i: string) => void
+  setSearch?: (i: string) => void,
+  triggerClassName?: string
 }
 
 export function AppSelect({
@@ -37,14 +38,15 @@ export function AppSelect({
   disabled,
   searchPlaceholder,
   search,
-  setSearch
+  setSearch,
+  triggerClassName,
 }: GenericSelectProps) {
   return (
         <div className={`flex flex-col gap-1 ${className ?? ""}`}>
             {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
 
             <Select value={value} onValueChange={onChange} disabled={disabled}>
-                <SelectTrigger className="w-full border border-gray-300 rounded-md">
+                <SelectTrigger className={`w-full border border-gray-300 rounded-md ${triggerClassName}`}>
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
 

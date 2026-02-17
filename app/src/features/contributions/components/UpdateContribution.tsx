@@ -26,6 +26,8 @@ export function UpdateContribution({ toUpdate, setUpdate, setReload }: {
     } | undefined>>
     setReload: Dispatch<SetStateAction<boolean>>
 }) {
+    console.log('to update', toUpdate);
+    
     const isPaid = toUpdate.contributed === 1;
     const [onProcess, setProcess] = useState(false);
 

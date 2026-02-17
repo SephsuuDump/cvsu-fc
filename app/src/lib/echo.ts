@@ -69,6 +69,8 @@ export function getEcho() {
 
   if (!window.Pusher) window.Pusher = Pusher;
 
+  const token = localStorage.getItem("token") || "";
+
   if (!window.Echo) {
     const host = process.env.NEXT_PUBLIC_REVERB_HOST!;
     const isTls = process.env.NEXT_PUBLIC_REVERB_SCHEME === "https";
@@ -76,29 +78,26 @@ export function getEcho() {
     window.Echo = new Echo({
       broadcaster: "reverb",
       key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
-
-      // IMPORTANT: host only (no :port here)
       wsHost: host,
-
-      // IMPORTANT: external port is 443 when using https/wss behind Cloudflare
-      wsPort: isTls ? 80 : Number(process.env.NEXT_PUBLIC_REVERB_PORT || 8080),
-      wssPort: isTls ? 443 : Number(process.env.NEXT_PUBLIC_REVERB_PORT || 8080),
-
+      wsPort: 8080,
+      wssPort: 443,
       forceTLS: isTls,
       encrypted: isTls,
-
       enabledTransports: ["ws", "wss"],
-
-      // DO NOT set wsPath to /wss. Default "/app" is correct for Reverb/Pusher protocol.
-      // wsPath: "/app",
-
       authEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`,
       auth: {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       },
     });
+  } else {
+    // ✅ refresh token header (important when user logs in / token changes)
+    (window.Echo as any).options.auth.headers.Authorization = `Bearer ${token}`;
+    const pusher = (window.Echo as any).connector?.pusher;
+    if (pusher?.config?.auth?.headers) {
+      pusher.config.auth.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   return window.Echo;

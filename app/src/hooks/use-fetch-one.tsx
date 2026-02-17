@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// ✅ Always returns a single item
 export function useFetchOne<T>(
-    fetchFn: (...args: any[]) => Promise<T>,
-    deps: any[] = [],
-    args: any[] = []
+  fetchFn: (...args: any[]) => Promise<T>,
+  deps: any[] = [],
+  args?: any[]
 ) {
     const [item, setItem] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
@@ -14,10 +13,17 @@ export function useFetchOne<T>(
     useEffect(() => {
         let isMounted = true;
 
+        if (!args || args.length === 0 || args.some(a => a == null)) {
+            setLoading(false);
+            return;
+        }
+
+        const safeArgs = args; 
+
         async function fetchData() {
         try {
             setLoading(true);
-            const result = await fetchFn(...args);
+            const result = await fetchFn(...safeArgs); 
             if (isMounted) setItem(result);
         } catch (err: any) {
             const message = err?.message || "Failed to fetch data";
@@ -29,10 +35,10 @@ export function useFetchOne<T>(
         }
 
         fetchData();
-        return () => {
-        isMounted = false;
+            return () => {
+            isMounted = false;
         };
-    }, [...deps]);
+    }, deps);
 
     return { data: item, loading, error };
 }

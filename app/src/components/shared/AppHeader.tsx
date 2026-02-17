@@ -10,6 +10,7 @@ export function AppHeader({ label, className }: {
             <div className={`${className} flex items-center gap-2`}>
                 <Image
                     src="/images/cvsu_logo.png"
+                    // className="max-md:hidden"
                     alt="CvSU Logo"
                     width={40}
                     height={40}

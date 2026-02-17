@@ -146,7 +146,7 @@ export function CreateAllocation({ claims, setOpen, setReload, defaultCampus, de
                     <DialogClose>Cancel</DialogClose>
                     <AddButton
                         type="submit"
-                        label="Creat Allocation"
+                        label="Create Allocation"
                         loadingLabel="Creating Allocation"
                         onProcess={ onProcess }
                     />

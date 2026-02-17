@@ -49,8 +49,8 @@ export function OfficersSection({ campusId }: {
     if (loading) return <SectionLoading />
     return (
         <section className="stack-md reveal">
-            <div className="flex">
-                <div className="bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200">
+            <div className="flex max-sm:grid!">
+                <div className="bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 max-sm:order-2 max-sm:mt-2">
                     {["OFFICER LIST", "POSITIONS"].map((item, i) => (
                         <button
                             key={i}
@@ -61,7 +61,7 @@ export function OfficersSection({ campusId }: {
                         </button>
                     ))}
                 </div>
-                <div className="ms-auto flex-center-y gap-1.5">
+                <div className="ms-auto flex-center-y gap-1.5 max-sm:order-1">
                     <Button
                         onClick={ () => {tab === "OFFICER LIST" ? setOpenOfficer(!openOfficer) : setOpenPosition(!openPosition)} }
                         className="!bg-darkgreen hover:opacity-90"

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { hasEmptyField, updateField } from "@/lib/helper";
 import { AuthService } from "@/services/auth.service";
 import Image from "next/image";
@@ -35,7 +36,7 @@ export function AuthPage() {
     }
 
     return (
-        <section className="flex-center flex-col h-screen">
+        <section className="flex-center flex-col h-screen max-sm:overflow-hidden">
             <img
                 src="/images/cvsu_entrance.jpg"
                 alt="Background"
@@ -46,19 +47,18 @@ export function AuthPage() {
                 via-white/90 via-[50%] 
                 to-white to-[99%]">
             </div>
-            <div className="z-10 flex-center flex-col gap-2">
-                <Image
+            <div className="z-10 flex-center flex-col gap-2 max-sm:-mt-24">
+                <img
                     src='/images/cvsu_logo.png'
                     alt="CvSU Logo"
-                    width={120}
-                    height={120}
+                    className="w-30 h-30 max-sm:w-20 max-sm:h-20"
                 />
-                <div className="head w-100 text-green-800 scale-x-110 font-bold text-5xl text-center">
+                <div className="head w-100 text-green-800 scale-x-110 font-bold text-5xl text-center max-sm:text-4xl">
                     CAVITE STATE <br />UNIVERSITY
                 </div>
 
                 <form 
-                    className="w-100 mt-4 flex flex-col bg-white px-12 py-6 rounded-md gap-4 shadow-md shadow-[#d3d3d3]"
+                    className="w-100 mt-4 flex flex-col bg-white px-12 py-6 rounded-md gap-4 shadow-md shadow-[#d3d3d3] max-sm:px-8 max-sm:w-9/10"
                     onSubmit={ e => {
                         e.preventDefault();
                         handleSubmit();
