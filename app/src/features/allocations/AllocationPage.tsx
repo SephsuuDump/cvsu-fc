@@ -57,12 +57,12 @@ export default function AllocationPage() {
     const { data: colleges, loading: collegesLoading } = useFetchData<College>(CollegeService.getAllColleges, []);
     const { data: allocations, loading: allocationLoading } = useFetchData(
         AllocationService.getAllocations,
-        [refreshFilter],
+        [refreshFilter, reload],
         [selectedCampus, 0, selectedYear, selectedMonth]
     )
     const { data: budget, loading: budgetLoading } = useFetchOne(
         AllocationService.getCollegeBudget,
-        [refreshFilter],
+        [refreshFilter, reload],
         [selectedCampus, 0, selectedYear, selectedMonth]
     )
     

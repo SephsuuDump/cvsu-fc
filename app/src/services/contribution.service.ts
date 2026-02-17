@@ -25,6 +25,14 @@ export class ContributionService {
         )
     }
 
+    static async markPaidOnMonth(campusId: number, month: string) {
+        return await requestData(
+            `${url}/mark-paid?campus_id=${campusId}&month=${month}`,
+            'POST',
+            { "Accept": "application/json" },
+        )
+    }
+
     static async exportContributions(startDate: string, endDate: string, year: string, campusId: number, collegeId: number) {
         return await requestData(
             `${url}/export?start_date=${startDate}&year=${year}&college_id=${collegeId}&campus_id=${campusId}&end_date=${endDate}`,

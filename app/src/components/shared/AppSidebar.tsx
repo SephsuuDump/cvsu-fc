@@ -105,7 +105,7 @@ export function AppSidebar() {
                             className="bg-center bg-cover"
                             style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                         >
-                            <Link href="/auth/login" className="block text-center">
+                            <Link href="/" className="block text-center">
                                 <Image
                                     src="/images/cvsu_logo.png"
                                     alt="CvSU Logo"
@@ -156,7 +156,7 @@ export function AppSidebar() {
                 className="rounded-md bg-cover border-r-green-100 border-0"
                 style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
             >
-                <Link className="text-center aspect-auto" href="/auth/login">
+                <Link className="text-center aspect-auto" href="/">
                     <Image
                         src="/images/cvsu_logo.png"
                         alt="CvSU Logo"

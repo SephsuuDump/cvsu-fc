@@ -41,13 +41,17 @@ const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 const GREEN_COLORS = [
     "#14532d",
-    "#166534",
-    "#15803d",
-    "#16a34a",
-    "#22c55e",
-    "#4ade80",
-    "#86efac",
-    "#bbf7d0",
+    "#385DFF",
+    "#00F12E",
+    "#0DD7FF",
+    "#E41010",
+    "#E49C20",
+    "#F6F605",
+    "#9B2CF6",
+    "#D5EADB",
+    "#E4A4EA",
+    "#EA8981",
+    "#9283EA"
 ];
 const SEX_COLORS = ["#6495ed", "#ec4899"]; 
 

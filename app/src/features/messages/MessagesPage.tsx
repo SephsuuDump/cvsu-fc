@@ -118,7 +118,7 @@ export function MessagesPage() {
 		setTimeout(() => {
 			scrollToBottom();
 		}, 20);
-	}, [selectedConv, messages]);
+	}, [selectedConv]);
 
 	useLayoutEffect(() => {
 		if (!selectedConv?.id) return;

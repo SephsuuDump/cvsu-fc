@@ -26,7 +26,10 @@ const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 export function ContributionPage() {
     const { claims, loading: authLoading } = useAuth();
+
     const [reload, setReload] = useState(false);
+    const [onProcess, setProcess] = useState(false);
+
     const [selectedMonth, setSelectedMonth] = useState(
         new Date().toLocaleString("default", { month: "long" })
     );
@@ -103,6 +106,20 @@ export function ContributionPage() {
 
     const { page, setPage, size, setSize, paginated } = usePagination(contributions, 10); 
 
+    async function markPaidOnMonth() {
+        try {
+            setProcess(true)
+            const data = await ContributionService.markPaidOnMonth(Number(selectedCampus), selectedMonth.toLowerCase())
+
+            if (data) {
+                toast.success('Faculties on selected campus are all paid.')
+                setReload(prev => !prev)
+            }
+        } catch (error) {
+            toast.error(String(error))
+        } finally { setProcess(false) }
+    }
+
     if (staticLoading || authLoading) return <CvSULoading />
     
     return (
@@ -112,12 +129,12 @@ export function ContributionPage() {
                 Contributions for month of <span className="text-darkgreen">{ selectedMonth.toUpperCase() }</span>
             </div>
             <div className="w-full flex-center-y max-sm:grid!">
-                <div className="flex-center-y flex-wrap bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2 max-sm:grid! max-sm:grid-cols-2 max-sm:w-full">
+                <div className="flex-center-y flex-wrap bg-slate-50 w-fit rounded-t-lg shadow-sx border-slate-200 p-2 max-md:grid! max-md:grid-cols-2 max-md:w-full">
                     <Select 
                         value={selectedMonth} 
                         onValueChange={setSelectedMonth} 
                     >
-                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
+                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-md:w-full">
                             <SelectValue placeholder='Select Month' />
                         </SelectTrigger>
                         <SelectContent>
@@ -131,7 +148,7 @@ export function ContributionPage() {
                         value={selectedYear} 
                         onValueChange={setSelectedYear}
                     >
-                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
+                        <SelectTrigger className="w-35 font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-md:w-full">
                             <SelectValue placeholder='Select Year' />
                         </SelectTrigger>
                         <SelectContent>
@@ -146,7 +163,7 @@ export function ContributionPage() {
                         onValueChange={setSelectedCampus}
                         disabled={claims.role !== "ADMIN"}
                     >
-                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
+                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-md:w-full">
                             <SelectValue placeholder='All Campuses' />
                         </SelectTrigger>
                         <SelectContent>
@@ -164,7 +181,7 @@ export function ContributionPage() {
                         onValueChange={setSelectedCollege}
                         disabled={claims.role !== "ADMIN"}
                     >
-                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-sm:w-full">
+                        <SelectTrigger className="font-semibold rounded-b-none text-[15px] rounded-t-lg p-4 max-md:w-full">
                             <SelectValue placeholder='All Colleges' />
                         </SelectTrigger>
                         <SelectContent>
@@ -178,10 +195,17 @@ export function ContributionPage() {
                     </Select>
                 </div>
 
-                <div className="ms-auto flex-center-y gap-1.5 max-sm:w-full">
+                <div className="ms-auto flex-center-y gap-2 max-md:w-full max-md:justify-end max-sm:justify-center max-sm:my-1">
+                    <Button
+                        onClick={markPaidOnMonth}
+                        className="!bg-darkgreen rounded-full hover:opacity-90" 
+                        disabled={selectedCampus === "0"}
+                    >
+                        Mark All as Paid
+                    </Button>
                     <Button 
                         onClick={ () => setOpen(!open) }
-                        className="rounded-full bg-slate-50 shadow-sm text-black w-full max-sm:rounded-none" 
+                        className="rounded-full bg-slate-50 shadow-sm text-black hover:bg-slate-100" 
                         size="sm"
                     >
                         <FileUp /> Export
