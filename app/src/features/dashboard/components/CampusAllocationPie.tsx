@@ -62,6 +62,23 @@ type ChartItem = {
     value: number;
 };
 
+function ChartTotal({
+    label,
+    value,
+}: {
+    label: string;
+    value: string | number;
+}) {
+    return (
+        <div className="mt-2 px-2 text-center text-xs leading-snug text-gray-600 sm:text-sm">
+            <div>{label}</div>
+            <div className="font-semibold text-gray-900 break-all">
+                {value}
+            </div>
+        </div>
+    );
+}
+
 function ScrollLegend({
     items,
     title = "Legend",
@@ -182,9 +199,6 @@ export default function CampusAndCollegeAllocationPie() {
     const collegeTotal = collegeChartData.reduce((a, b) => a + b.value, 0);
     const totalGender = genderChartData.reduce((sum, d) => sum + d.value, 0);
 
-    console.log(collegeChartData);
-    
-
     if (authLoading) return <CvSULoading />
     return (
         <section className="space-y-6">
@@ -241,43 +255,43 @@ export default function CampusAndCollegeAllocationPie() {
             {loadingGenderCounts ? (
                 <SectionLoading />
             ) : (
-                <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 overflow-hidden max-md:h-150">
+                <div className="flex h-[380px] flex-col overflow-hidden rounded-xl bg-slate-50 p-4 shadow-md max-md:h-auto">
                     <AppHeader label="Gender Distribution" />
 
-                    <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
-                        {/* Chart */}
-                        <div className="flex-1 min-w-0">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={genderChartData}
-                                        dataKey="value"
-                                        nameKey="name"
-                                        innerRadius="55%"
-                                        outerRadius="80%"
-                                        stroke="#fff"
-                                        strokeWidth={2}
-                                        isAnimationActive={false}
-                                    >
-                                        {genderChartData.map((_, i) => (
-                                            <Cell
-                                                key={i}
-                                                fill={SEX_COLORS[i % SEX_COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
+                    <div className="mt-2 flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
+                        <div className="flex min-w-0 flex-1 flex-col">
+                            <div className="h-[220px] flex-1 sm:h-[240px] md:min-h-0">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={genderChartData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius="55%"
+                                            outerRadius="80%"
+                                            stroke="#fff"
+                                            strokeWidth={2}
+                                            isAnimationActive={false}
+                                        >
+                                            {genderChartData.map((_, i) => (
+                                                <Cell
+                                                    key={i}
+                                                    fill={SEX_COLORS[i % SEX_COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
 
-                                    <Tooltip formatter={(v) => v} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                        <Tooltip formatter={(v) => v} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
 
-                            <p className="text-center text-sm text-gray-600 mt-2">
-                                Total:{" "}
-                                <span className="font-semibold">
-                                    {totalGender}
-                                </span>
-                            </p>
+                            <ChartTotal
+                                label="Total members"
+                                value={totalGender}
+                            />
                         </div>
+
                         {!isMobile && (
                             <ScrollLegend 
                                 items={genderChartData}
@@ -303,47 +317,47 @@ export default function CampusAndCollegeAllocationPie() {
             ) : (
                 <div className="grid grid-cols-1 gap-4 reveal">
                     {/* CAMPUS CARD */}
-                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 max-md:h-full">
+                    <div className="flex h-[380px] flex-col rounded-xl bg-slate-50 p-4 shadow-md max-md:h-auto">
                         <AppHeader label="Total Allocation per Campus" />
 
-                        <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
-                            {/* Chart area */}
-                            <div className="flex-1 min-w-0">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={campusChartData}
-                                            dataKey="value"
-                                            nameKey="name"
-                                            innerRadius="55%"
-                                            outerRadius="80%"
-                                            stroke="#fff"
-                                            strokeWidth={2}
-                                            isAnimationActive={false}
-                                        >
-                                            {campusChartData.map((_, i) => (
-                                                <Cell
-                                                    key={i}
-                                                    fill={GREEN_COLORS[i % GREEN_COLORS.length]}
-                                                />
-                                            ))}
-                                        </Pie>
+                        <div className="mt-2 flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
+                            <div className="flex min-w-0 flex-1 flex-col">
+                                <div className="h-[220px] flex-1 sm:h-[240px] md:min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={campusChartData}
+                                                dataKey="value"
+                                                nameKey="name"
+                                                innerRadius="55%"
+                                                outerRadius="80%"
+                                                stroke="#fff"
+                                                strokeWidth={2}
+                                                isAnimationActive={false}
+                                            >
+                                                {campusChartData.map((_, i) => (
+                                                    <Cell
+                                                        key={i}
+                                                        fill={GREEN_COLORS[i % GREEN_COLORS.length]}
+                                                    />
+                                                ))}
+                                            </Pie>
 
-                                        <Tooltip
-                                            formatter={(v) =>
-                                                typeof v === "number" ? peso(v) : v
-                                            }
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                            <Tooltip
+                                                formatter={(v) =>
+                                                    typeof v === "number" ? peso(v) : v
+                                                }
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
 
-                                <p className="text-center text-sm text-gray-600 mt-2">
-                                    Total:{" "}
-                                    <span className="font-semibold">
-                                        {peso(campusTotal)}
-                                    </span>
-                                </p>
+                                <ChartTotal
+                                    label="Total amount"
+                                    value={peso(campusTotal)}
+                                />
                             </div>
+
                             {!isMobile && (
                                 <ScrollLegend 
                                     items={campusChartData} 
@@ -358,57 +372,56 @@ export default function CampusAndCollegeAllocationPie() {
                     </div>
 
                     {/* COLLEGE CARD */}
-                    <div className="h-[380px] bg-slate-50 rounded-xl shadow-md p-4 max-md:h-fit">
+                    <div className="flex h-[380px] flex-col rounded-xl bg-slate-50 p-4 shadow-md max-md:h-auto">
                         <AppHeader label="Allocation per College" />
 
-                        <div className="flex flex-col md:flex-row gap-4 h-[320px] max-md:h-100">
-                            {/* Chart area */}
-                            <div className="flex-1 min-w-0 h-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={collegeChartData}
-                                            dataKey="value"
-                                            nameKey="name"
-                                            innerRadius="55%"
-                                            outerRadius="80%"
-                                            stroke="#fff"
-                                            strokeWidth={2}
-                                            isAnimationActive={false}
-                                        >
-                                            {collegeChartData.map((_, i) => (
-                                                <Cell
-                                                    key={i}
-                                                    fill={GREEN_COLORS[i % GREEN_COLORS.length]}
-                                                />
-                                            ))}
-                                        </Pie>
+                        <div className="mt-2 flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
+                            <div className="flex min-w-0 flex-1 flex-col">
+                                <div className="h-[220px] flex-1 sm:h-[240px] md:min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={collegeChartData}
+                                                dataKey="value"
+                                                nameKey="name"
+                                                innerRadius="55%"
+                                                outerRadius="80%"
+                                                stroke="#fff"
+                                                strokeWidth={2}
+                                                isAnimationActive={false}
+                                            >
+                                                {collegeChartData.map((_, i) => (
+                                                    <Cell
+                                                        key={i}
+                                                        fill={GREEN_COLORS[i % GREEN_COLORS.length]}
+                                                    />
+                                                ))}
+                                            </Pie>
 
-                                        <Tooltip
-                                            formatter={(v) =>
-                                                typeof v === "number" ? peso(v) : v
-                                            }
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                            <Tooltip
+                                                formatter={(v) =>
+                                                    typeof v === "number" ? peso(v) : v
+                                                }
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
 
-                                <p className="text-center text-sm text-gray-600 mt-2">
-                                    Total:{" "}
-                                    <span className="font-semibold">
-                                        {peso(collegeTotal)}
-                                    </span>
-                                </p>
+                                <ChartTotal
+                                    label="Total amount"
+                                    value={peso(collegeTotal)}
+                                />
                             </div> 
                             {!isMobile && (
                                 <ScrollLegend 
                                     items={collegeChartData} 
-                                    title="Campuses" 
+                                    title="Colleges" 
                                 />
                             )}
                         </div>
 
                         {isMobile && (
-                            <ScrollLegend items={collegeChartData} title="Campuses" />
+                            <ScrollLegend items={collegeChartData} title="Colleges" />
                         )}
                         
                     </div>

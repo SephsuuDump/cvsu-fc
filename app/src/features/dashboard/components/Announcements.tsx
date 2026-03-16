@@ -25,6 +25,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+type LikedUser = {
+    id: number;
+    name: string;
+};
+
+function normalizeUserName(name?: string) {
+    return (name ?? "").trim().replace(/\s+/g, " ");
+}
+
 export function Announcements({ claims, className }: {
     claims: Claim
     className?: string
@@ -34,7 +43,7 @@ export function Announcements({ claims, className }: {
     const [viewImage, setViewImage] = useState<string | undefined>();
     const [localLikes, setLocalLikes] = useState<Record<number, boolean>>({});
     const [localLikeCount, setLocalLikeCount] = useState<Record<number, number>>({});
-    const [localLikeUsers, setLocalLikeUsers] = useState<Record<number, { id: number; name: string }[]>>({});
+    const [localLikeUsers, setLocalLikeUsers] = useState<Record<number, LikedUser[]>>({});
     const [range, setRange] = useState<DateRange | undefined>();
 
     const getAnnouncements = useCallback(() => {
@@ -83,8 +92,8 @@ export function Announcements({ claims, className }: {
     }
 
     function shallowEqualUserList(
-        a: { id: number; name: string }[],
-        b: { id: number; name: string }[]
+        a: LikedUser[],
+        b: LikedUser[]
     ) {
         if (a.length !== b.length) return false;
         for (let i = 0; i < a.length; i++) {
@@ -94,8 +103,8 @@ export function Announcements({ claims, className }: {
     }
 
     function shallowEqualRecordUsers(
-        a: Record<number, { id: number; name: string }[]>,
-        b: Record<number, { id: number; name: string }[]>
+        a: Record<number, LikedUser[]>,
+        b: Record<number, LikedUser[]>
     ) {
         const aKeys = Object.keys(a);
         const bKeys = Object.keys(b);
@@ -115,14 +124,14 @@ export function Announcements({ claims, className }: {
 
         const likes: Record<number, boolean> = {};
         const counts: Record<number, number> = {};
-        const users: Record<number, { id: number; name: string }[]> = {};
+        const users: Record<number, LikedUser[]> = {};
 
         announcements.forEach((item) => {
             likes[item.id] = item.likes?.some((like) => like.id === claims.id) ?? false;
             counts[item.id] = item.likes_count ?? 0;
             users[item.id] = (item.likes ?? []).map((u) => ({
-            id: u.id,
-            name: `${u.name ?? ""} ${u.name ?? ""}`.trim() || u.name || "",
+                id: u.id,
+                name: normalizeUserName(u.name),
             }));
         });
 
@@ -161,7 +170,7 @@ export function Announcements({ claims, className }: {
 
     async function likeAnnouncement(id: number) {
         const wasLiked = localLikes[id] ?? false;
-        const currentUserName = `${claims.firstName} ${claims.lastName}`;
+        const currentUserName = normalizeUserName(`${claims.firstName} ${claims.lastName}`);
 
         setLocalLikeCount((prev) => ({
             ...prev,
@@ -177,7 +186,14 @@ export function Announcements({ claims, className }: {
             const list = prev[id] ?? [];
             return wasLiked
                 ? { ...prev, [id]: list.filter((u) => u.id !== claims.id) }
-                : { ...prev, [id]: [...list, { id: claims.id, name: currentUserName }] };
+                : {
+                    ...prev,
+                    [id]: list.some((u) => u.id === claims.id)
+                        ? list.map((u) => (
+                            u.id === claims.id ? { ...u, name: currentUserName } : u
+                        ))
+                        : [...list, { id: claims.id, name: currentUserName }],
+                };
         });
 
         try {
