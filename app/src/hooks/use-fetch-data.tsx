@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export function useFetchData<T>(
@@ -46,6 +46,6 @@ export function useFetchData<T>(
         };
     }, [page, size, JSON.stringify(deps)]);
 
-    const data = Array.isArray(items) ? items : [];
+    const data = useMemo(() => (Array.isArray(items) ? items : []), [items]);
     return { data, loading, error };
 }

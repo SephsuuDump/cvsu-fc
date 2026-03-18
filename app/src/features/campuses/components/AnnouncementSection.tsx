@@ -9,6 +9,11 @@ import { SectionLoading } from "@/components/ui/loader";
 import { Announcement } from "@/types/announcement";
 import { useState } from "react";
 
+function getCampusLabel(name?: string) {
+    if (!name) return "All Campuses";
+    return name.match(/University\s*-\s*(.+)/i)?.[1] ?? name;
+}
+
 export function AnnouncementsSection({ campusId }: {
     campusId: number
 }) {
@@ -31,6 +36,11 @@ export function AnnouncementsSection({ campusId }: {
                                 <div className="font-semibold">{ item.user?.first_name } { item.user?.last_name }</div>
                             </div>
                             <AnnouncementBadge label={ item.label } />
+                        </div>
+                        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-200 bg-linear-to-r from-emerald-50 to-white px-2.5 py-1 text-[10px] font-semibold text-darkgreen shadow-sm">
+                            <span className="truncate text-[9px] font-bold text-emerald-800/80 uppercase">
+                                {getCampusLabel(item.campus?.name)}
+                            </span>
                         </div>
                         <div className="text-sm">{ item.content }</div>
                         <Separator />

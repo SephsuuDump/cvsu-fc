@@ -13,6 +13,11 @@ import { DeleteEvent } from "./DeleteEvent";
 import { useAuth } from "@/hooks/use-auth";
 import { ModalLoader } from "@/components/ui/loader";
 
+function getCampusLabel(name?: string) {
+    if (!name) return "All Campuses";
+    return name.match(/University\s*-\s*(.+)/i)?.[1] ?? name;
+}
+
 export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
     today: string
     setSelectedDay: Dispatch<SetStateAction<string | undefined>>
@@ -75,7 +80,7 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                     <div className="h-[60vh] overflow-y-auto">
                         {events.map((item, i) => (
                             <div className="flex flex-col gap-2 bg-slate-100 rounded-md shadow-sm border-slate-300 my-2 p-4" key={i}>
-                                <div className="flex-center-y gap-1 mb-2">
+                                <div className="flex-center-y gap-1 mb-2 max-sm:mb-0">
                                     <CalendarDays className="w-4 h-4 text-darkgreen" />
                                     <div className="text-sm text-gray-700 font-semibold">{ formatEventRange(item.event_start, item.event_end) }</div>
                                     <AppRUDSelection 
@@ -88,6 +93,11 @@ export function ViewEventsDay({ today, setSelectedDay, events, setOpen }: {
                                         hideUpdate={ claims.id !== item.user?.id }
                                         hideDelete={ claims.id !== item.user?.id }
                                     />
+                                </div>
+                                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-200 bg-linear-to-r from-emerald-50 to-white px-2.5 py-1 text-[10px] font-semibold text-darkgreen shadow-sm">
+                                    <span className="truncate text-[9px] font-bold text-emerald-800/80 uppercase">
+                                        {getCampusLabel(item.campus?.name)}
+                                    </span>
                                 </div>
                                 <div className="font-semibold">{ item.title }</div>
                                 <div className="text-sm text-gray">{ item.description }</div>

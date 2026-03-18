@@ -1,10 +1,11 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import { MessageSidebar } from "./components/MessagesSidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Paperclip, File as FileIcon } from "lucide-react";
+import { Send, Paperclip, File as FileIcon, ChevronLeft, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MessagesService } from "@/services/messages.service";
@@ -22,6 +23,7 @@ export function MessagesPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -200,6 +202,30 @@ export function MessagesPage() {
       hour: "numeric",
       minute: "2-digit",
     });
+  };
+
+  const getConversationParticipants = (conversation: any) =>
+    Array.isArray(conversation?.participants)
+      ? conversation.participants.filter((participant: any) => participant.id !== claims.id)
+      : [];
+
+  const getParticipantName = (participant: any) =>
+    [participant?.first_name, participant?.last_name].filter(Boolean).join(" ").trim();
+
+  const getConversationTitle = (conversation: any) => {
+    const title = getConversationParticipants(conversation)
+      .map((participant: any) => getParticipantName(participant))
+      .filter(Boolean)
+      .join(", ");
+
+    return title || "Conversation";
+  };
+
+  const getConversationFallback = (conversation: any) => {
+    const primaryParticipant = getConversationParticipants(conversation)[0];
+    const initials = `${primaryParticipant?.first_name?.[0] ?? ""}${primaryParticipant?.last_name?.[0] ?? ""}`;
+
+    return initials || "FC";
   };
 
   const getAttachmentUrl = (f: any) => {
@@ -457,185 +483,217 @@ export function MessagesPage() {
 
   if (authLoading) return <CvSULoading />;
 
+  const conversationTitle = selectedConv ? getConversationTitle(selectedConv) : "Messages";
+  const showSidebar = !mobileThreadOpen;
+  const showConversation = mobileThreadOpen;
+
   return (
-    <section className="flex h-[95vh]">
+    <section className="flex h-full min-h-0 overflow-hidden rounded-md border border-slate-200 bg-white md:max-h-svh max-md:mt-13 max-md:h-[calc(100svh-3.75rem)] max-md:border-0 max-md:rounded-none">
       <MessageSidebar
-        className="w-80"
+        className={`${showSidebar ? "flex" : "hidden"} w-full md:flex md:w-80 md:min-w-80 md:max-w-80`}
         conversations={conversations}
         selectedConv={selectedConv}
         setSelectedConv={setSelectedConv}
         setShowModal={setShowModal}
+        onConversationSelect={() => setMobileThreadOpen(true)}
         claims={claims}
       />
 
-      <div className="relative w-full flex flex-col border-l bg-slate-50">
-        <div className="flex items-center gap-2 border-b bg-white px-4 py-3">
-          {selectedConv && (
+      <div className={`${showConversation ? "flex" : "hidden"} min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-50 md:flex md:border-l`}>
+          <div className="flex items-center gap-2 border-b bg-white px-3 py-3 md:px-4 max-md:px-0!">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-ml-2 md:hidden"
+              onClick={() => setMobileThreadOpen(false)}
+              aria-label="Back to conversations"
+            >
+              <ChevronLeft />
+            </Button>
+
+            {selectedConv ? (
+              <>
+                <AppAvatar fallback={getConversationFallback(selectedConv)} />
+                <span className="truncate font-bold">{conversationTitle}</span>
+              </>
+            ) : (
+              <span className="text-sm text-gray-500">Select a conversation to start messaging.</span>
+            )}
+          </div>
+
+          {selectedConv ? (
             <>
-              <AppAvatar fallback="JB" />
-              <span className="font-bold">
-                {selectedConv.participants
-                  .filter((participant: any) => participant.id !== claims.id)
-                  .map(
-                    (participant: any) =>
-                      `${participant.first_name} ${participant.last_name}`
-                  )
-                  .join(", ")}
-              </span>
-            </>
-          )}
-        </div>
-
-        <div
-          ref={containerRef}
-          id="messages-container"
-          className="flex-1 space-y-3 overflow-y-auto p-4 pb-28"
-        >
-          {messages.map((msg: any) => {
-            const isMine = msg.sender?.id === claims.id;
-            const hasText = Boolean(msg.message);
-
-            return (
               <div
-                key={msg.id}
-                className={`max-w-sm overflow-hidden rounded-lg ${
-                  isMine ? "ml-auto bg-darkgreen text-white" : "bg-gray-200"
-                }`}
+                ref={containerRef}
+                id="messages-container"
+                className="scrollbar-custom min-h-0 flex-1 space-y-3 overflow-y-auto p-3 md:p-4"
               >
-                {msg.attachments?.map((attachment: any, index: number) => {
-                  const fileUrl = getAttachmentUrl(attachment);
-                  const fileName = getAttachmentName(attachment);
-                  const isImage = isImageAttachment(attachment);
-
-                  if (!fileUrl) {
-                    return (
-                      <div key={index} className="px-3 py-2 text-sm opacity-80">
-                        <span className="inline-flex items-center gap-2">
-                          <FileIcon className="h-4 w-4" />
-                          {fileName}
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  return isImage ? (
-                    <img
-                      key={index}
-                      src={fileUrl}
-                      alt={fileName}
-                      className="max-h-[320px] w-full cursor-pointer object-contain bg-black"
-                      onClick={() => setPreviewImage(fileUrl)}
-                      onLoad={() => {
-                        if (shouldScrollRef.current) scrollToBottom();
-                      }}
-                    />
-                  ) : (
-                    <a
-                      key={index}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block px-3 py-2 text-sm underline"
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <FileIcon className="h-4 w-4" />
-                        {fileName}
-                      </span>
-                    </a>
-                  );
-                })}
-
-                {hasText && (
-                  <div className="whitespace-pre-wrap px-3 py-2 text-sm">
-                    {msg.message}
+                {messages.length === 0 && (
+                  <div className="flex h-full min-h-48 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white/60 px-4 text-center text-sm text-gray-500">
+                    No messages yet. Start the conversation when you&apos;re ready.
                   </div>
                 )}
 
-                <div className="px-3 py-1 text-right text-[10px] opacity-70">
-                  {getDisplayTime(msg)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                {messages.map((msg: any) => {
+                  const isMine = msg.sender?.id === claims.id;
+                  const hasText = Boolean(msg.message);
 
-        {files.length > 0 && (
-          <div className="flex gap-3 overflow-x-auto border-t bg-white p-2">
-            {files.map((file, index) => {
-              const isImage = file.type.startsWith("image");
-              const previewUrl = URL.createObjectURL(file);
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`w-fit max-w-[85%] max-w-full overflow-hidden rounded-lg shadow-sm md:max-w-sm ${
+                        isMine ? "ml-auto bg-darkgreen text-white" : "bg-gray-200"
+                      }`}
+                    >
+                      {msg.attachments?.map((attachment: any, index: number) => {
+                        const fileUrl = getAttachmentUrl(attachment);
+                        const fileName = getAttachmentName(attachment);
+                        const isImage = isImageAttachment(attachment);
 
-              return (
-                <div
-                  key={index}
-                  className="relative flex h-24 w-24 items-center justify-center rounded-md border bg-gray-100"
-                >
-                  {isImage ? (
-                    <img
-                      src={previewUrl}
-                      alt={file.name}
-                      className="h-full w-full cursor-pointer rounded-md object-cover"
-                      onClick={() => setPreviewImage(previewUrl)}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center px-1 text-center text-xs">
-                      <span className="text-2xl">
-                        <FileIcon />
-                      </span>
-                      <span className="w-full truncate">{file.name}</span>
+                        if (!fileUrl) {
+                          return (
+                            <div key={index} className="px-3 py-2 text-sm opacity-80">
+                              <span className="inline-flex items-center gap-2 break-all">
+                                <FileIcon className="h-4 w-4" />
+                                {fileName}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        return isImage ? (
+                          <img
+                            key={index}
+                            src={fileUrl}
+                            alt={fileName}
+                            className="max-h-[320px] w-full cursor-pointer object-contain bg-black"
+                            onClick={() => setPreviewImage(fileUrl)}
+                            onLoad={() => {
+                              if (shouldScrollRef.current) scrollToBottom();
+                            }}
+                          />
+                        ) : (
+                          <a
+                            key={index}
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block px-3 py-2 text-sm underline"
+                          >
+                            <span className="inline-flex items-center gap-2 break-all">
+                              <FileIcon className="h-4 w-4" />
+                              {fileName}
+                            </span>
+                          </a>
+                        );
+                      })}
+
+                      {hasText && (
+                        <div className="whitespace-pre-wrap break-words px-3 py-2 text-sm">
+                          {msg.message}
+                        </div>
+                      )}
+
+                      <div className="px-3 py-1 text-right text-[10px] opacity-70">
+                        {getDisplayTime(msg)}
+                      </div>
                     </div>
-                  )}
+                  );
+                })}
+              </div>
 
-                  <button
-                    onClick={() =>
-                      setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index))
-                    }
-                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs text-white"
-                  >
-                    x
-                  </button>
+              {files.length > 0 && (
+                <div className="shrink-0 flex gap-3 overflow-x-auto border-t bg-white p-2">
+                  {files.map((file, index) => {
+                    const isImage = file.type.startsWith("image");
+                    const previewUrl = URL.createObjectURL(file);
+
+                    return (
+                      <div
+                        key={index}
+                        className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-md border bg-gray-100 md:h-24 md:w-24"
+                      >
+                        {isImage ? (
+                          <img
+                            src={previewUrl}
+                            alt={file.name}
+                            className="h-full w-full cursor-pointer rounded-md object-cover"
+                            onClick={() => setPreviewImage(previewUrl)}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center px-1 text-center text-xs">
+                            <span className="text-2xl">
+                              <FileIcon />
+                            </span>
+                            <span className="w-full truncate">{file.name}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index))
+                          }
+                          className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs text-white"
+                        >
+                          x
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        )}
+              )}
 
-        <div className="absolute bottom-0 flex w-full items-center border-t bg-white px-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            hidden
-            onChange={(e) =>
-              setFiles(e.target.files ? Array.from(e.target.files) : [])
-            }
-          />
+              <div className="mt-auto shrink-0 flex w-full items-center gap-1.5 border-t bg-white px-2 py-2 md:px-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  hidden
+                  onChange={(e) =>
+                    setFiles(e.target.files ? Array.from(e.target.files) : [])
+                  }
+                />
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Paperclip />
-          </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Paperclip />
+                </Button>
 
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-              }
-            }}
-            className="flex-1 rounded-none border-0"
-            placeholder="Type your message here"
-          />
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  className="min-w-0 flex-1 border-0 shadow-none focus-visible:shadow-none"
+                  placeholder="Type your message here"
+                />
 
-          <Button onClick={sendMessage} className="!bg-darkgreen" size="sm">
-            <Send /> Send
-          </Button>
-        </div>
+                <Button
+                  onClick={sendMessage}
+                  className="!bg-darkgreen max-sm:size-9 max-sm:px-0"
+                  size="sm"
+                >
+                  <Send />
+                  <span className="hidden sm:inline">Send</span>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center text-gray-500">
+              <MessageSquare className="h-10 w-10 opacity-60" />
+              <div className="max-w-sm text-sm">
+                Choose a conversation from the sidebar to view messages and send replies.
+              </div>
+            </div>
+          )}
       </div>
 
       {previewImage && (
@@ -669,6 +727,7 @@ export function MessagesPage() {
           setOpen={setShowModal}
           setConversations={setConversations}
           setSelectedConv={setSelectedConv}
+          onConversationReady={() => setMobileThreadOpen(true)}
         />
       )}
     </section>

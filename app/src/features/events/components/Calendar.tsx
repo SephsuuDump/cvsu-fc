@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEventCounts } from "@/hooks/use-event-count";
 import { ViewEventsDay } from "./ViewEventsDay";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -10,15 +10,16 @@ import { CvSULoading } from "@/components/ui/loader";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateEvent } from "./CreateEvent";
 import { useAuth } from "@/hooks/use-auth";
-import { AppHeader } from "@/components/shared/AppHeader";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
 
-export function Calendar({ className }: {
+export function Calendar({ className, onEventsChange, onLoadingChange }: {
     className?: string;
+    onEventsChange?: (events: FCEvent[]) => void;
+    onLoadingChange?: (loading: boolean) => void;
 }) {
     const today = new Date();
     const { claims, loading: authLoading } = useAuth();
@@ -54,16 +55,19 @@ export function Calendar({ className }: {
     const emptyDays = Array.from({ length: firstDay });
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-    const fetchEventsFn =
-        claims?.role === "ADMIN"
-            ? EventService.getAllEvents                
-            : EventService.getEventsByCampus;          
-
     const { data: events, loading } = useFetchData<FCEvent>(
         EventService.getEventsByCampus,
         [currentMonth, currentYear, claims?.campus?.id, reload],     
         [claims.role === "ADMIN" ? 0 : claims?.campus?.id ?? 0, monthNames[currentMonth].toLowerCase(), currentYear, claims.role]
     );
+
+    useEffect(() => {
+        onEventsChange?.(events);
+    }, [events, onEventsChange]);
+
+    useEffect(() => {
+        onLoadingChange?.(loading || authLoading);
+    }, [loading, authLoading, onLoadingChange]);
 
     const eventCounts = useEventCounts(events, currentMonth, currentYear);
 
@@ -94,7 +98,7 @@ export function Calendar({ className }: {
                         {emptyDays.map((_, i) => (
                             <div key={`empty-${i}`} />
                         ))}
-                        {days.map((day, index) => {
+                        {days.map((day) => {
                             const isToday =
                                 day === today.getDate() &&
                                 currentMonth === today.getMonth() &&

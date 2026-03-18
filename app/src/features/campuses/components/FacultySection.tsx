@@ -90,7 +90,7 @@ export function FacultySection({ campusId }: {
                 </div>
             )}
             <div className="grid grid-cols-3 gap-2 max-md:grid-cols-2 max-sm:grid-cols-1">
-                {finalFilteredUsers.map((item, i) => {
+                {finalFilteredUsers.filter(i => i.role !== 'JOB ORDER').map((item, i) => {
                     const loggedUser = claims.id;
                     return (
                         <Fragment key={i}>

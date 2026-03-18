@@ -5,22 +5,22 @@ import { ModalTitle } from "@/components/shared/ModalTitle";
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
 } from "@/components/ui/dialog";
 import { ModalLoader } from "@/components/ui/loader";
 import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { updateField } from "@/lib/helper";
 import { UserService } from "@/services/user.service";
 import { User } from "@/types/user";
+import { Dispatch, SetStateAction } from "react";
+import { ConversationSummary } from "../types";
 
-export function CreateConversation({open, setOpen, setConversations, setSelectedConv}: {
+export function CreateConversation({open, setOpen, setConversations, setSelectedConv, onConversationReady}: {
     open: boolean;
     setOpen: (i: boolean) => void;
-    setConversations: any
-    setSelectedConv: any
+    setConversations: Dispatch<SetStateAction<ConversationSummary[]>>;
+    setSelectedConv: (conversation: ConversationSummary | null) => void;
+    onConversationReady?: () => void;
 }) {
     const { claims, loading: authLoading } = useAuth();
 
@@ -46,24 +46,25 @@ export function CreateConversation({open, setOpen, setConversations, setSelected
             },
             body: JSON.stringify({ receiver_id: userId }),
           }
-        ).then((r) => r.json());
+        ).then((r) => r.json() as Promise<{ conversation: ConversationSummary }>);
     
         const newConv = res.conversation;
     
-        setConversations((prev: any) => [newConv, ...prev]);
+        setConversations((prev) => [newConv, ...prev]);
         setSelectedConv(newConv);
+        onConversationReady?.();
         setOpen(false);
     };
 
     if (authLoading || loading) return <ModalLoader />
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="overflow-y-auto max-h-10/11">
+            <DialogContent className="max-h-10/11 w-[calc(100vw-1.5rem)] max-w-lg overflow-y-auto">
                 <ModalTitle label="Start a conversation" />
 
                 <div className="">
                     <AppInput 
-                        placeholder="Search for a faculy member"
+                        placeholder="Search for a faculty member"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                     />
@@ -72,14 +73,11 @@ export function CreateConversation({open, setOpen, setConversations, setSelected
                             No new users available
                         </div>
                     ) : (
-                        filteredUsers.map((u: any) => (
+                        filteredUsers.map((u: Partial<User>) => (
                             <button
                                 key={u.id}
                                 type="button"
-                                onClick={() => {
-                                    startConversation(u.id);
-                                    setOpen(false);
-                                }}
+                                onClick={() => startConversation(u.id)}
                                 className="w-full text-left p-4 border-b hover:bg-gray-100"
                             >
                                 <div className="font-semibold">

@@ -56,7 +56,7 @@ export function AppSidebar() {
     }
 
     if (!mounted) return null;
-    if (pathName === "/auth") return null;
+    if (pathName.startsWith("/auth")) return null;
 
     let route;
     if (!claims) return <AuthPage />;

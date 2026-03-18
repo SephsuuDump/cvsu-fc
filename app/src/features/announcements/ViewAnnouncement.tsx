@@ -59,7 +59,7 @@ export function ViewAnnouncementPage() {
 
                 <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
-                    <span>{data?.campus?.name}</span>
+                    <span>{data?.campus ? data.campus.name : "Cavite State University - All Campuses"}</span>
                 </div>
 
                 <div className="flex items-center gap-2">

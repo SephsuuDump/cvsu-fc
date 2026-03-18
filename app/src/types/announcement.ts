@@ -46,6 +46,11 @@ export type Announcement = {
         last_name: string;
         first_name: string;
         middle_name?: string; 
+        college?: {
+            id: number;
+            name: string;
+            abbreviations: string;
+        };
     }
 }
 

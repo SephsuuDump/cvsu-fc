@@ -25,8 +25,6 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { CreateAllocation } from "./components/CreateAllocation";
 import { CvSULoading, SectionLoading } from "@/components/ui/loader";
 import { useFetchOne } from "@/hooks/use-fetch-one";
-import { useSearchFilter } from "@/hooks/use-search-filter";
-import { match } from "assert";
 import { formatToPeso } from "@/lib/helper";
 import { useAuth } from "@/hooks/use-auth";
 import { AllocationExportMonthRange } from "./components/ExportDateRange";
@@ -39,13 +37,13 @@ const pastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 export default function AllocationPage() {
     const { claims, loading: authLoading } = useAuth();
 
-    if (authLoading) return <CvSULoading />
-
     const [refreshFilter, setRefreshFilter] = useState(false);
     const [reload, setReload] = useState(false);
     const [search, setSearch] = useState("");
     const [levelFilter, setLevelFilter] = useState<AllocationLevel | "ALL">("ALL");
-    const [selectedCampus, setSelectedCampus] = useState(claims ? claims.campus.id : 0);
+    const [selectedCampus, setSelectedCampus] = useState(
+        claims?.role === "ADMIN" ? 0 : claims?.campus?.id ?? 0
+    );
     const [selectedCollege, setSelectedCollege] = useState(0);
 
     const [selectedMonth, setSelectedMonth] = useState(
@@ -57,17 +55,25 @@ export default function AllocationPage() {
     const { data: colleges, loading: collegesLoading } = useFetchData<College>(CollegeService.getAllColleges, []);
     const { data: allocations, loading: allocationLoading } = useFetchData(
         AllocationService.getAllocations,
-        [refreshFilter, reload],
-        [selectedCampus, 0, selectedYear, selectedMonth]
+        [refreshFilter, reload, selectedCampus, selectedCollege, selectedYear, selectedMonth],
+        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
     )
     const { data: budget, loading: budgetLoading } = useFetchOne(
         AllocationService.getCollegeBudget,
-        [refreshFilter, reload],
-        [selectedCampus, 0, selectedYear, selectedMonth]
+        [refreshFilter, reload, selectedCampus, selectedCollege, selectedYear, selectedMonth],
+        [selectedCampus, selectedCollege, selectedYear, selectedMonth]
     )
     
     const { open, setOpen } = useCrudState();
     const { open: openExport, setOpen: setOpenExport } = useCrudState();
+
+    useEffect(() => {
+        if (authLoading || !claims?.role) return;
+
+        if (claims.role !== "ADMIN") {
+            setSelectedCampus(claims.campus.id);
+        }
+    }, [authLoading, claims?.role, claims?.campus?.id]);
 
     const filteredAllocations = useMemo(() => {
         if (!allocations) return [];
@@ -85,6 +91,8 @@ export default function AllocationPage() {
             return matchesSearch && matchesLevel;
         });
     }, [allocations, search, levelFilter]);
+
+    if (authLoading || !claims) return <CvSULoading />
 
     return (
         <section className="stack-md reveal max-md:mt-15 max-md:overflow-hidden">
@@ -181,12 +189,14 @@ export default function AllocationPage() {
                     </Button>
                 </div>
                 <div className="flex-center-y gap-2 max-md:my-2">
-                    <Button 
-                        onClick={ () => setOpenExport(true) }
-                        className="bg-slate-50 shadow-sm text-black" 
-                    >
-                        <FileUp /> Export
-                    </Button>
+                    {["ADMIN", "COORDINATOR", "MEMBER"].includes(claims.role) && (
+                        <Button 
+                            onClick={ () => setOpenExport(true) }
+                            className="bg-slate-50 shadow-sm text-black hover:bg-slate-300!" 
+                        >
+                            <FileUp /> Export
+                        </Button>
+                    )}
                     {["ADMIN", "COORDINATOR"].includes(claims.role) && (
                         <Button
                             onClick={ () => setOpen(true) }

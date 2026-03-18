@@ -38,7 +38,7 @@ export function CreateEvent({ setOpen, selectedDay, setReload }: {
     const { claims, loading: authLoading } = useAuth();
     const { data: campuses, loading: campusLoading } = useFetchData(CampusService.getAllCampus);
 
-    const visibilities = ['ALL', 'COORDINATOR', 'MEMBER', 'JOB OFFER'];
+    const visibilities = ['ALL', 'COORDINATOR', 'MEMBER', 'JOB ORDER'];
 
     const [onProcess, setProcess] = useState(false)
     const [event, setEvent] = useState<Partial<FCEvent>>({

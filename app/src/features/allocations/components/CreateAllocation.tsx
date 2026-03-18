@@ -1,10 +1,9 @@
-import { AppHeader } from "@/components/shared/AppHeader";
 import { AppInput } from "@/components/shared/AppInput";
 import { AppSelect } from "@/components/shared/AppSelect";
 import { AppTextarea } from "@/components/shared/AppTextare";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AddButton } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { ModalLoader } from "@/components/ui/loader";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { hasEmptyField, updateField } from "@/lib/helper";
@@ -29,7 +28,7 @@ export function CreateAllocation({ claims, setOpen, setReload, defaultCampus, de
         description: '',
         amount: 0,
         level: defaultCollege === 0 ? "CAMPUS" : defaultCollege !== 0 ? "COLLEGE" : claims.role === "ADMIN" ? "CAMPUS" : "COLLEGE",
-        campus_id: defaultCampus && defaultCampus !== 0 ? defaultCampus :claims.role !== "ADMIN" ? claims.campus.id : 1,
+        campus_id: defaultCampus && defaultCampus !== 0 ? defaultCampus :claims.role !== "ADMIN" ? claims.campus.id : 0,
         college_id: defaultCollege && defaultCollege !== 0 ? defaultCollege : claims.role !== "ADMIN" ? claims.college.id : null,
     })
 

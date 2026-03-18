@@ -203,9 +203,9 @@ export default function CampusAndCollegeAllocationPie() {
     return (
         <section className="space-y-6">
             {/* ===== FILTERS ===== */}
-            <div className="flex-center-y gap-2 max-sm:grid! max-md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2">
                 <Select value={selectedCampus} onValueChange={setSelectedCampus} disabled={ claims.role !== "ADMIN" }>
-                    <SelectTrigger className="rounded-full w-44 truncate disabled:text-gray max-sm:w-full">
+                    <SelectTrigger className="rounded-full w-full truncate disabled:text-gray">
                         <SelectValue placeholder="Select Campus" />
                     </SelectTrigger>
                     <SelectContent>
@@ -222,7 +222,7 @@ export default function CampusAndCollegeAllocationPie() {
                 </Select>
 
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                    <SelectTrigger className="w-40 rounded-full max-sm:w-full">
+                    <SelectTrigger className="w-full rounded-full">
                         <SelectValue placeholder="Month" />
                     </SelectTrigger>
                     <SelectContent>
@@ -233,7 +233,7 @@ export default function CampusAndCollegeAllocationPie() {
                 </Select>
 
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                    <SelectTrigger className="w-32 rounded-full max-sm:w-full">
+                    <SelectTrigger className="w-full rounded-full">
                         <SelectValue placeholder="Year" />
                     </SelectTrigger>
                     <SelectContent>

@@ -17,7 +17,7 @@ import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateAnnouncement } from "./UpdateAnnouncement";
 import { DeleteAnnouncement } from "./DeleteAnnouncement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { CalendarSearch, ThumbsUp } from "lucide-react";
+import { CalendarSearch, GraduationCap, MapPin, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { DateRange } from "react-day-picker";
@@ -32,6 +32,11 @@ type LikedUser = {
 
 function normalizeUserName(name?: string) {
     return (name ?? "").trim().replace(/\s+/g, " ");
+}
+
+function getCampusLabel(name?: string) {
+    if (!name) return "All Campuses";
+    return name.match(/University\s*-\s*(.+)/i)?.[1] ?? name;
 }
 
 export function Announcements({ claims, className }: {
@@ -233,7 +238,7 @@ export function Announcements({ claims, className }: {
                                     variant="secondary"
                                     className={`rounded-full bg-white shadow-sm gap-2 ${
                                         range?.from ? "border border-darkgreen text-darkgreen" : ""
-                                    }`}
+                                    } ${claims.role === "JOB ORDER" && "w-full"}`}
                                 >
                                     Filter <CalendarSearch className="h-4 w-4" />
                                 </Button>
@@ -266,18 +271,23 @@ export function Announcements({ claims, className }: {
                 <div>
                     {filteredAnnouncements.map((item) => (
                         <div className="flex flex-col gap-2 bg-slate-50 rounded-md shadow-sm border-slate-300 my-2 p-4" key={item.id}>
-                            <div className="flex">
-                                <div className="flex-center-y gap-2">
+                            <div className="flex items-start gap-3">
+                                <div className="min-w-0 flex flex-1 flex-wrap items-center gap-2">
                                     <AppAvatar fallback={ `${item.user!.first_name[0]}${item.user!.last_name[0]}` } />
                                     <div className="font-semibold">{ item.user!.first_name } { item.user!.last_name }</div>
+                                    <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-linear-to-r from-emerald-50 to-white px-2.5 py-1 text-[10px] font-semibold text-darkgreen shadow-sm">
+                                        <span className="truncate text-[9px] font-bold text-emerald-800/80 uppercase">
+                                            {getCampusLabel(item.campus?.name)}
+                                        </span>
+                                    </div>
                                 </div>
                                 <AnnouncementBadge 
                                     label={ item.label }
-                                    className="ms-auto mr-4"
+                                    className="ms-auto mt-0.5 mr-4 shrink-0"
                                 />
                                 <AppRUDSelection 
                                     item={ item }
-                                    className="hover:rounded-full hover:bg-slate-200"
+                                    className="shrink-0 hover:rounded-full hover:bg-slate-200"
                                     setView={ setView }
                                     setUpdate={ setUpdate  }
                                     setDelete={ setDelete }

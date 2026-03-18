@@ -205,7 +205,7 @@ export function ContributionPage() {
                     </Button>
                     <Button 
                         onClick={ () => setOpen(!open) }
-                        className="rounded-full bg-slate-50 shadow-sm text-black hover:bg-slate-100" 
+                        className="rounded-full bg-slate-50 shadow-sm text-black hover:bg-slate-300!" 
                         size="sm"
                     >
                         <FileUp /> Export

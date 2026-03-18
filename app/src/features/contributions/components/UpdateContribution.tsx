@@ -59,7 +59,7 @@ export function UpdateContribution({ toUpdate, setUpdate, setReload }: {
                     <div
                         className={`text-white text-center py-1 w-25 font-semibold tracking-wider ${!isPaid ? "bg-darkgreen" : "bg-yellow-700"}`}
                     >
-                        { !isPaid ? "PAID" : "PENDING"}
+                        { !isPaid ? "PAID" : "PENDING" }
                     </div>
                 </div>
                 <form   
