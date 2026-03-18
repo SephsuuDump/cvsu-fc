@@ -611,23 +611,30 @@ export function MessagesPage() {
                     return (
                       <div
                         key={index}
-                        className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-md border bg-gray-100 md:h-24 md:w-24"
+                        className="relative flex w-28 shrink-0 flex-col overflow-hidden rounded-md border bg-white shadow-sm md:w-32"
                       >
-                        {isImage ? (
-                          <img
-                            src={previewUrl}
-                            alt={file.name}
-                            className="h-full w-full cursor-pointer rounded-md object-cover"
-                            onClick={() => setPreviewImage(previewUrl)}
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center px-1 text-center text-xs">
-                            <span className="text-2xl">
-                              <FileIcon />
-                            </span>
-                            <span className="w-full truncate">{file.name}</span>
-                          </div>
-                        )}
+                        <div className="flex h-20 items-center justify-center bg-gray-100 md:h-24">
+                          {isImage ? (
+                            <img
+                              src={previewUrl}
+                              alt={file.name}
+                              className="h-full w-full cursor-pointer object-cover"
+                              onClick={() => setPreviewImage(previewUrl)}
+                            />
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center px-2 text-center text-xs text-gray-600">
+                              <span className="text-2xl">
+                                <FileIcon />
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 border-t bg-slate-50 px-2 py-1.5 text-xs text-gray-700">
+                          <span className="block truncate" title={file.name}>
+                            {file.name}
+                          </span>
+                        </div>
 
                         <button
                           type="button"

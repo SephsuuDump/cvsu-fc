@@ -90,6 +90,7 @@ export function AccountPage() {
                         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${user?.image_url}`}
                         className="w-28 h-28 border-4 border-white shadow-lg object-cover"
                         fallbackClassName="bg-green-900 text-3xl text-slate-50"
+                        fallback={`${user?.first_name[0].toUpperCase()}${user?.last_name[0].toUpperCase()}`}
                     />
 
                     <div 

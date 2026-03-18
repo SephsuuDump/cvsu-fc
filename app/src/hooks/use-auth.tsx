@@ -8,7 +8,7 @@ interface AuthContextType {
     loading: boolean;
 }
 
-const claimsInit = {
+const claimsInit: Claim = {
     campus: {
         id: 0,
         name: '',
@@ -25,6 +25,30 @@ const claimsInit = {
     role: ''
 }
 
+type RawClaims = Partial<Claim> & {
+    first_name?: string;
+    last_name?: string;
+    campus?: Partial<Claim["campus"]> | null;
+    college?: Partial<Claim["college"]> | null;
+};
+
+function normalizeClaims(raw?: RawClaims | null): Claim {
+    return {
+        ...claimsInit,
+        ...raw,
+        firstName: raw?.firstName ?? raw?.first_name ?? '',
+        lastName: raw?.lastName ?? raw?.last_name ?? '',
+        campus: {
+            ...claimsInit.campus,
+            ...(raw?.campus ?? {}),
+        },
+        college: {
+            ...claimsInit.college,
+            ...(raw?.college ?? {}),
+        },
+    };
+}
+
 type AuthProviderProps = React.PropsWithChildren<object>;
 
 const AuthContext = createContext<AuthContextType>({ claims: claimsInit, loading: true });
@@ -37,8 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const fetchClaims = async () => {
             try {
                 const response = await AuthService.getCookie();
-                setClaims(response);
-            } catch (error) {
+                setClaims(normalizeClaims(response));
+            } catch {
                 setClaims(claimsInit);
             } finally {
                 setLoading(false);

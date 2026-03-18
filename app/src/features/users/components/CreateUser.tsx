@@ -178,14 +178,14 @@ export function CreateUser({ setOpen, setReload, campusId }:  {
                             college_id: Number(value)
                         }))}
                     >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full truncate overflow-ellipsis">
                             <SelectValue placeholder="Select college" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="0">All Colleges</SelectItem>
                             {colleges.map((item, i) => (
                                 <SelectItem value={String(item.id)} key={i}>
-                                    { item.name } ({ item.abbreviations })
+                                    { item.abbreviations }
                                 </SelectItem>
                             ))}
                         </SelectContent>

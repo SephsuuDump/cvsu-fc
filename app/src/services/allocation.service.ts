@@ -15,7 +15,7 @@ export class AllocationService {
 
     static async getCollegeBudget(campusId: number, collegeId: number, year: string, month: string) {
         return await requestData(
-            `${BASE_URL}/budget/college-active?campus_id=${campusId}&college_id=${collegeId}&year=${year}&month=${month}`,
+            `${BASE_URL}/budget/college-active-history?campus_id=${campusId}&college_id=${collegeId}&year=${year}&month=${month}`,
             'GET',
             { "Accept": "application/json" }
         )

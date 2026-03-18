@@ -221,6 +221,7 @@ function DropdownFooter({
     handleLogout: () => void;
 }) {
     const isMobile = useIsMobile();
+    const avatarFallback = `${claims.firstName?.[0] ?? ""}${claims.lastName?.[0] ?? ""}`.toUpperCase() || "FC";
 
     return (
         <DropdownMenu open={open} onOpenChange={setShow}>
@@ -230,7 +231,7 @@ function DropdownFooter({
                         sidebarOpen ? "p-1.5" : "p-0"
                     }`}
                 >
-                    <AppAvatar fallback="FC" />
+                    <AppAvatar fallback={avatarFallback} />
                     <div>
                         <div className="font-semibold text-start">{claims.role}</div>
                         <div className="text-xs -mt-0.5 text-start">
@@ -249,7 +250,7 @@ function DropdownFooter({
                 className="w-56 bg-white border-darkgreen"
             >
                 <div className="flex-center-y gap-2 p-2">
-                    <AppAvatar fallback="FC" />
+                    <AppAvatar fallback={avatarFallback} />
                     <div>
                         <div className="font-semibold text-start">{claims.role}</div>
                         <div className="text-xs text-muted-foreground text-start">

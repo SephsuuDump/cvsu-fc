@@ -315,7 +315,7 @@ export function Announcements({ claims, className }: {
                                                 key={file.id}
                                                 href={`${FILE_URL}/${file.file_path}`}
                                                 download
-                                                className="flex items-center gap-1 text-sm text-darkgreen overflow-ellipsis hover:underline"
+                                                className="flex w-full items-center gap-1 text-sm text-darkgreen overflow-ellipsis hover:underline"
                                                 target="_blank"
                                             >
                                                 <svg
