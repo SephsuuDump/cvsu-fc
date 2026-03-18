@@ -9,7 +9,7 @@ export function updateField<T>(
     }));
 }
 
-export function hasEmptyField<T extends Record<string, any>>(
+export function hasEmptyField<T extends Record<string, unknown>>(
     obj: T,
     exemptKeys: (keyof T)[] = []
 ): boolean {
@@ -93,7 +93,13 @@ export function formatCustomDate(dateString: string): string {
     })} at ${formatTime(date)}`;
 }
 
-export const formatMessageDateTime = (messageDateTime: string): string => {
+export const formatMessageDateTime = (
+    messageDateTime?: string | null
+): string => {
+    if (!messageDateTime) {
+        return "";
+    }
+
     const now = new Date();
     let date: Date;
 
@@ -228,4 +234,3 @@ export function formatToPeso(amount: number): string {
         minimumFractionDigits: 2,
     }).format(amount);
 }
-

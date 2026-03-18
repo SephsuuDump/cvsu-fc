@@ -100,7 +100,7 @@ export function MessageSidebar({
                                 {/* <div className="-mt-0.5 truncate text-xs text-gray">{item.content || "No messages yet"}</div> */}
                             </div>
                             <div className="hidden shrink-0 text-[10px] text-gray-500 sm:block">
-                                {formatMessageDateTime(item.created_at)}
+                                {formatMessageDateTime(item.created_at ?? "")}
                             </div>
                         </button>
                     );
