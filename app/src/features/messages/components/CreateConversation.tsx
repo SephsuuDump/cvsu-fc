@@ -30,7 +30,7 @@ export function CreateConversation({open, setOpen, setConversations, setSelected
             [claims.role === "ADMIN" ? 0 : claims.campus.id, 0]
         );
     
-        const { search, setSearch, filteredItems: filteredUsers } = useSearchFilter<Partial<User>>(
+        const { search, setSearch, filteredItems: filteredUsers } = useSearchFilter<User>(
             users,
             ["first_name", "last_name"]
         );
@@ -73,7 +73,7 @@ export function CreateConversation({open, setOpen, setConversations, setSelected
                             No new users available
                         </div>
                     ) : (
-                        filteredUsers.map((u: Partial<User>) => (
+                        filteredUsers.map((u: User) => (
                             <button
                                 key={u.id}
                                 type="button"
