@@ -57,9 +57,9 @@ export function UpdateContribution({ toUpdate, setUpdate, setReload }: {
                     </div>
                     <ArrowBigRight className="scale-x-120 w-5 h-5" fill="#000" />
                     <div
-                        className={`text-white text-center py-1 w-25 font-semibold tracking-wider ${!isPaid ? "bg-darkgreen" : "bg-darkred"}`}
+                        className={`text-white text-center py-1 w-25 font-semibold tracking-wider ${!isPaid ? "bg-darkgreen" : "bg-yellow-700"}`}
                     >
-                        { !isPaid ? "PAID" : "UNPAID"}
+                        { !isPaid ? "PAID" : "PENDING"}
                     </div>
                 </div>
                 <form   

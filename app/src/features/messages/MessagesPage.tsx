@@ -4,12 +4,13 @@ import { AppAvatar } from "@/components/shared/AppAvatar";
 import { MessageSidebar } from "./components/MessagesSidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Paperclip, File } from "lucide-react";
+import { Send, Paperclip, File as FileIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MessagesService } from "@/services/messages.service";
 import { getEcho } from "@/lib/echo";
 import { CvSULoading } from "@/components/ui/loader";
+import { CreateConversation } from "./components/CreateConversation";
 
 export function MessagesPage() {
   const { claims, loading: authLoading } = useAuth();
@@ -20,30 +21,207 @@ export function MessagesPage() {
   const [input, setInput] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [showModal, setShowModal] = useState(false);
-
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const shouldScrollRef = useRef(false);
 
-  // ✅ helpers (ONLY for correct file/image detection + filename fallback)
-    const getAttachmentUrl = (f: any) => {
-    const u = f?.url;
+  const scrollToBottom = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  };
 
-    // keep optimistic local previews working
-    if (typeof u === "string" && (u.startsWith("blob:") || u.startsWith("data:"))) {
-      return u;
+  const resolveMessageDate = (message: any) => {
+    const candidates = [
+      message?.created_at,
+      message?.createdAt,
+      message?.sent_at,
+      message?.sentAt,
+      message?.timestamp,
+      message?.date,
+    ];
+
+    for (const candidate of candidates) {
+      if (!candidate) continue;
+
+      if (candidate instanceof Date && !Number.isNaN(candidate.getTime())) {
+        return candidate.toISOString();
+      }
+
+      if (typeof candidate === "number") {
+        const parsed = new Date(candidate);
+        if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+      }
+
+      if (typeof candidate === "string" && candidate.trim()) {
+        const parsed = new Date(candidate);
+        if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+      }
     }
 
-    // already absolute
-    if (typeof u === "string" && /^https?:\/\//i.test(u)) return u;
+    return null;
+  };
 
-    // relative path from backend ("/messages/xxx.pdf" OR "messages/xxx.pdf") OR file_path
+  const normalizeAttachments = (message: any, fallback?: any) => {
+    const source =
+      message?.attachments ??
+      message?.files ??
+      message?.file_attachments ??
+      fallback?.attachments ??
+      [];
+
+    return Array.isArray(source) ? source : [];
+  };
+
+  const normalizeMessage = (message: any, fallback?: any) => {
+    if (typeof message === "string" || typeof message === "number") {
+      return {
+        ...fallback,
+        id: fallback?.id ?? `temp-${Date.now()}`,
+        message: String(message),
+        sender: fallback?.sender ?? { id: claims.id },
+        created_at: resolveMessageDate(fallback) ?? new Date().toISOString(),
+        attachments: normalizeAttachments(fallback),
+        _optimistic: false,
+      };
+    }
+
+    if (!message && fallback) return fallback;
+
+    const normalizedSender =
+      message?.sender ??
+      message?.user ??
+      fallback?.sender ?? {
+        id:
+          message?.sender_id ??
+          message?.user_id ??
+          fallback?.sender?.id ??
+          claims.id,
+      };
+
+    return {
+      ...fallback,
+      ...message,
+      id: message?.id ?? message?.message_id ?? fallback?.id ?? `temp-${Date.now()}`,
+      message:
+        message?.message ??
+        message?.content ??
+        message?.body ??
+        message?.text ??
+        fallback?.message ??
+        null,
+      sender: normalizedSender,
+      created_at:
+        resolveMessageDate(message) ??
+        resolveMessageDate(fallback) ??
+        new Date().toISOString(),
+      attachments: normalizeAttachments(message, fallback),
+      _optimistic: message?._optimistic ?? false,
+    };
+  };
+
+  const extractMessagePayload = (payload: any) => {
+    if (!payload) return null;
+    if (typeof payload === "string" || typeof payload === "number") return payload;
+    if (typeof payload !== "object") return null;
+
+    if (payload.message && typeof payload.message === "object") return payload.message;
+    if (payload.data && typeof payload.data === "object") return payload.data;
+
+    return payload;
+  };
+
+  const hasRenderableContent = (message: any) => {
+    if (!message) return false;
+
+    const content =
+      typeof message === "string" || typeof message === "number"
+        ? String(message).trim()
+        : String(
+            message?.message ??
+              message?.content ??
+              message?.body ??
+              message?.text ??
+              ""
+          ).trim();
+
+    return Boolean(content) || normalizeAttachments(message).length > 0;
+  };
+
+  const isSameMessage = (left: any, right: any) => {
+    if (!left || !right) return false;
+
+    if (String(left.id) === String(right.id)) return true;
+
+    const leftSenderId = left?.sender?.id ?? left?.sender_id ?? left?.user_id;
+    const rightSenderId = right?.sender?.id ?? right?.sender_id ?? right?.user_id;
+
+    const leftDate = resolveMessageDate(left);
+    const rightDate = resolveMessageDate(right);
+
+    const sameSender = String(leftSenderId ?? "") === String(rightSenderId ?? "");
+    const sameBody = String(left?.message ?? "") === String(right?.message ?? "");
+    const sameAttachmentCount =
+      normalizeAttachments(left).length === normalizeAttachments(right).length;
+
+    if (!sameSender || !sameBody || !sameAttachmentCount) return false;
+    if (leftDate && rightDate && leftDate === rightDate) return true;
+
+    const leftTime = leftDate ? new Date(leftDate).getTime() : null;
+    const rightTime = rightDate ? new Date(rightDate).getTime() : null;
+    const hasTempMessage =
+      Boolean(left?._optimistic) ||
+      Boolean(right?._optimistic) ||
+      String(left?.id ?? "").startsWith("temp-") ||
+      String(right?.id ?? "").startsWith("temp-");
+
+    if (
+      hasTempMessage &&
+      leftTime !== null &&
+      rightTime !== null &&
+      Math.abs(leftTime - rightTime) <= 60_000
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const getDisplayTime = (message: any) => {
+    const resolved = resolveMessageDate(message);
+    if (!resolved) return "Just now";
+
+    const date = new Date(resolved);
+    if (Number.isNaN(date.getTime())) return "Just now";
+
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
+  const getAttachmentUrl = (f: any) => {
+    const directUrl = f?.url;
+
+    if (
+      typeof directUrl === "string" &&
+      (directUrl.startsWith("blob:") || directUrl.startsWith("data:"))
+    ) {
+      return directUrl;
+    }
+
+    if (typeof directUrl === "string" && /^https?:\/\//i.test(directUrl)) {
+      return directUrl;
+    }
+
     const path =
-      typeof u === "string" && u.length > 0
-        ? u
+      typeof directUrl === "string" && directUrl.length > 0
+        ? directUrl
         : typeof f?.file_path === "string"
-        ? f.file_path
-        : null;
+          ? f.file_path
+          : null;
 
     if (!path) return null;
 
@@ -79,10 +257,8 @@ export function MessagesPage() {
   };
 
   const isImageAttachment = (f: any) => {
-    // 1) backend provided explicit type
     if (String(f?.file_type || "").toLowerCase() === "image") return true;
 
-    // 2) mime fields from backend OR optimistic temp attachments
     const mime =
       f?.mime_type ||
       f?.file_mime_type ||
@@ -90,10 +266,10 @@ export function MessagesPage() {
       f?.type ||
       "";
 
-    if (typeof mime === "string" && mime.toLowerCase().startsWith("image/"))
+    if (typeof mime === "string" && mime.toLowerCase().startsWith("image/")) {
       return true;
+    }
 
-    // 3) fallback by extension (from name or url/path)
     const name = getAttachmentName(f);
     const url = getAttachmentUrl(f) || "";
     const probe = `${name} ${url}`.toLowerCase();
@@ -106,54 +282,76 @@ export function MessagesPage() {
 
     (async () => {
       const data = await MessagesService.getConversationsByUser(claims.id);
-      setConversations(data);
+      setConversations(data ?? []);
+      setSelectedConv(data?.[0] ?? null);
     })();
   }, [claims?.id]);
 
   useEffect(() => {
-    if (!selectedConv) return;
+    if (!selectedConv) {
+      setMessages([]);
+      return;
+    }
 
     (async () => {
       const data = await MessagesService.getMessagesByUser(selectedConv.id);
-      setMessages(data);
+      const messageList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.messages)
+          ? data.messages
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
 
-      setTimeout(() => {
-        const el = document.getElementById("messages-container");
-        if (el) el.scrollTop = el.scrollHeight;
-      }, 20);
+      shouldScrollRef.current = true;
+      setMessages(messageList.map((message: any) => normalizeMessage(message)));
     })();
   }, [selectedConv]);
 
+  useLayoutEffect(() => {
+    if (!shouldScrollRef.current) return;
+
+    requestAnimationFrame(() => {
+      scrollToBottom();
+      shouldScrollRef.current = false;
+    });
+  }, [selectedConv?.id, messages.length]);
+
   const sendMessage = async () => {
     if (!selectedConv) return;
-    if (!input.trim() && files.length === 0) return;
+
+    const messageText = input.trim();
+    const pendingFiles = [...files];
+
+    if (!messageText && pendingFiles.length === 0) return;
 
     const tempId = `temp-${Date.now()}`;
 
     const tempMessage = {
       id: tempId,
-      message: input || null,
+      message: messageText || null,
       sender: { id: claims.id },
       created_at: new Date().toISOString(),
-      attachments: files.map((f) => ({
-        file_name: f.name,
-        file_type: f.type.startsWith("image") ? "image" : "file",
+      attachments: pendingFiles.map((file) => ({
+        file_name: file.name,
+        file_type: file.type.startsWith("image") ? "image" : "file",
         file_path: null,
-        url: URL.createObjectURL(f),
-        file_size: f.size,
-        mime_type: f.type,
+        url: URL.createObjectURL(file),
+        file_size: file.size,
+        mime_type: file.type,
       })),
       _optimistic: true,
     };
 
+    shouldScrollRef.current = true;
     setMessages((prev) => [...prev, tempMessage]);
     setInput("");
     setFiles([]);
 
     const fd = new FormData();
-    fd.append("conversation_id", selectedConv.id);
-    if (input.trim()) fd.append("message", input);
-    files.forEach((f) => fd.append("files[]", f));
+    fd.append("conversation_id", String(selectedConv.id));
+    if (messageText) fd.append("message", messageText);
+    pendingFiles.forEach((file) => fd.append("files[]", file));
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages`, {
@@ -164,11 +362,37 @@ export function MessagesPage() {
         body: fd,
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(`Failed to send message: ${res.status}`);
+      }
 
-      setMessages((prev) => prev.map((m) => (m.id === tempId ? data.message : m)));
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      const serverPayload = extractMessagePayload(data);
+
+      if (serverPayload && (hasRenderableContent(serverPayload) || serverPayload?.id)) {
+        const normalizedResponse = normalizeMessage(serverPayload, {
+          ...tempMessage,
+          _optimistic: false,
+        });
+
+        setMessages((prev) =>
+          prev.map((message) => (message.id === tempId ? normalizedResponse : message))
+        );
+      } else {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === tempId ? { ...message, _optimistic: false } : message
+          )
+        );
+      }
     } catch {
-      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setMessages((prev) => prev.filter((message) => message.id !== tempId));
     }
   };
 
@@ -180,7 +404,6 @@ export function MessagesPage() {
     if (!echo) return;
 
     const channelName = `conversation.${convId}`;
-
     const echoChannel = echo.private(channelName);
 
     const pusher = (echo as any).connector?.pusher;
@@ -195,25 +418,30 @@ export function MessagesPage() {
     pusherChannel?.bind?.("pusher:subscription_error", onSubError);
 
     const onMessageSent = (payload: any) => {
-      console.log("MessageSent received", payload);
+      const incomingPayload = extractMessagePayload(payload);
+      if (!incomingPayload || !hasRenderableContent(incomingPayload)) return;
+
+      const incoming = normalizeMessage(incomingPayload);
+
+      shouldScrollRef.current = true;
 
       setMessages((prev) => {
-        const withoutOptimistic = prev.filter((m) => !m._optimistic);
-        const exists = withoutOptimistic.some(
-          (m) => String(m.id) === String(payload.id)
+        const exists = prev.some(
+          (message) => !message._optimistic && isSameMessage(message, incoming)
         );
-        if (exists) return withoutOptimistic;
 
-        return [...withoutOptimistic, payload];
+        const withoutMatchedPending = prev.filter(
+          (message) => !(message._optimistic && isSameMessage(message, incoming))
+        );
+
+        if (exists) return withoutMatchedPending;
+
+        return [...withoutMatchedPending, incoming];
       });
 
-      setTimeout(() => {
-        const el = document.getElementById("messages-container");
-        if (el) el.scrollTop = el.scrollHeight;
-      }, 20);
+      setTimeout(scrollToBottom, 20);
     };
 
-    // Support both default event name and custom broadcastAs(".MessageSent")
     echoChannel.listen("MessageSent", onMessageSent);
     echoChannel.listen(".MessageSent", onMessageSent);
 
@@ -224,8 +452,6 @@ export function MessagesPage() {
       echoChannel.stopListening("MessageSent");
       echoChannel.stopListening(".MessageSent");
       echo.leave(channelName);
-
-      console.log("left:", `private-${channelName}`);
     };
   }, [selectedConv?.id]);
 
@@ -242,23 +468,28 @@ export function MessagesPage() {
         claims={claims}
       />
 
-      <div className="relative w-full flex flex-col bg-slate-50 border-l">
-        <div className="flex items-center gap-2 px-4 py-3 bg-white border-b">
+      <div className="relative w-full flex flex-col border-l bg-slate-50">
+        <div className="flex items-center gap-2 border-b bg-white px-4 py-3">
           {selectedConv && (
             <>
               <AppAvatar fallback="JB" />
               <span className="font-bold">
                 {selectedConv.participants
-                  .filter((p: any) => p.id !== claims.id)
-                  .map((p: any) => `${p.first_name} ${p.last_name}`)}
+                  .filter((participant: any) => participant.id !== claims.id)
+                  .map(
+                    (participant: any) =>
+                      `${participant.first_name} ${participant.last_name}`
+                  )
+                  .join(", ")}
               </span>
             </>
           )}
         </div>
 
         <div
+          ref={containerRef}
           id="messages-container"
-          className="flex-1 overflow-y-auto p-4 space-y-3 pb-28"
+          className="flex-1 space-y-3 overflow-y-auto p-4 pb-28"
         >
           {messages.map((msg: any) => {
             const isMine = msg.sender?.id === claims.id;
@@ -267,55 +498,61 @@ export function MessagesPage() {
             return (
               <div
                 key={msg.id}
-                className={`max-w-sm rounded-lg overflow-hidden ${
+                className={`max-w-sm overflow-hidden rounded-lg ${
                   isMine ? "ml-auto bg-darkgreen text-white" : "bg-gray-200"
                 }`}
               >
-                {msg.attachments?.map((f: any, i: number) => {
-                  const fileUrl = getAttachmentUrl(f);
-                  const fileName = getAttachmentName(f);
-                  const isImg = isImageAttachment(f);
+                {msg.attachments?.map((attachment: any, index: number) => {
+                  const fileUrl = getAttachmentUrl(attachment);
+                  const fileName = getAttachmentName(attachment);
+                  const isImage = isImageAttachment(attachment);
 
                   if (!fileUrl) {
                     return (
-                      <div key={i} className="px-3 py-2 text-sm opacity-80">
+                      <div key={index} className="px-3 py-2 text-sm opacity-80">
                         <span className="inline-flex items-center gap-2">
-                          <File className="w-4 h-4" />
+                          <FileIcon className="h-4 w-4" />
                           {fileName}
                         </span>
                       </div>
                     );
                   }
 
-                  return isImg ? (
+                  return isImage ? (
                     <img
-                      key={i}
+                      key={index}
                       src={fileUrl}
                       alt={fileName}
-                      className="w-full max-h-[320px] object-contain bg-black cursor-pointer"
+                      className="max-h-[320px] w-full cursor-pointer object-contain bg-black"
                       onClick={() => setPreviewImage(fileUrl)}
+                      onLoad={() => {
+                        if (shouldScrollRef.current) scrollToBottom();
+                      }}
                     />
                   ) : (
                     <a
-                      key={i}
+                      key={index}
                       href={fileUrl}
                       target="_blank"
-                      className="block px-3 py-2 underline text-sm"
+                      rel="noreferrer"
+                      className="block px-3 py-2 text-sm underline"
                     >
                       <span className="inline-flex items-center gap-2">
-                        <File className="w-4 h-4" /> {fileName}
+                        <FileIcon className="h-4 w-4" />
+                        {fileName}
                       </span>
                     </a>
                   );
                 })}
 
                 {hasText && (
-                  <div className="px-3 py-2 text-sm whitespace-pre-wrap">
+                  <div className="whitespace-pre-wrap px-3 py-2 text-sm">
                     {msg.message}
                   </div>
                 )}
-                <div className="px-3 py-1 text-[10px] opacity-70 text-right">
-                  {new Date(msg.created_at).toLocaleTimeString()}
+
+                <div className="px-3 py-1 text-right text-[10px] opacity-70">
+                  {getDisplayTime(msg)}
                 </div>
               </div>
             );
@@ -323,39 +560,39 @@ export function MessagesPage() {
         </div>
 
         {files.length > 0 && (
-          <div className="flex gap-3 p-2 border-t bg-white overflow-x-auto">
-            {files.map((file, i) => {
+          <div className="flex gap-3 overflow-x-auto border-t bg-white p-2">
+            {files.map((file, index) => {
               const isImage = file.type.startsWith("image");
               const previewUrl = URL.createObjectURL(file);
 
               return (
                 <div
-                  key={i}
-                  className="relative w-24 h-24 border rounded-md bg-gray-100 flex items-center justify-center"
+                  key={index}
+                  className="relative flex h-24 w-24 items-center justify-center rounded-md border bg-gray-100"
                 >
                   {isImage ? (
                     <img
                       src={previewUrl}
                       alt={file.name}
-                      className="w-full h-full object-cover rounded-md cursor-pointer"
+                      className="h-full w-full cursor-pointer rounded-md object-cover"
                       onClick={() => setPreviewImage(previewUrl)}
                     />
                   ) : (
-                    <div className="flex flex-col items-center text-center text-xs px-1">
+                    <div className="flex flex-col items-center px-1 text-center text-xs">
                       <span className="text-2xl">
-                        <File />
+                        <FileIcon />
                       </span>
-                      <span className="truncate w-full">{file.name}</span>
+                      <span className="w-full truncate">{file.name}</span>
                     </div>
                   )}
 
                   <button
                     onClick={() =>
-                      setFiles((prev) => prev.filter((_, idx) => idx !== i))
+                      setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index))
                     }
-                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs text-white"
                   >
-                    ✕
+                    x
                   </button>
                 </div>
               );
@@ -363,7 +600,7 @@ export function MessagesPage() {
           </div>
         )}
 
-        <div className="absolute bottom-0 w-full flex items-center bg-white border-t px-2">
+        <div className="absolute bottom-0 flex w-full items-center border-t bg-white px-2">
           <input
             ref={fileInputRef}
             type="file"
@@ -385,7 +622,13 @@ export function MessagesPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="border-0 rounded-none flex-1"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
+            className="flex-1 rounded-none border-0"
             placeholder="Type your message here"
           />
 
@@ -397,27 +640,36 @@ export function MessagesPage() {
 
       {previewImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
           onClick={() => setPreviewImage(null)}
         >
           <div
-            className="relative max-w-[90vw] max-h-[90vh]"
+            className="relative max-h-[90vh] max-w-[90vw]"
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={previewImage}  
+              src={previewImage}
               alt="Preview"
-              className="max-w-full max-h-[90vh] object-contain rounded"
+              className="max-h-[90vh] max-w-full rounded object-contain"
             />
 
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute -top-3 -right-3 bg-white text-black rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold"
+              className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg font-bold text-black"
             >
-              ✕
+              x
             </button>
           </div>
         </div>
+      )}
+
+      {showModal && (
+        <CreateConversation
+          open={showModal}
+          setOpen={setShowModal}
+          setConversations={setConversations}
+          setSelectedConv={setSelectedConv}
+        />
       )}
     </section>
   );
